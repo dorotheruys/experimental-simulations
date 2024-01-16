@@ -44,14 +44,56 @@ def wind_off(na):
 
 def time_estimate(df):
     diff = lambda param, i: df[param][i] - df[param][i-1]
+    point_time_list = [0]
+    total_time_list = [0]
     for i in range(1, len(df)): # starting from the second datapoint
         AoA_diff = diff("AoA", i)
         elevator_diff = diff("Elevator", i)
         velocity_diff = diff("Tunnel velocity", i)
         propset_diff = diff("propeller setting", i)
-        point_time = AoA_diff * 2
-        print(point_time)
+        point_time = abs(AoA_diff) * 2 + 15
+        if velocity_diff != 0:
+            point_time += 60  # 60 seconds to change the speed
+        if elevator_diff != 0:
+            point_time += 12.5*60 + 3*60  # 12.5 min of downtime + 3 min to get going again
+        if propset_diff != 0:
+            point_time += 30
+        point_time_list.append(point_time)
+        total_time = np.sum(point_time_list)
+        total_time_list.append(total_time)
+    df["setpoint time"] = point_time_list
+    df["total time"] = total_time_list
+    # df["setpoint time"] *= 1/ 60
+    # df["total time"] *= 1/60
     return df
+
+import pandas as pd
+import numpy as np
+
+def time_estimate2(df):
+    # Calculate differences
+    AoA_diff = df["AoA"].diff().abs()
+    elevator_diff = df["Elevator"].diff().abs()
+    velocity_diff = df["Tunnel velocity"].diff().abs()
+    propset_diff = df["propeller setting"].diff().abs()
+
+    # Calculate point_time and total_time
+    point_time = AoA_diff * 2 + 15
+    point_time += (velocity_diff != 0) * 60
+    point_time += (elevator_diff != 0) * (12.5 * 60 + 3 * 60)
+    point_time += (propset_diff != 0) * 30
+    total_time = point_time.cumsum()
+
+    # Manually set the values for the first item
+    point_time.iloc[0] = 0  # or any value you want
+    total_time.iloc[0] = 0  # or any value you want
+
+    # Add new columns to the DataFrame
+    df["setpoint time"] = point_time
+    df["total time"] = total_time
+
+    return df
+
 
 
 
@@ -61,7 +103,7 @@ def time_estimate(df):
 # n_prop = [0, 1, 2]  # [rpm]
 
 n_angles = [-5, 7, 12, 14]  # [deg]
-n_elevator = [0]  # [deg]
+n_elevator = [0,15]  # [deg]
 n_windspeed = [40]  # [m/s]
 n_prop = [2]  # [rpm]
 
@@ -70,6 +112,7 @@ total_time = wind_on(n_angles, n_prop, n_windspeed, n_elevator) + wind_off(n_ang
 print('total time=', total_time, 'minutes')
 
 testmatrix = get_test_matrix()
-print(testmatrix)
-print("")
+
 print(time_estimate(testmatrix))
+print(time_estimate2(testmatrix))
+print(f"3 hours = {3*60*60} seconds")
