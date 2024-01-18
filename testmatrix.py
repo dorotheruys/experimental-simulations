@@ -15,6 +15,40 @@ def get_test_matrix(n_elevator, n_windspeed, n_prop, n_angles):
     mat = pd.DataFrame(mat, columns=['Elevator', 'Tunnel velocity', 'propeller setting', 'AoA'])
     return mat
 
+def randomize_testmatrix(df, AoA_and_propset=False, AoA_and_tunnelvelocity=False, all_variables=False):
+    # Check that only one boolean parameter is True
+    if sum([AoA_and_propset, AoA_and_tunnelvelocity, all_variables]) > 1:
+        raise ValueError("Only one of AoA_and_propset, AoA_and_tunnelvelocity, and all_variables can be True.")
+
+    elif AoA_and_propset:
+        # Group the DataFrame by elevator and tunnel velocity  # Thus randomizing AoA and propeller setting
+        grouped = df.groupby(["Elevator", "Tunnel velocity"], dropna=False)
+    elif AoA_and_tunnelvelocity:
+        # Group the DataFrame by elevator and propeller setting # Thus randomizing AoA and tunnel velocity
+        grouped = df.groupby(["Elevator", "propeller setting"], dropna=False)
+    elif all_variables:
+        # Group the DataFrame by elevator only # Thus randomizing AoA, tunnel velocity and propeller setting
+        grouped = df.groupby(["Elevator"], dropna=False)
+    else:
+        # Group the DataFrame by elevator, tunnel velocity and propeller setting #thus only randomizing AoA
+        grouped = df.groupby(["Elevator", "Tunnel velocity", "propeller setting"], dropna=False)
+
+    # Create a list to store the randomized smaller DataFrames
+    randomized_dfs = []
+
+    for i, (_, data) in enumerate(grouped):
+        # Randomize the order of rows in the smaller DataFrame. Using i makes sure the seed is different
+        randomized_data = data.sample(frac=1, random_state=i)
+        # Add the randomized DataFrame to the list
+        randomized_dfs.append(randomized_data)
+
+    # Concatenate the randomized DataFrames back into a single DataFrame
+    randomized_df = pd.concat(randomized_dfs)
+
+    # Reset the index of the DataFrame
+    randomized_df = randomized_df.reset_index(drop=True)
+    return randomized_df
+
 
 def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     # Calculate differences
@@ -51,43 +85,18 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     return df, total_time_final  # Returns dataframe and also final time (final time in seconds)
 
 
-def randomize_testmatrix(df, AoA_and_propset=False, AoA_and_tunnelvelocity=False, all_variables=False):
-    # Check that only one boolean parameter is True
-    if sum([AoA_and_propset, AoA_and_tunnelvelocity, all_variables]) > 1:
-        raise ValueError("Only one of AoA_and_propset, AoA_and_tunnelvelocity, and all_variables can be True.")
 
-    elif AoA_and_propset:
-        # Group the DataFrame by elevator and tunnel velocity  # Thus randomizing AoA and propeller setting
-        grouped = df.groupby(["Elevator", "Tunnel velocity"])
-    elif AoA_and_tunnelvelocity:
-        # Group the DataFrame by elevator and propeller setting # Thus randomizing AoA and tunnel velocity
-        grouped = df.groupby(["Elevator", "propeller setting"])
-    elif all_variables:
-        # Group the DataFrame by elevator only # Thus randomizing AoA, tunnel velocity and propeller setting
-        grouped = df.groupby(["Elevator"])
-    else:
-        # Group the DataFrame by elevator, tunnel velocity and propeller setting #thus only randomizing AoA
-        grouped = df.groupby(["Elevator", "Tunnel velocity", "propeller setting"])
+def convert_testmatrix_J_to_Hz(df):
+    # Define a lambda function to convert J to Hz using the formula V / (J * 0.2032)
+    # Add an exception for a specific value of J
+    propfreq_from_J_V = lambda J,V : V / (J * 0.2032)
 
-    # Create a list to store the randomized smaller DataFrames
-    randomized_dfs = []
+    # Apply the lambda function to the 'propeller setting' and 'Tunnel velocity' columns of the DataFrame
+    df["propeller setting"] = df.apply(lambda row: propfreq_from_J_V(row["propeller setting"], row["Tunnel velocity"]), axis=1)
 
-    for i, (_, data) in enumerate(grouped):
-        # Randomize the order of rows in the smaller DataFrame. Using i makes sure the seed is different
-        randomized_data = data.sample(frac=1, random_state=i)
-        # Add the randomized DataFrame to the list
-        randomized_dfs.append(randomized_data)
+    # Return the modified DataFrame
+    return df
 
-    # Concatenate the randomized DataFrames back into a single DataFrame
-    randomized_df = pd.concat(randomized_dfs)
-
-    # Reset the index of the DataFrame
-    randomized_df = randomized_df.reset_index(drop=False)
-    return randomized_df
-
-def propfreq_from_J_V(J, V):
-    D = 0.2032  # [m]
-    return V/(J*D)
 
 
 # Define times for component changes in seconds
@@ -102,23 +111,29 @@ dt_recalibrate = 15
 time_before_start = 15 * 60
 
 # Set ranges for variables
-n_angles = [-5, 7, 12, 14]  # [deg]
-n_elevator = [-15, 0 ,15]  # [deg]
-n_windspeed = [10, 20, 40]  # [m/s]
-n_prop = [0, 1, 2, 3]  # [rpm]
+AoA_values = [-5, 7, 12, 14]  # [deg]
+Elevator_values = [-15, 0,15]  # [deg]
+Tunnel_velocity_values = [10, 20, 40]  # [m/s]
+prop_J_values = [0, 1, 2, 3]  # [rpm]
 
 # # # Below is a smaller version to use when changing shit
-# n_angles = [-5, 8, 14]  # [deg]
-# n_elevator = [0,7,15]  # [deg]
-# n_windspeed = [1,10]  # [m/s]
-# n_prop = [20,1]  # [rpm]
+# AoA_values = [-4]  # [deg]
+# Elevator_values = [15]  # [deg]
+# Tunnel_velocity_values = [20, 40]  # [m/s]
+# prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
 
 use_randomized_testmatrix = True
 
 if __name__ == "__main__":
     # Generate the points
-    testmatrix_wind_on = get_test_matrix(n_elevator, n_windspeed, n_prop, n_angles)
-    testmatrix_wind_off = get_test_matrix([0], [0], [0], n_angles)
+    testmatrix_wind_on = get_test_matrix(Elevator_values, Tunnel_velocity_values, prop_J_values, AoA_values)
+    testmatrix_wind_off = get_test_matrix([0], [0], [0], AoA_values)
+    # print(testmatrix_wind_on)
+
+    # Go from Advance ratio J to rotational frequency
+    print(convert_testmatrix_J_to_Hz(testmatrix_wind_on))
+
+
 
     # Add randomization steps here: This allows us to check the effect of randomizing more stuff
     if use_randomized_testmatrix:
@@ -127,16 +142,18 @@ if __name__ == "__main__":
         # For the wind on stuff, options are available to add more randomization and to see how it impacts the matrix
         testmatrix_wind_on_random = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
                                                   AoA_and_tunnelvelocity=False, all_variables=False)
+        # Add time
         testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off_random,
                                                                                       time_before_start,
-                                                                                      abs(n_angles[0]) * dt_aoa_per_deg)
+                                                                                      abs(AoA_values[0]) * dt_aoa_per_deg)
         testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on_random,
                                                                                     total_time_wind_off,
                                                                                     dt_tunnel_startup)
     else:
+        # Add time
         testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
                                                                                       time_before_start,
-                                                                                      abs(n_angles[0]) * dt_aoa_per_deg)
+                                                                                      abs(AoA_values[0]) * dt_aoa_per_deg)
         testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
                                                                                     total_time_wind_off,
                                                                                     dt_tunnel_startup)
