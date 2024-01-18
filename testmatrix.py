@@ -15,6 +15,7 @@ def get_test_matrix(n_elevator, n_windspeed, n_prop, n_angles):
     mat = pd.DataFrame(mat, columns=['Elevator', 'Tunnel velocity', 'propeller setting', 'AoA'])
     return mat
 
+
 def randomize_testmatrix(df, AoA_and_propset=False, AoA_and_tunnelvelocity=False, all_variables=False):
     # Check that only one boolean parameter is True
     if sum([AoA_and_propset, AoA_and_tunnelvelocity, all_variables]) > 1:
@@ -55,7 +56,23 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     AoA_diff = df["AoA"].diff().abs()
     elevator_diff = df["Elevator"].diff().abs()
     velocity_diff = df["Tunnel velocity"].diff().abs()
-    propset_diff = df["propeller setting"].diff().abs()
+
+    def custom_diff(series):
+        diff = [0]  # Initialize the difference series
+        for i in range(1, len(series)):
+            if pd.isnull(series[i - 1]) and pd.isnull(series[i]):
+                # If both values are NaN, the difference is 0
+                diff.append(0)
+            elif pd.isnull(series[i - 1]) or pd.isnull(series[i]):
+                # If one of the values is NaN, the difference is nonzero (here we use np.nan to represent it)
+                diff.append(np.nan)
+            else:
+                # If neither value is NaN, calculate the actual difference
+                diff.append(abs(series[i] - series[i - 1]))
+        return pd.Series(diff)
+
+    # Use the custom function to calculate the difference
+    propset_diff = custom_diff(df["propeller setting"])
 
     # Initialize point_time with dt_sampling for all points
     point_time = pd.Series([first_setpoint_duration + dt_sampling] + [dt_sampling] * (len(df) - 1))
@@ -85,18 +102,18 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     return df, total_time_final  # Returns dataframe and also final time (final time in seconds)
 
 
-
 def convert_testmatrix_J_to_Hz(df):
+    # Check if inputs are valid
+    if (df["propeller setting"] == 0).any():
+        raise ValueError("Advance ratio cannot be 0")
     # Define a lambda function to convert J to Hz using the formula V / (J * 0.2032)
-    # Add an exception for a specific value of J
-    propfreq_from_J_V = lambda J,V : V / (J * 0.2032)
+    propfreq_from_J_V = lambda J, V: V / (J * 0.2032)
 
     # Apply the lambda function to the 'propeller setting' and 'Tunnel velocity' columns of the DataFrame
-    df["propeller setting"] = df.apply(lambda row: propfreq_from_J_V(row["propeller setting"], row["Tunnel velocity"]), axis=1)
+    df["propeller setting"] = df.apply(lambda row: propfreq_from_J_V(row["propeller setting"], row["Tunnel velocity"]),
+                                       axis=1)
 
-    # Return the modified DataFrame
     return df
-
 
 
 # Define times for component changes in seconds
@@ -112,14 +129,15 @@ time_before_start = 15 * 60
 
 # Set ranges for variables
 AoA_values = [-5, 7, 12, 14]  # [deg]
-Elevator_values = [-15, 0,15]  # [deg]
+Elevator_values = [-15, 0, 15]  # [deg]
 Tunnel_velocity_values = [10, 20, 40]  # [m/s]
-prop_J_values = [0, 1, 2, 3]  # [rpm]
+prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
+
 
 # # # Below is a smaller version to use when changing shit
-# AoA_values = [-4]  # [deg]
-# Elevator_values = [15]  # [deg]
-# Tunnel_velocity_values = [20, 40]  # [m/s]
+# AoA_values = [10, 0]  # [deg]
+# Elevator_values = [10]  # [deg]
+# Tunnel_velocity_values = [40]  # [m/s]
 # prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
 
 use_randomized_testmatrix = True
@@ -128,24 +146,20 @@ if __name__ == "__main__":
     # Generate the points
     testmatrix_wind_on = get_test_matrix(Elevator_values, Tunnel_velocity_values, prop_J_values, AoA_values)
     testmatrix_wind_off = get_test_matrix([0], [0], [0], AoA_values)
-    # print(testmatrix_wind_on)
-
-    # Go from Advance ratio J to rotational frequency
-    print(convert_testmatrix_J_to_Hz(testmatrix_wind_on))
-
-
 
     # Add randomization steps here: This allows us to check the effect of randomizing more stuff
     if use_randomized_testmatrix:
-        testmatrix_wind_off_random = randomize_testmatrix(testmatrix_wind_off)  # not giving boolean options as they are not relevant
+        testmatrix_wind_off_random = randomize_testmatrix(
+            testmatrix_wind_off)  # not giving boolean options as they are not relevant
 
         # For the wind on stuff, options are available to add more randomization and to see how it impacts the matrix
         testmatrix_wind_on_random = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
-                                                  AoA_and_tunnelvelocity=False, all_variables=False)
+                                                         AoA_and_tunnelvelocity=False, all_variables=False)
         # Add time
         testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off_random,
                                                                                       time_before_start,
-                                                                                      abs(AoA_values[0]) * dt_aoa_per_deg)
+                                                                                      abs(AoA_values[
+                                                                                              0]) * dt_aoa_per_deg)
         testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on_random,
                                                                                     total_time_wind_off,
                                                                                     dt_tunnel_startup)
@@ -153,14 +167,14 @@ if __name__ == "__main__":
         # Add time
         testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
                                                                                       time_before_start,
-                                                                                      abs(AoA_values[0]) * dt_aoa_per_deg)
+                                                                                      abs(AoA_values[
+                                                                                              0]) * dt_aoa_per_deg)
         testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
                                                                                     total_time_wind_off,
                                                                                     dt_tunnel_startup)
 
     print(f"Testmatrix for wind off measurements")
     print(testmatrix_wind_off_with_time)
-
     print(f"Testmatrix for wind on measurements")
     print(testmatrix_wind_on_with_time)
     print(f"Total expected time: {datetime.timedelta(seconds=int(total_time_wind_on))}")
