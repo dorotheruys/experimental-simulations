@@ -58,7 +58,7 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     point_time = pd.Series([first_setpoint_duration + dt_sampling] + [dt_sampling] * (len(df) - 1))
 
     # Add time for AoA_diff
-    point_time[1:] += AoA_diff[1:] * dt_aoa_per_deg +15
+    point_time[1:] += AoA_diff[1:] * dt_aoa_per_deg + 15
 
     # Add time for velocity_diff and propset_diff only if the corresponding value in elevator_diff is zero
     point_time[1:] += ((velocity_diff[1:] != 0) & (elevator_diff[1:] == 0)) * dt_freestream_flow
