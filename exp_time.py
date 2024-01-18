@@ -46,3 +46,35 @@ def wind_off(na):
 #15+5 for tunnel prep, 10 for trimming
 total_time=wind_on(na,n_p,nv,n_e)+ wind_off(na)+15+5+10
 print('total time=',total_time,'minutes')
+
+
+# Copies of old, redundant files from testmatrix.py
+# calculates time for wind on
+def wind_on(na, n_p, nv, n_e):
+    a = len(na)
+    b = len(n_p)
+    c = len(nv)
+    d = len(n_e)
+    prop_onoff = 15 * 60
+    c_ele = 15 * 60
+    c_tunnel_v = 2 * 60
+    c_alpha = 25
+    t_samp = 7  # sampling time per point
+    c_prop_set = 30
+    set1 = a * c_alpha * b + b * c_prop_set
+    set2 = set1 * c + c * c_tunnel_v
+    set3 = set2 * d + d * c_ele
+    sampling_time = a * b * c * d * t_samp
+    return (set3 + sampling_time) / 60  # return time in minutes
+
+
+def wind_off(na):
+    a = len(na)
+    prop_onoff = 15 * 60
+    c_ele = 15 * 60
+    c_tunnel_v = 2 * 60
+    c_alpha = a * 2 + 20
+    t_samp = 10
+    prop_set = 30
+
+    return (a * (c_alpha - 1) + prop_onoff) / 60  # return time in minutes
