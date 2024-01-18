@@ -82,35 +82,52 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     return df, total_time_final  # Returns dataframe and also final time (final time in seconds)
 
 
-def randomize_AoA(df, AoA_and_propset=False, AoA_and_tunnelvelocity=False, all_variables=False):
+def randomize_testmatrix(df, AoA_and_propset=False, AoA_and_tunnelvelocity=False, all_variables=False):
     # Check that only one boolean parameter is True
     if sum([AoA_and_propset, AoA_and_tunnelvelocity, all_variables]) > 1:
         raise ValueError("Only one of AoA_and_propset, AoA_and_tunnelvelocity, and all_variables can be True.")
 
     elif AoA_and_propset:
-        df = df.sort_values(['Elevator', 'Tunnel velocity', 'propeller setting']).groupby(
-            ['Elevator', 'Tunnel velocity'], sort=False).apply(lambda x: x.sample(frac=1, random_state=1)).reset_index(
-            drop=True)
+        # Group the DataFrame by elevator and tunnel velocity  # Thus randomizing AoA and propeller setting
+        grouped = df.groupby(["Elevator", "Tunnel velocity"])
     elif AoA_and_tunnelvelocity:
-        df = df.sort_values(['Elevator', 'Tunnel velocity', 'propeller setting']).groupby(
-            ['Elevator', 'propeller setting'], sort=False).apply(
-            lambda x: x.sample(frac=1, random_state=2)).reset_index(drop=True)
+        # Group the DataFrame by elevator and propeller setting # Thus randomizing AoA and tunnel velocity
+        grouped = df.groupby(["Elevator", "propeller setting"])
     elif all_variables:
-        df = df.sort_values(['Elevator', 'Tunnel velocity', 'propeller setting']).groupby(['Elevator'],
-                                                                                          sort=False).apply(
-            lambda x: x.sample(frac=1, random_state=3)).reset_index(drop=True)
+        # Group the DataFrame by elevator only # Thus randomizing AoA, tunnel velocity and propeller setting
+        grouped = df.groupby(["Elevator"])
     else:
-        df = df.sort_values(['Elevator', 'Tunnel velocity', 'propeller setting']).groupby(
-            ['Elevator', 'Tunnel velocity', 'propeller setting'], sort=False).apply(
-            lambda x: x.sample(frac=1, random_state=4)).reset_index(drop=True)
-    return df
+        # Group the DataFrame by elevator, tunnel velocity and propeller setting #thus only randomizing AoA
+        grouped = df.groupby(["Elevator", "Tunnel velocity", "propeller setting"])
+
+    # Create a list to store the randomized smaller DataFrames
+    randomized_dfs = []
+
+    for i, (_, data) in enumerate(grouped):
+        # Randomize the order of rows in the smaller DataFrame
+        randomized_data = data.sample(frac=1, random_state=i)
+        # Add the randomized DataFrame to the list
+        randomized_dfs.append(randomized_data)
+
+    # Concatenate the randomized DataFrames back into a single DataFrame
+    randomized_df = pd.concat(randomized_dfs)
+
+    # Reset the index of the DataFrame
+    randomized_df = randomized_df.reset_index(drop=False)
+    return randomized_df
+
+
+
+def propfreq_from_J_V(J, V):
+    D = 0.2032  # [m]
+    return V/(J*D)
 
 
 # Define times for component changes in seconds
 dt_aoa_per_deg = 2
 dt_tunnel_startup = 3 * 60
 dt_freestream_flow = 1 * 60
-dt_sampling = 10
+dt_sampling = 15
 dt_elevator_adjust = 12.5 * 60
 dt_propset = 30
 dt_recalibrate = 15
@@ -123,11 +140,11 @@ n_elevator = [-15, 0 ,15]  # [deg]
 n_windspeed = [10, 20, 40]  # [m/s]
 n_prop = [0, 1, 2, 3]  # [rpm]
 
-# # Below is a smaller version to use when changing shit
-# n_angles = [-5, 14]  # [deg]
-# n_elevator = [0,15]  # [deg]
-# n_windspeed = [40, 60]  # [m/s]
-# n_prop = [2, 10]  # [rpm]
+# # # Below is a smaller version to use when changing shit
+# n_angles = [-5, 8, 14]  # [deg]
+# n_elevator = [0,7,15]  # [deg]
+# n_windspeed = [1,10]  # [m/s]
+# n_prop = [20,1]  # [rpm]
 
 # 15+5 for tunnel prep, 10 for trimming  # Yeah so this is outdated BS ~ Koen
 
@@ -143,14 +160,15 @@ if __name__ == "__main__":
     testmatrix_wind_off = get_test_matrix([0], [0], [0], n_angles)
     # print("Test matrices before time calc")
     # print(testmatrix_wind_on)
+    #
+    # print(randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False, AoA_and_tunnelvelocity=False, all_variables=True))
 
     # Add randomization steps here: This allows us to check the effect of randomizing more stuff
     if use_randomized_testmatrix:
-        testmatrix_wind_off_random = randomize_AoA(
-            testmatrix_wind_off)  # not giving boolean options as they are not relevant
+        testmatrix_wind_off_random = randomize_testmatrix(testmatrix_wind_off)  # not giving boolean options as they are not relevant
 
         # For the wind on stuff, options are available to add more randomization and to see how it impacts the matrix
-        testmatrix_wind_on_random = randomize_AoA(testmatrix_wind_on, AoA_and_propset=False,
+        testmatrix_wind_on_random = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
                                                   AoA_and_tunnelvelocity=False, all_variables=False)
         testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off_random,
                                                                                       time_before_start,
