@@ -116,6 +116,26 @@ def convert_testmatrix_J_to_Hz(df):
     return df
 
 
+def export_excel(df):
+    # Please don't touch this function. Git and Excel are a bit of an unpleasant combination and this function is here to make sure you really need to make that excel sheet, and can't just accidentally make it
+    print()
+    print("Are you 100% certain you want to actually generate a new Excel sheet?")
+    response = input("Type \'yes\' if you want to proceed")
+    if response == "yes":
+        print("Don't forget to deal correctly with this excel sheet in context of GitHub")
+        print("As in, don't add it to GitHub unless you have a very good reason")
+        response_2 = input("Do you understand that message?")
+        if response_2 == "yes":
+            print("Okay, your call ¯\_(ツ)_/¯")
+            df.to_excel("Testmatrix.xlsx", index=False)
+            print("Excel sheet generated")
+    else:
+        print("You chose wisely")
+        print("No Excel sheet generated")
+    print(
+        "One final note: If the Excel sheet is added to github, pleas always change the name after making changes, otherwise we'll override once we rerun this program.")
+
+
 # Define times for component changes in seconds
 dt_aoa_per_deg = 2
 dt_tunnel_startup = 3 * 60
@@ -127,12 +147,13 @@ dt_recalibrate = 15
 
 time_before_start = 15 * 60
 
+time_between_wind_off_and_on = 3 * 60  # feels like we should have some time before we get going, just for contingency
+
 # Set ranges for variables
 AoA_values = [-5, 7, 12, 14]  # [deg]
 Elevator_values = [-15, 0, 15]  # [deg]
 Tunnel_velocity_values = [10, 20, 40]  # [m/s]
 prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
-
 
 # # # Below is a smaller version to use when changing shit
 # AoA_values = [10, 0]  # [deg]
@@ -141,6 +162,7 @@ prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
 # prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
 
 use_randomized_testmatrix = True
+generate_excel_sheet = False  # No need to make this true unless you have a good reason
 
 if __name__ == "__main__":
     # Generate the points
@@ -161,7 +183,7 @@ if __name__ == "__main__":
                                                                                       abs(AoA_values[
                                                                                               0]) * dt_aoa_per_deg)
         testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on_random,
-                                                                                    total_time_wind_off,
+                                                                                    total_time_wind_off + time_between_wind_off_and_on,
                                                                                     dt_tunnel_startup)
     else:
         # Add time
@@ -178,3 +200,7 @@ if __name__ == "__main__":
     print(f"Testmatrix for wind on measurements")
     print(testmatrix_wind_on_with_time)
     print(f"Total expected time: {datetime.timedelta(seconds=int(total_time_wind_on))}")
+
+    if generate_excel_sheet:
+        combined_matrices = pd.concat([testmatrix_wind_off_with_time, testmatrix_wind_on_with_time], ignore_index=True)
+        export_excel(combined_matrices)
