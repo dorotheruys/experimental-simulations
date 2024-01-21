@@ -139,15 +139,35 @@ def export_excel(df):
         "One final note: If the Excel sheet is added to github, pleas always change the name after making changes, otherwise we'll override once we rerun this program.")
 
 
-def reorder_blocks(df, elevator_order):
+def reorder_blocks(df, elevator_order, velocity_order):
     # Create a dictionary mapping elevator values to DataFrames
     df_dict = {elevator: df[df['Elevator'] == elevator] for elevator in df['Elevator'].unique()}
 
-    # Reorder the DataFrames according to elevator_order and concatenate
-    reordered_df = pd.concat([df_dict[elevator] for elevator in elevator_order])
+    # Create a new list to store the reordered DataFrames
+    reordered_dfs = []
+
+    # Iterate over the elevator_order
+    for elevator in elevator_order:
+        # Get the DataFrame for the current elevator
+        df_elevator = df_dict[elevator]
+
+        # Create a dictionary mapping tunnel velocity values to DataFrames for the current elevator
+        df_velocity_dict = {velocity: df_elevator[df_elevator['Tunnel velocity'] == velocity] for velocity in
+                            df_elevator['Tunnel velocity'].unique()}
+
+        # Reorder the DataFrames according to velocity_order and concatenate
+        df_elevator_reordered = pd.concat(
+            [df_velocity_dict[velocity] for velocity in velocity_order if velocity in df_velocity_dict])
+
+        # Add the reordered DataFrame to the list
+        reordered_dfs.append(df_elevator_reordered)
+
+    # Concatenate the reordered DataFrames
+    reordered_df = pd.concat(reordered_dfs)
 
     # Reset index
     reordered_df = reordered_df.reset_index(drop=True)
+
     return reordered_df
 
 
@@ -167,13 +187,13 @@ time_between_wind_off_and_on = 3 * 60  # feels like we should have some time bef
 # Set ranges for variables
 AoA_values = [-5, 7, 12, 14]  # [deg]
 Elevator_values = [-15, 15, 0]  # [deg]
-Tunnel_velocity_values = [10, 20, 40]  # [m/s]
+Tunnel_velocity_values = [40, 20, 10]  # [m/s]
 prop_J_values = [1.25, 1.9, np.nan, 3]  # [rpm]
 
 # # # Below is a smaller version to use when changing shit
-# AoA_values = [10, 0]  # [deg]
-# Elevator_values = [-15,10, 0]  # [deg]
-# Tunnel_velocity_values = [40]  # [m/s]
+# AoA_values = [0]  # [deg]
+# Elevator_values = [10, 0]  # [deg]
+# Tunnel_velocity_values = [40,20,10]  # [m/s]
 # prop_J_values = [1.25]  # [rpm]
 
 use_randomized_testmatrix = True
@@ -193,7 +213,7 @@ if __name__ == "__main__":
         testmatrix_wind_on = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
                                                   AoA_and_tunnelvelocity=False, all_variables=False)
 
-    testmatrix_wind_on = reorder_blocks(testmatrix_wind_on, Elevator_values)
+    testmatrix_wind_on = reorder_blocks(testmatrix_wind_on, Elevator_values, Tunnel_velocity_values)
 
     # Add time
     testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
