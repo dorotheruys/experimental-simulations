@@ -139,6 +139,18 @@ def export_excel(df):
         "One final note: If the Excel sheet is added to github, pleas always change the name after making changes, otherwise we'll override once we rerun this program.")
 
 
+def reorder_blocks(df, elevator_order):
+    # Create a dictionary mapping elevator values to DataFrames
+    df_dict = {elevator: df[df['Elevator'] == elevator] for elevator in df['Elevator'].unique()}
+
+    # Reorder the DataFrames according to elevator_order and concatenate
+    reordered_df = pd.concat([df_dict[elevator] for elevator in elevator_order])
+
+    # Reset index
+    reordered_df = reordered_df.reset_index(drop=True)
+    return reordered_df
+
+
 # Define times for component changes in seconds
 dt_aoa_per_deg = 2
 dt_tunnel_startup = 3 * 60
@@ -154,18 +166,18 @@ time_between_wind_off_and_on = 3 * 60  # feels like we should have some time bef
 
 # Set ranges for variables
 AoA_values = [-5, 7, 12, 14]  # [deg]
-Elevator_values = [-15, 0, 15]  # [deg]
+Elevator_values = [-15, 15, 0]  # [deg]
 Tunnel_velocity_values = [10, 20, 40]  # [m/s]
 prop_J_values = [1.25, 1.9, np.nan, 3]  # [rpm]
 
 # # # Below is a smaller version to use when changing shit
 # AoA_values = [10, 0]  # [deg]
-# Elevator_values = [10]  # [deg]
+# Elevator_values = [-15,10, 0]  # [deg]
 # Tunnel_velocity_values = [40]  # [m/s]
-# prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
+# prop_J_values = [1.25]  # [rpm]
 
 use_randomized_testmatrix = True
-generate_excel_sheet = True  # No need to make this true unless you have a good reason
+generate_excel_sheet = False  # No need to make this true unless you have a good reason
 
 if __name__ == "__main__":
     # Generate the points
@@ -179,8 +191,9 @@ if __name__ == "__main__":
 
         # For the wind on stuff, options are available to add more randomization and to see how it impacts the matrix
         testmatrix_wind_on = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
-                                                         AoA_and_tunnelvelocity=False, all_variables=False)
+                                                  AoA_and_tunnelvelocity=False, all_variables=False)
 
+    testmatrix_wind_on = reorder_blocks(testmatrix_wind_on, Elevator_values)
 
     # Add time
     testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
