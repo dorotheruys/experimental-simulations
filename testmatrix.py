@@ -129,6 +129,9 @@ def export_excel(df):
             print("Okay, your call ¯\_(ツ)_/¯")
             df.to_excel("Testmatrix.xlsx", index=False)
             print("Excel sheet generated")
+        else:
+            print("You chose wisely")
+            print("No Excel sheet generated")
     else:
         print("You chose wisely")
         print("No Excel sheet generated")
@@ -153,7 +156,7 @@ time_between_wind_off_and_on = 3 * 60  # feels like we should have some time bef
 AoA_values = [-5, 7, 12, 14]  # [deg]
 Elevator_values = [-15, 0, 15]  # [deg]
 Tunnel_velocity_values = [10, 20, 40]  # [m/s]
-prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
+prop_J_values = [1.25, 1.9, np.nan, 3]  # [rpm]
 
 # # # Below is a smaller version to use when changing shit
 # AoA_values = [10, 0]  # [deg]
@@ -162,7 +165,7 @@ prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
 # prop_J_values = [1.25, 2.25, np.nan, 4]  # [rpm]
 
 use_randomized_testmatrix = True
-generate_excel_sheet = False  # No need to make this true unless you have a good reason
+generate_excel_sheet = True  # No need to make this true unless you have a good reason
 
 if __name__ == "__main__":
     # Generate the points
@@ -171,29 +174,25 @@ if __name__ == "__main__":
 
     # Add randomization steps here: This allows us to check the effect of randomizing more stuff
     if use_randomized_testmatrix:
-        testmatrix_wind_off_random = randomize_testmatrix(
+        testmatrix_wind_off = randomize_testmatrix(
             testmatrix_wind_off)  # not giving boolean options as they are not relevant
 
         # For the wind on stuff, options are available to add more randomization and to see how it impacts the matrix
-        testmatrix_wind_on_random = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
+        testmatrix_wind_on = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
                                                          AoA_and_tunnelvelocity=False, all_variables=False)
-        # Add time
-        testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off_random,
-                                                                                      time_before_start,
-                                                                                      abs(AoA_values[
-                                                                                              0]) * dt_aoa_per_deg)
-        testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on_random,
-                                                                                    total_time_wind_off + time_between_wind_off_and_on,
-                                                                                    dt_tunnel_startup)
-    else:
-        # Add time
-        testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
-                                                                                      time_before_start,
-                                                                                      abs(AoA_values[
-                                                                                              0]) * dt_aoa_per_deg)
-        testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
-                                                                                    total_time_wind_off,
-                                                                                    dt_tunnel_startup)
+
+
+    # Add time
+    testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
+                                                                                  time_before_start,
+                                                                                  abs(AoA_values[
+                                                                                          0]) * dt_aoa_per_deg)
+    testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
+                                                                                total_time_wind_off + time_between_wind_off_and_on,
+                                                                                dt_tunnel_startup)
+
+    # Change propeller setting from Advance ratio to Hz:
+    testmatrix_wind_on_with_time = convert_testmatrix_J_to_Hz(testmatrix_wind_on_with_time)
 
     print(f"Testmatrix for wind off measurements")
     print(testmatrix_wind_off_with_time)
