@@ -166,3 +166,5 @@ cython_debug/
 #.idea/**/profile_settings.xml
 #.idea/**/vcs.xml
 #
+/Testmatrix.xlsx
+/testmatrix.tex
