@@ -127,7 +127,7 @@ def export_excel(df):
         response_2 = input("Do you understand that message?")
         if response_2 == "yes":
             print("Okay, your call ¯\_(ツ)_/¯")
-            df.to_excel("Testmatrix.xlsx", index=False)
+            df.to_excel("Testmatrix.xlsx", index=True)
             print("Excel sheet generated")
         else:
             print("You chose wisely")
