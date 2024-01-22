@@ -1,4 +1,3 @@
-import datetime
 import itertools
 
 import numpy as np
@@ -74,7 +73,7 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     # Use the custom function to calculate the difference
     propset_diff = custom_diff(df["propeller setting"])
 
-    # Initialize point_time with dt_sampling for all points
+    # Initialize point_time with dt_sampling for all points, and add first setpoint duration to first point
     point_time = pd.Series([first_setpoint_duration + dt_sampling] + [dt_sampling] * (len(df) - 1))
 
     # Add time for AoA_diff
@@ -110,8 +109,9 @@ def add_propeller_frequency(df):
     propfreq_from_J_V = lambda J, V: V / (J * 0.2032)
 
     # Apply the lambda function to the 'propeller setting' and 'Tunnel velocity' columns of the DataFrame
-    df["Propeller frequency"] = df.apply(lambda row: propfreq_from_J_V(row["propeller setting"], row["Tunnel velocity"]),
-                                       axis=1)
+    df["Propeller frequency"] = df.apply(
+        lambda row: propfreq_from_J_V(row["propeller setting"], row["Tunnel velocity"]),
+        axis=1)
 
     # Get the index of the column 'propeller setting'
     idx = df.columns.get_loc('propeller setting')
@@ -135,7 +135,7 @@ def export_excel(df):
         response_2 = input("Do you understand that message?")
         if response_2 == "yes":
             print("Okay, your call ¯\_(ツ)_/¯")
-            df.to_excel("Testmatrix.xlsx", index=True)
+            df.to_excel("Testmatrix_V2.xlsx", index=True)
             print("Excel sheet generated")
         else:
             print("You chose wisely")
@@ -144,7 +144,7 @@ def export_excel(df):
         print("You chose wisely")
         print("No Excel sheet generated")
     print(
-        "One final note: If the Excel sheet is added to github, pleas always change the name after making changes, otherwise we'll override once we rerun this program.")
+        "One final note: If the Excel sheet is added to github, please always change the name after making changes, otherwise we'll override once we rerun this program.")
 
 
 def reorder_blocks(df, elevator_order, velocity_order):
@@ -195,22 +195,28 @@ time_between_wind_off_and_on = 3 * 60  # feels like we should have some time bef
 # Set ranges for variables
 AoA_values = [-5, 7, 12, 14]  # [deg]
 Elevator_values = [-15, 15, 0]  # [deg]
-Tunnel_velocity_values = [40, 20, 10]  # [m/s]
-prop_J_values = [1.25, 1.9, np.nan, 3]  # [rpm]
+Tunnel_velocity_high_speed = [40]  # [m/s]
+Tunnel_velocity_low_speed = [20, 10]  # [m/s]
+prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
+prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
 
-# # # Below is a smaller version to use when changing shit
-# AoA_values = [0]  # [deg]
-# Elevator_values = [10, 0]  # [deg]
-# Tunnel_velocity_values = [40,20,10]  # [m/s]
-# prop_J_values = [1.25]  # [rpm]
+# Array for sorting the tunnel velocities
+Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
 
 use_randomized_testmatrix = True
 generate_excel_sheet = False  # No need to make this true unless you have a good reason
 
 if __name__ == "__main__":
     # Generate the points
-    testmatrix_wind_on = get_test_matrix(Elevator_values, Tunnel_velocity_values, prop_J_values, AoA_values)
     testmatrix_wind_off = get_test_matrix([0], [0], [np.nan], AoA_values)
+
+    testmatrix_wind_on_high_speed = get_test_matrix(Elevator_values, Tunnel_velocity_high_speed,
+                                                    prop_J_values_high_speed, AoA_values)
+    testmatrix_wind_on_low_speed = get_test_matrix(Elevator_values, Tunnel_velocity_low_speed, prop_J_values_low_speed,
+                                                   AoA_values)
+
+    # Combine the two into a single array
+    testmatrix_wind_on = pd.concat([testmatrix_wind_on_high_speed, testmatrix_wind_on_low_speed], ignore_index=True)
 
     # Add randomization steps here: This allows us to check the effect of randomizing more stuff
     if use_randomized_testmatrix:
@@ -240,7 +246,6 @@ if __name__ == "__main__":
     print(testmatrix_wind_off_with_time)
     print(f"Testmatrix for wind on measurements")
     print(testmatrix_wind_on_with_time)
-
 
     if generate_excel_sheet:
         combined_matrices = pd.concat([testmatrix_wind_off_with_time, testmatrix_wind_on_with_time], ignore_index=True)
