@@ -102,7 +102,7 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     return df, total_time_final  # Returns dataframe and also final time (final time in seconds)
 
 
-def convert_testmatrix_J_to_Hz(df):
+def add_propeller_frequency(df):
     # Check if inputs are valid
     if (df["propeller setting"] == 0).any():
         raise ValueError("Advance ratio cannot be 0")
@@ -110,9 +110,17 @@ def convert_testmatrix_J_to_Hz(df):
     propfreq_from_J_V = lambda J, V: V / (J * 0.2032)
 
     # Apply the lambda function to the 'propeller setting' and 'Tunnel velocity' columns of the DataFrame
-    df["propeller setting"] = df.apply(lambda row: propfreq_from_J_V(row["propeller setting"], row["Tunnel velocity"]),
+    df["Propeller frequency"] = df.apply(lambda row: propfreq_from_J_V(row["propeller setting"], row["Tunnel velocity"]),
                                        axis=1)
 
+    # Get the index of the column 'propeller setting'
+    idx = df.columns.get_loc('propeller setting')
+
+    # Insert the 'propeller frequency' column next to 'propeller setting'
+    df.insert(idx + 1, 'Propeller frequency', df.pop('Propeller frequency'))
+
+    # Rename the 'propeller setting' column
+    df.rename(columns={'propeller setting': 'Propeller advance ratio'}, inplace=True)
     return df
 
 
@@ -202,7 +210,7 @@ generate_excel_sheet = False  # No need to make this true unless you have a good
 if __name__ == "__main__":
     # Generate the points
     testmatrix_wind_on = get_test_matrix(Elevator_values, Tunnel_velocity_values, prop_J_values, AoA_values)
-    testmatrix_wind_off = get_test_matrix([0], [0], [0], AoA_values)
+    testmatrix_wind_off = get_test_matrix([0], [0], [np.nan], AoA_values)
 
     # Add randomization steps here: This allows us to check the effect of randomizing more stuff
     if use_randomized_testmatrix:
@@ -225,13 +233,14 @@ if __name__ == "__main__":
                                                                                 dt_tunnel_startup)
 
     # Change propeller setting from Advance ratio to Hz:
-    testmatrix_wind_on_with_time = convert_testmatrix_J_to_Hz(testmatrix_wind_on_with_time)
+    testmatrix_wind_off_with_time = add_propeller_frequency(testmatrix_wind_off_with_time)
+    testmatrix_wind_on_with_time = add_propeller_frequency(testmatrix_wind_on_with_time)
 
     print(f"Testmatrix for wind off measurements")
     print(testmatrix_wind_off_with_time)
     print(f"Testmatrix for wind on measurements")
     print(testmatrix_wind_on_with_time)
-    print(f"Total expected time: {datetime.timedelta(seconds=int(total_time_wind_on))}")
+
 
     if generate_excel_sheet:
         combined_matrices = pd.concat([testmatrix_wind_off_with_time, testmatrix_wind_on_with_time], ignore_index=True)
