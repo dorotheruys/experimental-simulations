@@ -193,35 +193,45 @@ dt_propset = 30
 dt_recalibrate = 15
 dt_decision_point = 5 * 60
 
-time_before_start = 15 * 60
-
-time_between_wind_off_and_on = 3 * 60  # feels like we should have some time before we get going, just for contingency
-
-# Set ranges for variables: Basic testmatrix
-AoA_values = [-5, 7, 12, 14]  # [deg]
-Elevator_values = [-15, 15, 0]  # [deg]
-Tunnel_velocity_high_speed = [40]  # [m/s]
-Tunnel_velocity_low_speed = [20, 10]  # [m/s]
-prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
-prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
-
-# # Set ranges for variables: Basic testmatrix
-AoA_values = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13]  # [deg]
-# AoA_values = [-2, 2,6, 9, 10, 11, 13]  # [deg]
-Elevator_values = [0]  # [deg]
-Tunnel_velocity_high_speed = [40]  # [m/s]
-Tunnel_velocity_low_speed = []  # [m/s]
-prop_J_values_high_speed = [1.6]  # [rpm]
-prop_J_values_low_speed = []  # [rpm]
-
-# Redefine values below
-time_before_start = 2 * 3600 + 44 * 60 + 46
-
-# Array for sorting the tunnel velocities
-Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
-
 use_randomized_testmatrix = True
-generate_excel_sheet = True  # No need to make this true unless you have a good reason
+generate_excel_sheet = False  # No need to make this true unless you have a good reason
+extended_matrix = False
+extended_short_version = True
+
+if extended_matrix:
+    # Set ranges for variables: Basic testmatrix
+    if extended_short_version:
+        AoA_values = [-2, 2, 6, 9, 10, 11, 13]  # [deg]
+    else:
+        AoA_values = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13]  # [deg]
+    Elevator_values = [0]  # [deg]
+    Tunnel_velocity_high_speed = [40]  # [m/s]
+    Tunnel_velocity_low_speed = []  # [m/s]
+    prop_J_values_high_speed = [1.6]  # [rpm]
+    prop_J_values_low_speed = []  # [rpm]
+
+    # Redefine values below
+    time_before_start = 2 * 3600 + 44 * 60 + 46
+    print('Please verify that the start time is still relevant')
+
+    # Array for sorting the tunnel velocities
+    Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
+
+else:
+    time_before_start = 15 * 60
+
+    time_between_wind_off_and_on = 3 * 60  # feels like we should have some time before we get going, just for contingency
+
+    # Set ranges for variables: Basic testmatrix
+    AoA_values = [-5, 7, 12, 14]  # [deg]
+    Elevator_values = [-15, 15, 0]  # [deg]
+    Tunnel_velocity_high_speed = [40]  # [m/s]
+    Tunnel_velocity_low_speed = [20, 10]  # [m/s]
+    prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
+    prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
+
+    # Array for sorting the tunnel velocities
+    Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
 
 if __name__ == "__main__":
     # Generate the points
@@ -245,23 +255,24 @@ if __name__ == "__main__":
 
     testmatrix_wind_on = reorder_blocks(testmatrix_wind_on, Elevator_values, Tunnel_velocity_values)
 
-    # # Add time
-    # testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
-    #                                                                               time_before_start,
-    #                                                                               abs(AoA_values[
-    #                                                                                       0]) * dt_aoa_per_deg)
-    # testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
-    #                                                                             total_time_wind_off + time_between_wind_off_and_on,
-    #                                                                             dt_tunnel_startup)
-
-    # Add time
-    testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
-                                                                                time_before_start,
-                                                                                60)
-    testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
-                                                                                  total_time_wind_on,
-                                                                                  abs(AoA_values[
-                                                                                          0]) * dt_aoa_per_deg + dt_tunnel_startup)
+    if extended_matrix:
+        # Add time
+        testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
+                                                                                    time_before_start,
+                                                                                    60)
+        testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
+                                                                                      total_time_wind_on,
+                                                                                      abs(AoA_values[
+                                                                                              0]) * dt_aoa_per_deg + dt_tunnel_startup)
+    else:
+        # Add time
+        testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
+                                                                                      time_before_start,
+                                                                                      abs(AoA_values[
+                                                                                              0]) * dt_aoa_per_deg)
+        testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
+                                                                                    total_time_wind_off + time_between_wind_off_and_on,
+                                                                                    dt_tunnel_startup)
 
     # Change propeller setting from Advance ratio to Hz:
     testmatrix_wind_off_with_time = add_propeller_frequency(testmatrix_wind_off_with_time)
@@ -273,8 +284,12 @@ if __name__ == "__main__":
     print(testmatrix_wind_on_with_time)
 
     if generate_excel_sheet:
-        # combined_matrices = pd.concat([testmatrix_wind_off_with_time, testmatrix_wind_on_with_time], ignore_index=True)
-        combined_matrices = pd.concat([testmatrix_wind_on_with_time, testmatrix_wind_off_with_time], ignore_index=True)
+        if extended_matrix:
+            combined_matrices = pd.concat([testmatrix_wind_on_with_time, testmatrix_wind_off_with_time],
+                                          ignore_index=True)
+        else:
+            combined_matrices = pd.concat([testmatrix_wind_off_with_time, testmatrix_wind_on_with_time],
+                                          ignore_index=True)
 
         # Add colum with datapoint number
         combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
