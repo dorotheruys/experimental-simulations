@@ -167,7 +167,6 @@ cython_debug/
 #.idea/**/vcs.xml
 #
 /Testmatrix.xlsx
-/testmatrix.tex
 /Testmatrix_V2.xlsx
 /Testmatrix_V3.xlsx
 /Testmatrix_extended_long.xlsx
