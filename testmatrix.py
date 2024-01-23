@@ -198,7 +198,7 @@ Elevator_values = [-15, 15, 0]  # [deg]
 Tunnel_velocity_high_speed = [40]  # [m/s]
 Tunnel_velocity_low_speed = [20, 10]  # [m/s]
 prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
-prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
+prop_J_values_low_speed = [1.6, np.nan, 3.5]  # [rpm]
 
 # Array for sorting the tunnel velocities
 Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
@@ -208,7 +208,7 @@ generate_excel_sheet = False  # No need to make this true unless you have a good
 
 if __name__ == "__main__":
     # Generate the points
-    testmatrix_wind_off = get_test_matrix([0], [0], [np.nan], AoA_values)
+    testmatrix_wind_off = get_test_matrix([-15], [0], [np.nan], AoA_values)
 
     testmatrix_wind_on_high_speed = get_test_matrix(Elevator_values, Tunnel_velocity_high_speed,
                                                     prop_J_values_high_speed, AoA_values)
