@@ -84,7 +84,7 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     point_time[1:] += ((propset_diff[1:] != 0) & (elevator_diff[1:] == 0)) * dt_propset
 
     # Add time for elevator_diff
-    point_time[1:] += (elevator_diff[1:] != 0) * (dt_elevator_adjust + dt_tunnel_startup)
+    point_time[1:] += (elevator_diff[1:] != 0) * (dt_elevator_adjust + dt_tunnel_startup + dt_decision_point)
 
     # Calculate total_time
     total_time = point_time.cumsum()
@@ -135,7 +135,7 @@ def export_excel(df):
         response_2 = input("Do you understand that message?")
         if response_2 == "yes":
             print("Okay, your call ¯\_(ツ)_/¯")
-            df.to_excel("Testmatrix_V2.xlsx", index=True)
+            df.to_excel("Testmatrix_V3.xlsx", index=False)
             print("Excel sheet generated")
         else:
             print("You chose wisely")
@@ -187,6 +187,7 @@ dt_sampling = 15
 dt_elevator_adjust = 12.5 * 60
 dt_propset = 30
 dt_recalibrate = 15
+dt_decision_point = 5 * 60
 
 time_before_start = 15 * 60
 
@@ -198,13 +199,13 @@ Elevator_values = [-15, 15, 0]  # [deg]
 Tunnel_velocity_high_speed = [40]  # [m/s]
 Tunnel_velocity_low_speed = [20, 10]  # [m/s]
 prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
-prop_J_values_low_speed = [1.6, np.nan, 3.5]  # [rpm]
+prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
 
 # Array for sorting the tunnel velocities
 Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
 
 use_randomized_testmatrix = True
-generate_excel_sheet = False  # No need to make this true unless you have a good reason
+generate_excel_sheet = True  # No need to make this true unless you have a good reason
 
 if __name__ == "__main__":
     # Generate the points
@@ -249,4 +250,6 @@ if __name__ == "__main__":
 
     if generate_excel_sheet:
         combined_matrices = pd.concat([testmatrix_wind_off_with_time, testmatrix_wind_on_with_time], ignore_index=True)
+        # Add colum with datapoint number
+        combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
         export_excel(combined_matrices)
