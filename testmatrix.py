@@ -207,7 +207,7 @@ prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
 
 # # Set ranges for variables: Basic testmatrix
 AoA_values = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13]  # [deg]
-# AoA_values = [-3, 0, 3, 6, 8, 9, 10, 11, 13]  # [deg]
+# AoA_values = [-2, 2,6, 9, 10, 11, 13]  # [deg]
 Elevator_values = [0]  # [deg]
 Tunnel_velocity_high_speed = [40]  # [m/s]
 Tunnel_velocity_low_speed = []  # [m/s]
@@ -216,7 +216,6 @@ prop_J_values_low_speed = []  # [rpm]
 
 # Redefine values below
 time_before_start = 2 * 3600 + 44 * 60 + 46
-time_between_wind_off_and_on = 0  # feels like we should have some time before we get going, just for contingency
 
 # Array for sorting the tunnel velocities
 Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
@@ -260,9 +259,9 @@ if __name__ == "__main__":
                                                                                 time_before_start,
                                                                                 60)
     testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
-                                                                                  total_time_wind_on + time_between_wind_off_and_on,
+                                                                                  total_time_wind_on,
                                                                                   abs(AoA_values[
-                                                                                          0]) * dt_aoa_per_deg)
+                                                                                          0]) * dt_aoa_per_deg + dt_tunnel_startup)
 
     # Change propeller setting from Advance ratio to Hz:
     testmatrix_wind_off_with_time = add_propeller_frequency(testmatrix_wind_off_with_time)
