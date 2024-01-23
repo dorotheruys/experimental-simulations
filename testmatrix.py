@@ -124,7 +124,11 @@ def add_propeller_frequency(df):
     return df
 
 
-def export_excel(df):
+def generate_excel(df, filename: str):
+    if not isinstance(filename, str):
+        raise TypeError('filename must be a string')
+    if not filename.endswith('.xlsx'):
+        raise ValueError('filename must end with .xlsx')
     # Please don't touch this function. Git and Excel are a bit of an unpleasant combination and this function is here to make sure you really need to make that excel sheet, and can't just accidentally make it
     print()
     print("Are you 100% certain you want to actually generate a new Excel sheet?")
@@ -135,7 +139,7 @@ def export_excel(df):
         response_2 = input("Do you understand that message?")
         if response_2 == "yes":
             print("Okay, your call ¯\_(ツ)_/¯")
-            df.to_excel("Testmatrix_V3.xlsx", index=False)
+            df.to_excel(f"{filename}", index=False)
             print("Excel sheet generated")
         else:
             print("You chose wisely")
@@ -193,13 +197,26 @@ time_before_start = 15 * 60
 
 time_between_wind_off_and_on = 3 * 60  # feels like we should have some time before we get going, just for contingency
 
-# Set ranges for variables
+# Set ranges for variables: Basic testmatrix
 AoA_values = [-5, 7, 12, 14]  # [deg]
 Elevator_values = [-15, 15, 0]  # [deg]
 Tunnel_velocity_high_speed = [40]  # [m/s]
 Tunnel_velocity_low_speed = [20, 10]  # [m/s]
 prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
 prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
+
+# # Set ranges for variables: Basic testmatrix
+AoA_values = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13]  # [deg]
+# AoA_values = [-3, 0, 3, 6, 8, 9, 10, 11, 13]  # [deg]
+Elevator_values = [0]  # [deg]
+Tunnel_velocity_high_speed = [40]  # [m/s]
+Tunnel_velocity_low_speed = []  # [m/s]
+prop_J_values_high_speed = [1.6]  # [rpm]
+prop_J_values_low_speed = []  # [rpm]
+
+# Redefine values below
+time_before_start = 2 * 3600 + 44 * 60 + 46
+time_between_wind_off_and_on = 0  # feels like we should have some time before we get going, just for contingency
 
 # Array for sorting the tunnel velocities
 Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
@@ -209,7 +226,7 @@ generate_excel_sheet = True  # No need to make this true unless you have a good 
 
 if __name__ == "__main__":
     # Generate the points
-    testmatrix_wind_off = get_test_matrix([-15], [0], [np.nan], AoA_values)
+    testmatrix_wind_off = get_test_matrix([Elevator_values[0]], [0], [np.nan], AoA_values)
 
     testmatrix_wind_on_high_speed = get_test_matrix(Elevator_values, Tunnel_velocity_high_speed,
                                                     prop_J_values_high_speed, AoA_values)
@@ -221,8 +238,7 @@ if __name__ == "__main__":
 
     # Add randomization steps here: This allows us to check the effect of randomizing more stuff
     if use_randomized_testmatrix:
-        testmatrix_wind_off = randomize_testmatrix(
-            testmatrix_wind_off)  # not giving boolean options as they are not relevant
+        testmatrix_wind_off = randomize_testmatrix(testmatrix_wind_off)  # not giving boolean options, irrelevant
 
         # For the wind on stuff, options are available to add more randomization and to see how it impacts the matrix
         testmatrix_wind_on = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
@@ -230,14 +246,23 @@ if __name__ == "__main__":
 
     testmatrix_wind_on = reorder_blocks(testmatrix_wind_on, Elevator_values, Tunnel_velocity_values)
 
+    # # Add time
+    # testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
+    #                                                                               time_before_start,
+    #                                                                               abs(AoA_values[
+    #                                                                                       0]) * dt_aoa_per_deg)
+    # testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
+    #                                                                             total_time_wind_off + time_between_wind_off_and_on,
+    #                                                                             dt_tunnel_startup)
+
     # Add time
+    testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
+                                                                                time_before_start,
+                                                                                60)
     testmatrix_wind_off_with_time, total_time_wind_off = get_testmatrix_with_time(testmatrix_wind_off,
-                                                                                  time_before_start,
+                                                                                  total_time_wind_on + time_between_wind_off_and_on,
                                                                                   abs(AoA_values[
                                                                                           0]) * dt_aoa_per_deg)
-    testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
-                                                                                total_time_wind_off + time_between_wind_off_and_on,
-                                                                                dt_tunnel_startup)
 
     # Change propeller setting from Advance ratio to Hz:
     testmatrix_wind_off_with_time = add_propeller_frequency(testmatrix_wind_off_with_time)
@@ -249,7 +274,9 @@ if __name__ == "__main__":
     print(testmatrix_wind_on_with_time)
 
     if generate_excel_sheet:
-        combined_matrices = pd.concat([testmatrix_wind_off_with_time, testmatrix_wind_on_with_time], ignore_index=True)
+        # combined_matrices = pd.concat([testmatrix_wind_off_with_time, testmatrix_wind_on_with_time], ignore_index=True)
+        combined_matrices = pd.concat([testmatrix_wind_on_with_time, testmatrix_wind_off_with_time], ignore_index=True)
+
         # Add colum with datapoint number
         combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
-        export_excel(combined_matrices)
+        generate_excel(combined_matrices, filename="Testmatrix_extended_long.xlsx")
