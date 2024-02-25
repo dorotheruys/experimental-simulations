@@ -14,7 +14,7 @@ dt_recalibrate = 15
 dt_decision_point = 5 * 60
 
 use_randomized_testmatrix = True
-generate_excel_sheet = False  # No need to make this true unless you have a good reason
+generate_excel_sheet = True  # No need to make this true unless you have a good reason
 extended_matrix = False
 extended_short_version = False
 
@@ -50,7 +50,6 @@ else:
     Tunnel_velocity_low_speed = [20, 10]  # [m/s]
     prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
     prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
-
 
     # Array for sorting the tunnel velocities
     Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
@@ -145,10 +144,11 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     # Add time for velocity_diff and propset_diff only if the corresponding value in elevator_diff is zero
     point_time[1:] += ((velocity_diff[1:] != 0) & (elevator_diff[1:] == 0)) * dt_freestream_flow
     point_time[1:] += ((propset_diff[1:] != 0) & (elevator_diff[1:] == 0)) * dt_propset
+
     point_time[1:] += propset_previous_nan * dt_tunnel_startup
 
     # Add time for elevator_diff
-    point_time[1:] += (elevator_diff[1:] != 0) * (dt_elevator_adjust + dt_tunnel_startup + dt_decision_point)
+    point_time[1:] += (elevator_diff[1:] != 0) * (dt_elevator_adjust + dt_decision_point) # + dt_tunnel_startup)
 
     # Calculate total_time
     total_time = point_time.cumsum()
@@ -307,4 +307,4 @@ if __name__ == "__main__":
 
         # Add colum with datapoint number
         combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
-        generate_excel(combined_matrices, filename="Testmatrix_V4.xlsx")
+        generate_excel(combined_matrices, filename="Testmatrix_V5.xlsx")
