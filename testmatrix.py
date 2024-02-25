@@ -3,6 +3,9 @@ import itertools
 import numpy as np
 import pandas as pd
 
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
+
 # Define times for component changes in seconds
 dt_aoa_per_deg = 2
 dt_tunnel_startup = 3 * 60
@@ -267,7 +270,28 @@ if __name__ == "__main__":
         testmatrix_wind_on = randomize_testmatrix(testmatrix_wind_on, AoA_and_propset=False,
                                                   AoA_and_tunnelvelocity=False, all_variables=False)
 
+
+
     testmatrix_wind_on = reorder_blocks(testmatrix_wind_on, Elevator_values, Tunnel_velocity_values)
+
+
+    # Splitting into three parts based on 'Elevator' values
+    parts = {}
+    for elevator, group in testmatrix_wind_on.groupby('Elevator'):
+        parts[elevator] = group
+
+    # Moving NaN rows to the end of each part
+    for elevator, part in parts.items():
+        nan_rows = part[part.isna().any(axis=1)]
+        non_nan_rows = part.dropna()
+        parts[elevator] = pd.concat([non_nan_rows, nan_rows])
+
+    # Concatenating the parts
+    testmatrix_wind_on = pd.concat(parts.values())
+
+    testmatrix_wind_on.reset_index(drop=True, inplace=True)
+
+    print(testmatrix_wind_on)
 
     if extended_matrix:
         # Add time
@@ -307,4 +331,4 @@ if __name__ == "__main__":
 
         # Add colum with datapoint number
         combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
-        generate_excel(combined_matrices, filename="Testmatrix_V5.xlsx")
+        generate_excel(combined_matrices, filename="Testmatrix_V51.xlsx")
