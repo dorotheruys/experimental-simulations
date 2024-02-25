@@ -51,13 +51,6 @@ else:
     prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
     prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
 
-    # Set ranges for variables: Basic testmatrix
-    AoA_values = [0, 14]  # [deg]
-    Elevator_values = [-10, 0]  # [deg]
-    Tunnel_velocity_high_speed = [40]  # [m/s]
-    Tunnel_velocity_low_speed = [10]  # [m/s]
-    prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
-    prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
 
     # Array for sorting the tunnel velocities
     Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
@@ -129,8 +122,19 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
                 diff.append(abs(series[i] - series[i - 1]))
         return pd.Series(diff)
 
+
+    def is_previous_value_nan (series):
+        # Shift the series by one position to get the previous value
+        previous_value = series.shift(1)
+        is_nan = previous_value.isna()& ~series.isna() & ~previous_value.index.isin([0])
+        return is_nan
+
     # Use the custom function to calculate the difference
     propset_diff = custom_diff(df["propeller setting"])
+    propset_previous_nan = is_previous_value_nan(df["propeller setting"])
+
+    # print(df["propeller setting"])
+    # print(propset_previous_nan)
 
     # Initialize point_time with dt_sampling for all points, and add first setpoint duration to first point
     point_time = pd.Series([first_setpoint_duration + dt_sampling] + [dt_sampling] * (len(df) - 1))
@@ -141,6 +145,7 @@ def get_testmatrix_with_time(df, total_time_start, first_setpoint_duration):
     # Add time for velocity_diff and propset_diff only if the corresponding value in elevator_diff is zero
     point_time[1:] += ((velocity_diff[1:] != 0) & (elevator_diff[1:] == 0)) * dt_freestream_flow
     point_time[1:] += ((propset_diff[1:] != 0) & (elevator_diff[1:] == 0)) * dt_propset
+    point_time[1:] += propset_previous_nan * dt_tunnel_startup
 
     # Add time for elevator_diff
     point_time[1:] += (elevator_diff[1:] != 0) * (dt_elevator_adjust + dt_tunnel_startup + dt_decision_point)
@@ -302,4 +307,4 @@ if __name__ == "__main__":
 
         # Add colum with datapoint number
         combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
-        generate_excel(combined_matrices, filename="Testmatrix_extended_long.xlsx")
+        generate_excel(combined_matrices, filename="Testmatrix_V4.xlsx")
