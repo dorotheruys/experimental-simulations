@@ -3,6 +3,65 @@ import itertools
 import numpy as np
 import pandas as pd
 
+# Define times for component changes in seconds
+dt_aoa_per_deg = 2
+dt_tunnel_startup = 3 * 60
+dt_freestream_flow = 1 * 60
+dt_sampling = 15
+dt_elevator_adjust = 12.5 * 60
+dt_propset = 30
+dt_recalibrate = 15
+dt_decision_point = 5 * 60
+
+use_randomized_testmatrix = True
+generate_excel_sheet = False  # No need to make this true unless you have a good reason
+extended_matrix = False
+extended_short_version = False
+
+if extended_matrix:
+    # Set ranges for variables: Basic testmatrix
+    if extended_short_version:
+        AoA_values = [-2, 2, 6, 9, 10, 11, 13]  # [deg]
+    else:
+        AoA_values = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13]  # [deg]
+    Elevator_values = [0]  # [deg]
+    Tunnel_velocity_high_speed = [40]  # [m/s]
+    Tunnel_velocity_low_speed = []  # [m/s]
+    prop_J_values_high_speed = [1.6]  # [rpm]
+    prop_J_values_low_speed = []  # [rpm]
+
+    # Redefine values below
+    time_before_start = 2 * 3600 + 44 * 60 + 46
+    print('Please verify that the start time is still relevant')
+    print()
+
+    # Array for sorting the tunnel velocities
+    Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
+
+else:
+    time_before_start = 15 * 60
+
+    time_between_wind_off_and_on = 3 * 60  # feels like we should have some time before we get going, just for contingency
+
+    # Set ranges for variables: Basic testmatrix
+    AoA_values = [-5, 7, 12, 14]  # [deg]
+    Elevator_values = [-15, 15, 0]  # [deg]
+    Tunnel_velocity_high_speed = [40]  # [m/s]
+    Tunnel_velocity_low_speed = [20, 10]  # [m/s]
+    prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
+    prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
+
+    # Set ranges for variables: Basic testmatrix
+    AoA_values = [0, 14]  # [deg]
+    Elevator_values = [-10, 0]  # [deg]
+    Tunnel_velocity_high_speed = [40]  # [m/s]
+    Tunnel_velocity_low_speed = [10]  # [m/s]
+    prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
+    prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
+
+    # Array for sorting the tunnel velocities
+    Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
+
 
 def get_test_matrix(n_elevator, n_windspeed, n_prop, n_angles):
     dummy = [n_elevator, n_windspeed, n_prop, n_angles]
@@ -182,56 +241,6 @@ def reorder_blocks(df, elevator_order, velocity_order):
 
     return reordered_df
 
-
-# Define times for component changes in seconds
-dt_aoa_per_deg = 2
-dt_tunnel_startup = 3 * 60
-dt_freestream_flow = 1 * 60
-dt_sampling = 15
-dt_elevator_adjust = 12.5 * 60
-dt_propset = 30
-dt_recalibrate = 15
-dt_decision_point = 5 * 60
-
-use_randomized_testmatrix = True
-generate_excel_sheet = False  # No need to make this true unless you have a good reason
-extended_matrix = False
-extended_short_version = True
-
-if extended_matrix:
-    # Set ranges for variables: Basic testmatrix
-    if extended_short_version:
-        AoA_values = [-2, 2, 6, 9, 10, 11, 13]  # [deg]
-    else:
-        AoA_values = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13]  # [deg]
-    Elevator_values = [0]  # [deg]
-    Tunnel_velocity_high_speed = [40]  # [m/s]
-    Tunnel_velocity_low_speed = []  # [m/s]
-    prop_J_values_high_speed = [1.6]  # [rpm]
-    prop_J_values_low_speed = []  # [rpm]
-
-    # Redefine values below
-    time_before_start = 2 * 3600 + 44 * 60 + 46
-    print('Please verify that the start time is still relevant')
-
-    # Array for sorting the tunnel velocities
-    Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
-
-else:
-    time_before_start = 15 * 60
-
-    time_between_wind_off_and_on = 3 * 60  # feels like we should have some time before we get going, just for contingency
-
-    # Set ranges for variables: Basic testmatrix
-    AoA_values = [-5, 7, 12, 14]  # [deg]
-    Elevator_values = [-15, 15, 0]  # [deg]
-    Tunnel_velocity_high_speed = [40]  # [m/s]
-    Tunnel_velocity_low_speed = [20, 10]  # [m/s]
-    prop_J_values_high_speed = [1.6, 1.8, np.nan, 3.5]  # [rpm]
-    prop_J_values_low_speed = [1.6, np.nan]  # [rpm]
-
-    # Array for sorting the tunnel velocities
-    Tunnel_velocity_values = Tunnel_velocity_high_speed + Tunnel_velocity_low_speed
 
 if __name__ == "__main__":
     # Generate the points
