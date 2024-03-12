@@ -11,7 +11,7 @@ clc
 %% Inputs
 
 % define root path on disk where data is stored
-diskPath = './DATA';
+diskPath = './RAW DATA';
 
 % get indices balance and pressure data files
 [idxB,idxP] = SUP_getIdx;
@@ -24,17 +24,17 @@ diskPath = './DATA';
 % structure and these must start with a letter, so you will need to replace
 % the first character with a letter. For the + and - signs this has already
 % been implemented.
-fn_BAL = {'BAL/raw_proponzerodef.txt'};
+fn_BAL = {'BAL/unc_group19delta_neg15.txt'};
 
 % filename(s) of the zero-measurement (tare) data files. Define an entry
 % per raw data files. In case multiple zero-measurements are available for
 % a datapoint, then add a structure with the filenames of the zero 
 % measurements at the index of that datapoint.
-fn0 = {'BAL/zer_ 20220216-085611.txt'}; 
+fn0 = {'BAL/zer_20240229-092428.txt'}; 
    
 % filenames of the pressure data files (same comments apply as for balance 
 % data files)
-fn_PRS = {'PRESSURE/raw_propon_zerodef.txt'};
+fn_PRS = {'PRESSURE/raw_group19delta_neg15.txt'};
    
 % wing geometry
 b     = 1.4*cosd(4); % span [m]
@@ -68,6 +68,6 @@ BAL = BAL_process(diskPath,fn_BAL,fn0,idxB,D,S,b,c,XmRefB,XmRefM,dAoA,dAoS,model
 % example of how to access balance data (adapt the names of the fields of
 % the structure to your data)
 figure
-plot(BAL.windOn.proponzerodef.AoA,BAL.windOn.proponzerodef.CL,'*b')
+plot(BAL.windOn.raw_group19delta_neg15.AoA,BAL.windOn.raw_group19delta_neg15.CL,'*b')
 
 
