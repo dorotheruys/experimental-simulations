@@ -64,6 +64,9 @@ PRS = PRS_process(diskPath,fn_PRS,idxP);
 BAL = BAL_process(diskPath,fn_BAL,fn0,idxB,D,S,b,c,XmRefB,XmRefM,dAoA,dAoS,modelType,modelPos,testSec,PRS);
 
 %% Write your code here to apply the corrections and visualize the data
+% Correction factors:
+
+
 
 % example of how to access balance data (adapt the names of the fields of
 % the structure to your data)
