@@ -27,7 +27,7 @@ def get_eff(J):
 
 V_appr = 50.        # [m/s]
 
-# Generate J values in the specified range
+# Generate J values in the specified range help
 J_values = np.linspace(0.8, 5, 100)
 
 # Calculate CT values for each J
