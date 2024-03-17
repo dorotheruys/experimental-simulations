@@ -28,8 +28,8 @@ names_p=['run','hr','min','sec','AoA','AoS','dPb','pBar','temp','rpmWT','rho','q
     
 #%%
 #load data with matlab engine
-file='BAL.mat'
-file_p='PRS_dat.mat'
+file='Sort_data/BAL.mat'
+file_p='Sort_data/PRS_dat.mat'
 
 eng = matlab.engine.start_matlab()
 s = eng.load(file)
@@ -152,61 +152,7 @@ def final_sort(data):
 bal_sorted1=final_sort(sort1(delta_neg15))
 bal_sorted2=final_sort(sort1(delta_0))
 bal_sorted3=final_sort(sort1(delta_15))
-#%%
 
-colors=['b','g','c','r','k','m','tab:orange','grey']
-    
-    
-def CL_plot(data):
-    fig,ax=plt.subplots()
-    alpha=np.linspace(-5,25,26)
-    for i in range(len(inp_lst)):
-        dat=get_set(data,inp_lst[i][0],inp_lst[i][1])
-        curve_fit=np.poly1d(np.polyfit(dat['AoA'],dat['CL'],2))
-        lab='V='+str(round(np.mean(dat['V']))) +'  , J=' +str(round(np.mean(dat['J_M1']),1))
-        #ax.plot(dat['AoA'],dat['CL'],label=lab,color=colors[i])
-        ax.plot(alpha,curve_fit(alpha),'-.',color=colors[i])
-        ax.scatter(dat['AoA'],dat['CL'],color=colors[i])
-        ax.legend()
-    ax.grid()
-    ax.set_ylabel('CL')
-    ax.set_xlabel('AoA')
-   
-def CLCD_plot(data):
-    fig,ax=plt.subplots()
-    cl=np.linspace(-1,1.7,50)
-    for i in range(len(inp_lst)):
-        dat=get_set(data,inp_lst[i][0],inp_lst[i][1])
-        curve_fit=np.poly1d(np.polyfit(dat['CL'],dat['CD'],2))
-        lab='V='+str(round(np.mean(dat['V']))) +'  , J=' +str(round(np.mean(dat['J_M1']),1))
-        ax.plot(dat['CD'],dat['CL'],label=lab,color=colors[i])
-        ax.plot(curve_fit(cl),cl,'-.',color=colors[i])
-        ax.scatter(dat['CD'],dat['CL'],color=colors[i])
-        ax.legend()
-    ax.grid()
-    ax.set_ylabel('CL')
-    ax.set_xlabel('CD')  
-    
-def CM_plot(data):
-    fig,ax=plt.subplots()
-    alpha=np.linspace(-5,20,26)
-    for i in range(len(inp_lst)):
-        dat=get_set(data,inp_lst[i][0],inp_lst[i][1])
-        curve_fit=np.poly1d(np.polyfit(dat['AoA'],dat['CMpitch'],1))
-        lab='V='+str(round(np.mean(dat['V']))) +'  , J=' +str(round(np.mean(dat['J_M1']),1))
-        #ax.plot(dat['AoA'],dat['CMpitch'],label=lab,color=colors[i])
-        ax.plot(alpha,curve_fit(alpha),'-.',color=colors[i])
-        ax.scatter(dat['AoA'],dat['CMpitch'],color=colors[i])
-        ax.legend()
-    ax.grid()
-    ax.set_ylabel('CM')
-    ax.set_xlabel('AoA')
-     
-CL_plot(bal_sorted3)
-CM_plot(bal_sorted3)
-CLCD_plot(bal_sorted3)
-    
-    
 
 
     
