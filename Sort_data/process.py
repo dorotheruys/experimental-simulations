@@ -16,9 +16,9 @@ import matplotlib.pyplot as plt
 
 
 
-bal_soted1=pd.read_csv('Sort_data/bal_sorted1.csv')
-bal_soted2=pd.read_csv('Sort_data/bal_sorted2.csv')
-bal_soted3=pd.read_csv('Sort_data/bal_sorted3.csv')
+bal_soted1=pd.read_csv('Experimetal_simulation/exp_git/Untitled/Sort_data/bal_sorted1.csv')
+bal_soted2=pd.read_csv('Experimetal_simulation/exp_git/Untitled/Sort_data/bal_sorted2.csv')
+bal_soted3=pd.read_csv('Experimetal_simulation/exp_git/Untitled/Sort_data/bal_sorted3.csv')
 
 colors=['b','g','c','r','k','m','tab:orange','grey']
 
