@@ -12,11 +12,18 @@ import pandas as pd
 
 import math
 import matplotlib.pyplot as plt
+import os
+
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+file1 = os.path.join(current_dir, 'bal_sorted1.csv')
+file2 = os.path.join(current_dir, 'bal_sorted2.csv')
+file3 = os.path.join(current_dir, 'bal_sorted3.csv')
 
 
-bal_sorted1=pd.read_csv('Sort_data/bal_sorted1.csv')
-bal_sorted2=pd.read_csv('Sort_data/bal_sorted2.csv')
-bal_sorted3=pd.read_csv('Sort_data/bal_sorted3.csv')
+bal_sorted1=pd.read_csv(file1)
+bal_sorted2=pd.read_csv(file2)
+bal_sorted3=pd.read_csv(file3)
 
 colors=['b','g','c','r','k','m','tab:orange','grey']
 
@@ -88,7 +95,19 @@ def CM_plot(data):
     ax.grid()
     ax.set_ylabel('CM')
     ax.set_xlabel('AoA')
-     
+    
+    
+#plots for delta=-15
+CL_plot(bal_sorted1)
+CM_plot(bal_sorted1)
+CLCD_plot(bal_sorted1)
+
+#plots for delta=15
+CL_plot(bal_sorted2)
+CM_plot(bal_sorted2)
+CLCD_plot(bal_sorted2)    
+    
+#plots for delta=15
 CL_plot(bal_sorted3)
 CM_plot(bal_sorted3)
 CLCD_plot(bal_sorted3)
