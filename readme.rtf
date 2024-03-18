@@ -1,0 +1,27 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2759
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww11520\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 sort_dat.py:\
+\
+sorted balance data are in bal_sorted1,bal_sorted2,bal_sorted3, as Dataframes\
+\
+To get specific set of data corresponding to tunnel velocity and prop setting, use get_set(data,vel,prop)\
+for data, fill in sort1(delta_neg15) /sort1(delta_0) / sort1(delta_15)\
+vel: fill in 40,20,10\
+prop: 1.6,  3.5,  1.8 or 17\
+\
+J values that are 17 or above means windmilling.\
+\
+process.py\
+\
+reads the saved sorted data which is saved as csv, should be in the folder\
+get_set() , for data, fill in bal_sorted1/ bal_sorted2/bal_sorted3\
+everything else is the same. \
+\
+current plots are scatters with an appropriate poly degree curve fit.\
+\
+Recommend to copy process.py delete the plot part, and then do the corrections, aviods the stuff in sort_dat.py}

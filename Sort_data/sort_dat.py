@@ -71,14 +71,19 @@ for i in range(len(names)):
     delta_0[names[i]]=np.array(set2[names[i]])
     delta_15[names[i]]=np.array(set3[names[i]])
 for i in range(len(names_z)) :  
-    delta_neg15_z[names_z[i]]=np.array(set1_z[names_z[i]])
-    delta_0_z[names_z[i]]=np.array(set2_z[names_z[i]])
-    delta_15_z[names_z[i]]=np.array(set3_z[names_z[i]])
+    delta_neg15_z[names_z[i]]=np.array(set1_z[names_z[i]]).flatten()
+    delta_0_z[names_z[i]]=np.array(set2_z[names_z[i]]).flatten()
+    delta_15_z[names_z[i]]=np.array(set3_z[names_z[i]]).flatten()
     
 for i in range(len(names_p)) :  
     delta_neg15_p[names_p[i]]=np.array(set1_p[names_p[i]])
     delta_0_p[names_p[i]]=np.array(set2_p[names_p[i]])
     delta_15_p[names_p[i]]=np.array(set3_p[names_p[i]])
+
+
+delta_neg15_z=pd.DataFrame.from_dict(delta_neg15_z)
+delta_0_z=pd.DataFrame.from_dict(delta_neg15_z)
+delta_15_z=pd.DataFrame.from_dict(delta_neg15_z)
 
 #%%
 def sort1(data):
