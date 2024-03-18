@@ -95,19 +95,56 @@ def CM_plot(data):
     ax.grid()
     ax.set_ylabel('CM')
     ax.set_xlabel('AoA')
-    
-    
-#plots for delta=-15
-CL_plot(bal_sorted1)
-CM_plot(bal_sorted1)
-CLCD_plot(bal_sorted1)
 
-#plots for delta=15
-CL_plot(bal_sorted2)
-CM_plot(bal_sorted2)
-CLCD_plot(bal_sorted2)    
+def CM_delta(dat1,dat2,dat3):
+    cmd1=[]
+    cmd2=[]
+    cmd3=[]
+    delta=np.array([-15,0,15])
+    aoa_lst=[-5,7,12,14]
+    lab=[]
+    for i in range(len(inp_lst)):
+        dummy1=get_set(dat1,inp_lst[i][0],inp_lst[i][1])
+        group1=dummy1.groupby('rounded_AoA')
+        dummy2=get_set(dat2,inp_lst[i][0],inp_lst[i][1])
+        group2=dummy2.groupby('rounded_AoA')
+        dummy3=get_set(dat3,inp_lst[i][0],inp_lst[i][1])
+        group3=dummy3.groupby('rounded_AoA')
+        for j in range(4):
+            cmd1.append(float(group1.get_group(aoa_lst[j])['CMpitch']))
+            cmd2.append(float(group2.get_group(aoa_lst[j])['CMpitch']))
+            cmd3.append(float(group3.get_group(aoa_lst[j])['CMpitch']))
+            lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
+                       +'    AoA='+str(aoa_lst[j]))
+            
+            
+    stack=np.stack((np.array(cmd1),np.array(cmd2),np.array(cmd3)))
     
-#plots for delta=15
-CL_plot(bal_sorted3)
-CM_plot(bal_sorted3)
-CLCD_plot(bal_sorted3)
+    delta_fit=np.linspace(-20,20,100)
+    fig,ax=plt.subplots()
+    for i in range(len(lab)):
+        curve_fit=np.poly1d(np.polyfit(delta,stack[:,i],1))
+        ax.scatter(delta,stack[:,i])
+        ax.plot(delta_fit,curve_fit(delta_fit),'-.',label=lab[i])
+        ax.legend()
+    ax.grid()
+    ax.set_ylabel('CM')
+    ax.set_xlabel('Delta')   
+    return stack
+cmd=CM_delta(bal_sorted1,bal_sorted2,bal_sorted3)   
+    
+    
+# #plots for delta=-15
+# CL_plot(bal_sorted1)
+# CM_plot(bal_sorted1)
+# CLCD_plot(bal_sorted1)
+
+# #plots for delta=15
+# CL_plot(bal_sorted2)
+# CM_plot(bal_sorted2)
+# CLCD_plot(bal_sorted2)    
+    
+# #plots for delta=15
+# CL_plot(bal_sorted3)
+# CM_plot(bal_sorted3)
+# CLCD_plot(bal_sorted3)
