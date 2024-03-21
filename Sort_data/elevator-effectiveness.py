@@ -55,23 +55,38 @@ def plot_from_dataframe(dataframe, order, x_var_name, y_var_name, inp_lst, x_axi
     :return: a plot of the submitted data
     """
     fig, ax = plt.subplots(figsize=(10, 6))
+    dfs_lst = []
 
     for i in range(len(inp_lst)):
         dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
 
-        # Use a polynomial data fit ## order 2
+        # Use a polynomial data fit with prescribed order
         curve_fit = np.poly1d(np.polyfit(dat[x_var_name], dat[y_var_name], order))
+
+        # Create label with V and J
         lab = 'V = '+str(round(np.mean(dat['V']))) + ' m/s, J = ' + str(round(np.mean(dat['rounded_J']), 1))
 
+        # Plot
         ax.plot(x_axis_range, curve_fit(x_axis_range), '-.', color=colors[i], label=lab)
         ax.scatter(dat[x_var_name], dat[y_var_name], color=colors[i])
         ax.legend()
 
+        # Append to curves to save the interpolated functions
+        dataframe_interpolated = pd.DataFrame(data=({'x_range': x_axis_range, 'y_values': curve_fit(x_axis_range),
+                                                     'V': dat['V'], 'rounded_J': dat['rounded_J']}))
+        dfs_lst.append(dataframe_interpolated)
+
+    # Concate all dataframes
+    dataframe_interpolated_all = pd.concat(dfs_lst, ignore_index=True)
+
+    # Set up the plot
     ax.grid()
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.set_xticks([i for i in np.arange(x_axis_range[0] - 2, x_axis_range[-1] + 2, 2)])
     ax.set_xlim([x_axis_range[0], x_axis_range[-1]])
+
+    return dataframe_interpolated_all
 
 
 # Slice the zero deflection array such that the new dataframe contains the same data points
@@ -99,11 +114,14 @@ tunnel_prop_combi = [[{'rounded_v': 40}, {'rounded_J': 1.6}],
                      [{'rounded_v': 20}, {'rounded_J': 17}],
                      [{'rounded_v': 10}, {'rounded_J': 17}]]
 
-plot_from_dataframe(cm_dataframe, 2, 'AoA', 'CM_de', tunnel_prop_combi, np.linspace(-6, 20, 26),
+
+df_resulting_plots = plot_from_dataframe(cm_dataframe, 2, 'AoA', 'CM_de', tunnel_prop_combi, np.linspace(-6, 20, 26),
                     f'$\\alpha$ [deg]', r'$\frac{\partial C_M}{\partial \delta_e}$')
 
 plot_from_dataframe(bal_sorted_15, 2, 'AoA', 'CL', tunnel_prop_combi, np.linspace(-6, 20, 26),
                     f'$\\alpha$ [deg]', f'$C_L$')
+plot_from_dataframe(bal_sorted_15, 2, 'AoA', 'CD', tunnel_prop_combi, np.linspace(-1, 1.7, 50),
+                    f'$C_L$ [deg]', f'$C_D$')
 
 
 plt.show()
