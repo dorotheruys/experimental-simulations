@@ -1,9 +1,5 @@
-import numpy as np
 import pandas as pd
-import os
 import matplotlib.pyplot as plt
-
-file1 = "../Sort_data/bal_sorted1.csv"
 
 
 def df_velocity_filter_tailoff(V_target: int):
@@ -41,27 +37,13 @@ def df_velocity_filter(filename, V_target: int):
 
 
 def lift_interference(df_uncor, df_tailoff):
-    # print(aoa_raw)
-    # print()
-    # print(df_tailoff)
-
-    # CLw_list = []
-    # for aoa in aoa_raw:
-    #     column = df_tailoff[df_tailoff["AoA"] == aoa]
-    #     CLw = column["CL"].item()
-    #     CLw_list.append(CLw)
-    #
-    # CLw_arr = np.array(CLw_list)
-
     aoa_uncor = df_uncor["rounded_AoA"]
 
-    # Assuming 'aoa_raw' is a list of AoA values
     aoa_series = pd.Series(aoa_uncor)
 
     # Use the 'isin' function to filter rows in 'df_tailoff' where 'AoA' matches any value in 'aoa_series'
     filtered = df_tailoff[df_tailoff['AoA'].isin(aoa_series)]
 
-    # Now 'filtered' is a DataFrame containing only the rows where 'AoA' is in 'aoa_raw'
     # Extract the 'CL' column and convert it to a numpy array
     CLw = filtered['CL'].values
 
@@ -80,31 +62,35 @@ def lift_interference(df_uncor, df_tailoff):
     return aoa_cor, CD_cor
 
 
-V_target = 40
 
-df_to_process = df_velocity_filter(file1, V_target)
-df_to_process = df_to_process[df_to_process["rounded_J"] == 1.6]
-df_tailoff = average_40_tailoff(df_velocity_filter_tailoff(V_target))
+if __name__ == "__main__":
+    V_target = 40
 
-aoa_new, CD_new = lift_interference(df_to_process, df_tailoff)
-aoa_old, CD_old = df_to_process["AoA"], df_to_process["CD"]
+    file1 = "../Sort_data/bal_sorted1.csv"
 
-fig, ax = plt.subplots()
-ax.scatter(aoa_old, CD_old, label='Old Data')
-ax.scatter(aoa_new, CD_new, label='New Data')
-ax.set_xlabel('AoA')
-ax.set_ylabel('CD')
-ax.legend()
-ax.grid(True)
-plt.show()
+    df_to_process = df_velocity_filter(file1, V_target)
+    df_to_process = df_to_process[df_to_process["rounded_J"] == 3.5]
+    df_tailoff = average_40_tailoff(df_velocity_filter_tailoff(V_target))
 
-fig, ax = plt.subplots()
-ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
-ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
-ax.set_xlabel('AoA')
-ax.set_ylabel('CL')
-ax.legend()
-ax.grid(True)
-plt.show()
+    aoa_new, CD_new = lift_interference(df_to_process, df_tailoff)
+    aoa_old, CD_old = df_to_process["AoA"], df_to_process["CD"]
+
+    fig, ax = plt.subplots()
+    ax.scatter(aoa_old, CD_old, label='Old Data')
+    ax.scatter(aoa_new, CD_new, label='New Data')
+    ax.set_xlabel('AoA')
+    ax.set_ylabel('CD')
+    ax.legend()
+    ax.grid(True)
+    plt.show()
+
+    fig, ax = plt.subplots()
+    ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
+    ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
+    ax.set_xlabel('AoA')
+    ax.set_ylabel('CL')
+    ax.legend()
+    ax.grid(True)
+    plt.show()
 
 
