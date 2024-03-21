@@ -97,7 +97,7 @@ def CM_plot(data,inp_lst):
     ax.set_ylabel('CM')
     ax.set_xlabel('AoA')
 #%%
-def CM_delta(dat1,dat2,dat3,inp_lst):
+def CM_delta(dat1,dat2,dat3,inp_lst,AoA):
     cmd1=[]
     cmd2=[]
     cmd3=[]
@@ -117,11 +117,11 @@ def CM_delta(dat1,dat2,dat3,inp_lst):
         #     cmd3.append(float(group3.get_group(aoa_lst[j])['CMpitch']))
         #     lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
         #                +'    AoA='+str(aoa_lst[j]))
-        cmd1.append(float(group1.get_group(7)['CMpitch']))
-        cmd2.append(float(group2.get_group(7)['CMpitch']))
-        cmd3.append(float(group3.get_group(7)['CMpitch']))
+        cmd1.append(float(group1.get_group(AoA)['CMpitch']))
+        cmd2.append(float(group2.get_group(AoA)['CMpitch']))
+        cmd3.append(float(group3.get_group(AoA)['CMpitch']))
         lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
-                    +'    AoA='+str(7))
+                    +'    AoA='+str(AoA)+ '[deg]')
                
             
     stack=np.stack((np.array(cmd1),np.array(cmd2),np.array(cmd3)))
@@ -135,7 +135,7 @@ def CM_delta(dat1,dat2,dat3,inp_lst):
         ax.legend()
     ax.grid()
     ax.set_ylabel(r'$\C_{M}, $')
-    ax.set_xlabel(r'$\nu_{SGS}, $')   
+    ax.set_xlabel(r'$\delta, $')   
     return stack
 
     
