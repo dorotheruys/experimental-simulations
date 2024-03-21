@@ -20,59 +20,58 @@ bal_sorted_0 = pd.read_csv(file2)
 bal_sorted_15 = pd.read_csv(file3)
 
 colors = ['b', 'g', 'c', 'r', 'k', 'm', 'tab:orange', 'grey']
-tunnel_prop_combi = [(40, 1.6), (40, 1.8), (40, 3.5), (20, 1.6), (10, 1.6), (40, 17), (20, 17), (10, 17)]
 
 
-def get_set(data, vel, prop):
-    if prop == 'off':
-        prop = 17
-        group1 = data.groupby('rounded_J')
-        layer1 = group1.get_group(prop)
+def get_function_set(data, var1, var2):
+    """
+    returns the data filtered by var1 and var2, sorted by 'AoA'
+    :param data: dataframe
+    :param var1: {"name": value}
+    :param var2: {"name": value}
+    """
 
-        group2 = layer1.groupby('rounded_v')
-        layer2 = group2.get_group(vel)
-    else:
+    name1 = list(var1.keys())[0]
+    group1 = data.groupby(name1)      # eg: 'rounded_v'
+    layer1 = group1.get_group(var1[name1])
 
-        group1 = data.groupby('rounded_v')
-        layer1 = group1.get_group(vel)
-
-        group2 = layer1.groupby('rounded_J')
-        layer2 = group2.get_group(prop)
+    name2 = list(var2.keys())[0]
+    group2 = layer1.groupby(name2)    # eg: 'rounded_J'
+    layer2 = group2.get_group(var2[name2])
 
     return layer2.sort_values(by='AoA')
 
 
-def plot_from_dataframe(dataframe, x_name, y_name, inp_lst, xlabel, ylabel):
+def plot_from_dataframe(dataframe, order, x_var_name, y_var_name, inp_lst, x_axis_range, xlabel, ylabel):
     """
     Plots data from a dataframe.
     :param dataframe: A dataframe of the tunnel data
-    :param x_name: name of the dataset to be used for x values
-    :param y_name: name of the dataset to be used for y values
+    :param order: Order of the polyfit
+    :param x_var_name: name of the dataset to be used for x values
+    :param y_var_name: name of the dataset to be used for y values
     :param inp_lst: list of combinations of tunnel and propeller speed
+    :param x_axis_range: linspace range for the x-axis
     :param xlabel: label for the x-axis
     :param ylabel: label for the y-axis
     :return: a plot of the submitted data
     """
     fig, ax = plt.subplots(figsize=(10, 6))
-    # X axis for curve fitting
-    x_axis = np.linspace(-20, 20, 26)
 
     for i in range(len(inp_lst)):
-        dat = get_set(dataframe, inp_lst[i][0], inp_lst[i][1])
+        dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
 
         # Use a polynomial data fit ## order 2
-        curve_fit = np.poly1d(np.polyfit(dat[x_name], dat[y_name], 2))
+        curve_fit = np.poly1d(np.polyfit(dat[x_var_name], dat[y_var_name], order))
         lab = 'V = '+str(round(np.mean(dat['V']))) + ' m/s, J = ' + str(round(np.mean(dat['rounded_J']), 1))
 
-        ax.plot(x_axis, curve_fit(x_axis), '-.', color=colors[i], label=lab)
-        ax.scatter(dat[x_name], dat[y_name], color=colors[i])
-        ax.legend(loc="upper right")
+        ax.plot(x_axis_range, curve_fit(x_axis_range), '-.', color=colors[i], label=lab)
+        ax.scatter(dat[x_var_name], dat[y_var_name], color=colors[i])
+        ax.legend()
 
     ax.grid()
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    ax.set_xticks([i for i in np.arange(x_axis[0] - 2, x_axis[-1] + 2, 2)])
-    ax.set_xlim([x_axis[0] - 2, x_axis[-1] + 2])
+    ax.set_xticks([i for i in np.arange(x_axis_range[0] - 2, x_axis_range[-1] + 2, 2)])
+    ax.set_xlim([x_axis_range[0], x_axis_range[-1]])
 
 
 # Slice the zero deflection array such that the new dataframe contains the same data points
@@ -90,8 +89,21 @@ cm_slope = pd.DataFrame(data=({'CM_de': coeff_CM[0]}))
 cm_datapoints = bal_sorted_15.loc[:, ['AoA', 'rounded_AoA', 'V', 'rounded_v', 'J_M1', 'rounded_J']]
 cm_dataframe = pd.concat([cm_datapoints, cm_slope], axis=1)
 
-# Plot the slope
-plot_from_dataframe(cm_dataframe, 'AoA', 'CM_de', tunnel_prop_combi, f'$\\alpha$ [deg]', r'$\frac{\partial C_M}{\partial \delta_e}$')
-plt.yticks([i for i in np.arange(-0.05, 0, 0.005)])
+# Plot the dCM/d deltae and CL for the set of tunnel and propeller speeds combinations
+tunnel_prop_combi = [[{'rounded_v': 40}, {'rounded_J': 1.6}],
+                     [{'rounded_v': 40}, {'rounded_J': 1.8}],
+                     [{'rounded_v': 40}, {'rounded_J': 3.5}],
+                     [{'rounded_v': 20}, {'rounded_J': 1.6}],
+                     [{'rounded_v': 10}, {'rounded_J': 1.6}],
+                     [{'rounded_v': 40}, {'rounded_J': 17}],
+                     [{'rounded_v': 20}, {'rounded_J': 17}],
+                     [{'rounded_v': 10}, {'rounded_J': 17}]]
+
+plot_from_dataframe(cm_dataframe, 2, 'AoA', 'CM_de', tunnel_prop_combi, np.linspace(-6, 20, 26),
+                    f'$\\alpha$ [deg]', r'$\frac{\partial C_M}{\partial \delta_e}$')
+
+plot_from_dataframe(bal_sorted_15, 2, 'AoA', 'CL', tunnel_prop_combi, np.linspace(-6, 20, 26),
+                    f'$\\alpha$ [deg]', f'$C_L$')
+
 
 plt.show()
