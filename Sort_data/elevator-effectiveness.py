@@ -84,10 +84,13 @@ bal_sorted_0_sliced = pd.concat([bal_sorted_0_sliced1, bal_sorted_0[50:]])
 CM_array = np.array([bal_sorted_min15['CMpitch'], bal_sorted_0_sliced['CMpitch'], bal_sorted_15['CMpitch']])
 delta_e_array_deg = [-15, 0, 15]    # deg
 coeff_CM = np.polyfit(np.transpose(delta_e_array_deg), CM_array, 1)
+
+# Make a dataframe consisting the slopes, AoA, V and K
 cm_slope = pd.DataFrame(data=({'CM_de': coeff_CM[0]}))
 cm_datapoints = bal_sorted_15.loc[:, ['AoA', 'rounded_AoA', 'V', 'rounded_v', 'J_M1', 'rounded_J']]
-
 cm_dataframe = pd.concat([cm_datapoints, cm_slope], axis=1)
+
+# Plot the slope
 plot_from_dataframe(cm_dataframe, 'AoA', 'CM_de', tunnel_prop_combi, f'$\\alpha$ [deg]', r'$\frac{\partial C_M}{\partial \delta_e}$')
 plt.yticks([i for i in np.arange(-0.05, 0, 0.005)])
 
