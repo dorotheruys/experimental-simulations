@@ -6,11 +6,9 @@ Created on Sun Mar 17 17:49:32 2024
 @author: jackcheng
 """
 
-import scipy as sp
 import numpy as np
 import pandas as pd
 
-import math
 import matplotlib.pyplot as plt
 import os
 
@@ -25,28 +23,28 @@ bal_sorted1=pd.read_csv(file1)
 bal_sorted2=pd.read_csv(file2)
 bal_sorted3=pd.read_csv(file3)
 
-colors=['b','g','c','r','k','m','tab:orange','grey']
+colors = ['b', 'g', 'c', 'r', 'k', 'm', 'tab:orange', 'grey']
 
 def get_set(data, vel,prop):
-    if prop=='off':
-        prop=17
-        group1=data.groupby('rounded_J')
-        layer1=group1.get_group(prop)    
+    if prop == 'off':
+        prop = 17
+        group1 = data.groupby('rounded_J')
+        layer1 = group1.get_group(prop)
         
-        group2=layer1.groupby('rounded_v')
-        layer2=group2.get_group(vel)
+        group2 = layer1.groupby('rounded_v')
+        layer2 = group2.get_group(vel)
     else:
 
-        group1=data.groupby('rounded_v')
-        layer1=group1.get_group(vel)
+        group1 = data.groupby('rounded_v')
+        layer1 = group1.get_group(vel)
         
-        group2=layer1.groupby('rounded_J')
-        layer2=group2.get_group(prop)    
+        group2 = layer1.groupby('rounded_J')
+        layer2 = group2.get_group(prop)
         
     return layer2.sort_values(by='AoA')
 
 
-inp_lst=[(40,1.6),(40,1.8),(40,3.5),(20,1.6),(10,1.6),(40,17),(20,17),(10,17)]
+inp_lst = [(40, 1.6), (40, 1.8), (40, 3.5), (20, 1.6), (10, 1.6), (40, 17), (20, 17), (10, 17)]
 def CL_plot(data):
     fig,ax=plt.subplots()
     #this is linspace for curve fitting
@@ -98,16 +96,21 @@ def CM_plot(data):
     
     
 #plots for delta=-15
-CL_plot(bal_sorted1)
+# CL_plot(bal_sorted1)
 CM_plot(bal_sorted1)
-CLCD_plot(bal_sorted1)
+plt.title(f'$\\delta_e$ = -15 deg')
+# CLCD_plot(bal_sorted1)
 
 #plots for delta=15
-CL_plot(bal_sorted2)
+# CL_plot(bal_sorted2)
 CM_plot(bal_sorted2)
-CLCD_plot(bal_sorted2)    
+plt.title(f'$\\delta_e$ = 15 deg')
+# CLCD_plot(bal_sorted2)
     
-#plots for delta=15
-CL_plot(bal_sorted3)
+#plots for delta=0
+# CL_plot(bal_sorted3)
 CM_plot(bal_sorted3)
-CLCD_plot(bal_sorted3)
+plt.title(f'$\\delta_e$ = 0 deg')
+# CLCD_plot(bal_sorted3)
+
+plt.show()
