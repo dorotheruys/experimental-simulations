@@ -173,3 +173,6 @@ cython_debug/
 /Testmatrix_extended_short.xlsx
 /Testmatrix_V4.xlsx
 /Testmatrix_V5.xlsx
+/Noisedata_from_matlab/MIC_0.mat
+/Noisedata_from_matlab/MIC_neg15_2.mat
+/Noisedata_from_matlab/MIC_plus15.mat
