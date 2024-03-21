@@ -146,7 +146,7 @@ CLCD_plot(bal_sorted2,[(40,1.6),(40,1.8),(40,3.5),(40,17)])
 
 CM_plot(bal_sorted2,[(40,1.6),(40,1.8),(40,3.5),(40,17)])
 
-CM_delta(bal_sorted1,bal_sorted2,bal_sorted3,[(40,1.6),(40,1.8),(40,3.5),(40,17)])   
+CM_delta(bal_sorted1,bal_sorted2,bal_sorted3,[(40,1.6),(40,1.8),(40,3.5),(40,17)],7)   
 
 
 
