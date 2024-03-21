@@ -42,32 +42,53 @@ def get_set(data, vel, prop):
     return layer2.sort_values(by='AoA')
 
 
-def plot_from_dataframe(dataframe, x_name, y_name, inp_lst):
+def plot_from_dataframe(dataframe, x_name, y_name, inp_lst, xlabel, ylabel):
     """
     Plots data from a dataframe.
     :param dataframe: A dataframe of the tunnel data
     :param x_name: name of the dataset to be used for x values
     :param y_name: name of the dataset to be used for y values
     :param inp_lst: list of combinations of tunnel and propeller speed
+    :param xlabel: label for the x-axis
+    :param ylabel: label for the y-axis
     :return: a plot of the submitted data
     """
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(10, 6))
     # X axis for curve fitting
-    x_axis = np.linspace(-5, 25, 26)
+    x_axis = np.linspace(-20, 20, 26)
 
     for i in range(len(inp_lst)):
         dat = get_set(dataframe, inp_lst[i][0], inp_lst[i][1])
 
         # Use a polynomial data fit ## order 2
         curve_fit = np.poly1d(np.polyfit(dat[x_name], dat[y_name], 2))
-        lab = 'V = '+str(round(np.mean(dat['V']))) + '  , J = ' + str(round(np.mean(dat['J_M1']), 1))
+        lab = 'V = '+str(round(np.mean(dat['V']))) + ' m/s, J = ' + str(round(np.mean(dat['rounded_J']), 1))
 
-        ax.plot(x_axis, curve_fit(x_axis), '-.', color=colors[i], abel=lab)
-        ax.scatter(dat[x_name], dat[y_name], olor=colors[i])
-        ax.legend()
+        ax.plot(x_axis, curve_fit(x_axis), '-.', color=colors[i], label=lab)
+        ax.scatter(dat[x_name], dat[y_name], color=colors[i])
+        ax.legend(loc="upper right")
 
     ax.grid()
-    ax.set_ylabel(x_name)
-    ax.set_xlabel(y_name)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_xticks([i for i in np.arange(x_axis[0] - 2, x_axis[-1] + 2, 2)])
+    ax.set_xlim([x_axis[0] - 2, x_axis[-1] + 2])
 
-plot_from_dataframe(bal_sorted_min15, '')
+
+# Slice the zero deflection array such that the new dataframe contains the same data points
+rows = [0, 12, 17, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 42, 47, 49]
+bal_sorted_0_sliced1 = bal_sorted_0.iloc[rows]
+bal_sorted_0_sliced = pd.concat([bal_sorted_0_sliced1, bal_sorted_0[50:]])
+
+# Make an array with all Cm coefficients and polyfit to line to return the slopes aka Cm delta
+CM_array = np.array([bal_sorted_min15['CMpitch'], bal_sorted_0_sliced['CMpitch'], bal_sorted_15['CMpitch']])
+delta_e_array_deg = [-15, 0, 15]    # deg
+coeff_CM = np.polyfit(np.transpose(delta_e_array_deg), CM_array, 1)
+cm_slope = pd.DataFrame(data=({'CM_de': coeff_CM[0]}))
+cm_datapoints = bal_sorted_15.loc[:, ['AoA', 'rounded_AoA', 'V', 'rounded_v', 'J_M1', 'rounded_J']]
+
+cm_dataframe = pd.concat([cm_datapoints, cm_slope], axis=1)
+plot_from_dataframe(cm_dataframe, 'AoA', 'CM_de', tunnel_prop_combi, f'$\\alpha$ [deg]', r'$\frac{\partial C_M}{\partial \delta_e}$')
+plt.yticks([i for i in np.arange(-0.05, 0, 0.005)])
+
+plt.show()

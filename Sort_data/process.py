@@ -107,7 +107,7 @@ CM_plot(bal_sorted2)
 plt.title(f'$\\delta_e$ = 15 deg')
 # CLCD_plot(bal_sorted2)
     
-#plots for delta=15
+#plots for delta=0
 # CL_plot(bal_sorted3)
 CM_plot(bal_sorted3)
 plt.title(f'$\\delta_e$ = 0 deg')
