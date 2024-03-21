@@ -1,21 +1,22 @@
 import pandas as pd
-from Data_sorting import df
+from Data_sorting import *
+from Thrust_calculation import Thrust_estimation
 import matplotlib.pyplot as plt
 
 def graph(J,V):
+    thrust_lst = []
+    for aoa in aoa_lst:
+        thrust_lst.append(Thrust_estimation(J,V, aoa))
     prop_setting = df['rounded_J'] == J
     tunnel_velocity = df['rounded_v'] == V
     filtered_df = df.loc[(prop_setting) & (tunnel_velocity)].copy()
     filtered_df['CL_squared'] = filtered_df['CL'] ** 2
-    x_column = 'CL_squared'
-    y_column = 'CD'
+    CL_squared_array = filtered_df['CL_squared'].values
+    CD_array = filtered_df['CD'].values+thrust_lst
 
-    filtered_df.plot(x=x_column, y=y_column, kind='scatter')
-
-    # Add title and labels
-    plt.title('Plot of {} vs {}'.format(y_column, x_column))
-    plt.xlabel(x_column)
-    plt.ylabel(y_column)
+    plt.scatter(CL_squared_array, CD_array)
+    plt.xlabel('CL^2')
+    plt.ylabel('CD')
 
     # Show the plot
     plt.show()
