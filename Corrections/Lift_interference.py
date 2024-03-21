@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 
 
@@ -25,5 +26,11 @@ def average_40(df_original):
     df_return = df_new.sort_values(by=['AoA'], ascending=True)
     return df_return.reset_index(drop=True)
 
+def lift_interference(aoa, CLw):
+    delta = 0.106 # Boundary correction factor
+    S_over_c = 0.2172/0.165
+    tau2  = 1  # (placeholder)
+
+    d_aoa_uw = delta * S_over_c * Clw
 
 
