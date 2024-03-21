@@ -45,9 +45,10 @@ def get_set(data, vel,prop):
         
     return layer2.sort_values(by='AoA')
 
+#%%
 
-inp_lst=[(40,1.6),(40,1.8),(40,3.5),(20,1.6),(10,1.6),(40,17),(20,17),(10,17)]
-def CL_plot(data):
+#inp_lst=[(40,1.6),(40,1.8),(40,3.5),(20,1.6),(10,1.6),(40,17),(20,17),(10,17)]
+def CL_plot(data,inp_lst):
     fig,ax=plt.subplots()
     #this is linspace for curve fitting
     alpha=np.linspace(-5,25,26)
@@ -63,8 +64,8 @@ def CL_plot(data):
     ax.grid()
     ax.set_ylabel('CL')
     ax.set_xlabel('AoA')
-   
-def CLCD_plot(data):
+#%%
+def CLCD_plot(data,inp_lst):
     fig,ax=plt.subplots()
     cl=np.linspace(-1,1.7,50)
     for i in range(len(inp_lst)):
@@ -79,8 +80,8 @@ def CLCD_plot(data):
     ax.grid()
     ax.set_ylabel('CL')
     ax.set_xlabel('CD')  
-    
-def CM_plot(data):
+#%%  
+def CM_plot(data,inp_lst):
     fig,ax=plt.subplots()
     alpha=np.linspace(-5,20,26)
     for i in range(len(inp_lst)):
@@ -95,8 +96,8 @@ def CM_plot(data):
     ax.grid()
     ax.set_ylabel('CM')
     ax.set_xlabel('AoA')
-
-def CM_delta(dat1,dat2,dat3):
+#%%
+def CM_delta(dat1,dat2,dat3,inp_lst):
     cmd1=[]
     cmd2=[]
     cmd3=[]
@@ -110,13 +111,18 @@ def CM_delta(dat1,dat2,dat3):
         group2=dummy2.groupby('rounded_AoA')
         dummy3=get_set(dat3,inp_lst[i][0],inp_lst[i][1])
         group3=dummy3.groupby('rounded_AoA')
-        for j in range(4):
-            cmd1.append(float(group1.get_group(aoa_lst[j])['CMpitch']))
-            cmd2.append(float(group2.get_group(aoa_lst[j])['CMpitch']))
-            cmd3.append(float(group3.get_group(aoa_lst[j])['CMpitch']))
-            lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
-                       +'    AoA='+str(aoa_lst[j]))
-            
+        # for j in range(4):
+        #     cmd1.append(float(group1.get_group(aoa_lst[j])['CMpitch']))
+        #     cmd2.append(float(group2.get_group(aoa_lst[j])['CMpitch']))
+        #     cmd3.append(float(group3.get_group(aoa_lst[j])['CMpitch']))
+        #     lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
+        #                +'    AoA='+str(aoa_lst[j]))
+        cmd1.append(float(group1.get_group(7)['CMpitch']))
+        cmd2.append(float(group2.get_group(7)['CMpitch']))
+        cmd3.append(float(group3.get_group(7)['CMpitch']))
+        lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
+                    +'    AoA='+str(7))
+               
             
     stack=np.stack((np.array(cmd1),np.array(cmd2),np.array(cmd3)))
     
@@ -128,18 +134,29 @@ def CM_delta(dat1,dat2,dat3):
         ax.plot(delta_fit,curve_fit(delta_fit),'-.',label=lab[i])
         ax.legend()
     ax.grid()
-    ax.set_ylabel('CM')
-    ax.set_xlabel('Delta')   
+    ax.set_ylabel(r'$\C_{M}, $')
+    ax.set_xlabel(r'$\nu_{SGS}, $')   
     return stack
-cmd=CM_delta(bal_sorted1,bal_sorted2,bal_sorted3)   
+
     
-    
+#%%
+CL_plot(bal_sorted2,[(40,1.6),(40,1.8),(40,3.5),(40,17)])
+
+CLCD_plot(bal_sorted2,[(40,1.6),(40,1.8),(40,3.5),(40,17)])
+
+CM_plot(bal_sorted2,[(40,1.6),(40,1.8),(40,3.5),(40,17)])
+
+CM_delta(bal_sorted1,bal_sorted2,bal_sorted3,[(40,1.6),(40,1.8),(40,3.5),(40,17)])   
+
+
+
+
 # #plots for delta=-15
 # CL_plot(bal_sorted1)
 # CM_plot(bal_sorted1)
 # CLCD_plot(bal_sorted1)
 
-# #plots for delta=15
+# #plots for delta=0
 # CL_plot(bal_sorted2)
 # CM_plot(bal_sorted2)
 # CLCD_plot(bal_sorted2)    
