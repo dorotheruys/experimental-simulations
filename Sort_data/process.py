@@ -102,7 +102,7 @@ def CM_delta(dat1,dat2,dat3,inp_lst,AoA):
     cmd2=[]
     cmd3=[]
     delta=np.array([-15,0,15])
-    aoa_lst=[-5,7,12,14]
+   
     lab=[]
     for i in range(len(inp_lst)):
         dummy1=get_set(dat1,inp_lst[i][0],inp_lst[i][1])
@@ -111,17 +111,14 @@ def CM_delta(dat1,dat2,dat3,inp_lst,AoA):
         group2=dummy2.groupby('rounded_AoA')
         dummy3=get_set(dat3,inp_lst[i][0],inp_lst[i][1])
         group3=dummy3.groupby('rounded_AoA')
-        # for j in range(4):
-        #     cmd1.append(float(group1.get_group(aoa_lst[j])['CMpitch']))
-        #     cmd2.append(float(group2.get_group(aoa_lst[j])['CMpitch']))
-        #     cmd3.append(float(group3.get_group(aoa_lst[j])['CMpitch']))
-        #     lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
-        #                +'    AoA='+str(aoa_lst[j]))
+      
+        
         cmd1.append(float(group1.get_group(AoA)['CMpitch']))
         cmd2.append(float(group2.get_group(AoA)['CMpitch']))
         cmd3.append(float(group3.get_group(AoA)['CMpitch']))
-        lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
-                    +'    AoA='+str(AoA)+ '[deg]')
+        # lab.append('V=' +str(round(inp_lst[i][0],1))+ '  J= '+str(round(inp_lst[i][1],1))\
+        #             +'    AoA='+str(AoA))
+        lab.append('J= '+str(round(inp_lst[i][1],1)))
                
             
     stack=np.stack((np.array(cmd1),np.array(cmd2),np.array(cmd3)))
@@ -134,8 +131,9 @@ def CM_delta(dat1,dat2,dat3,inp_lst,AoA):
         ax.plot(delta_fit,curve_fit(delta_fit),'-.',label=lab[i])
         ax.legend()
     ax.grid()
-    ax.set_ylabel(r'$\C_{M}, $')
-    ax.set_xlabel(r'$\delta, $')   
+    ax.set_ylabel(r'$C_{M} $')
+    ax.set_xlabel(r'$\delta [deg]$')  
+    ax.set_title('V= '+str( inp_lst[0][0] )+' m/s,  ' + r'$\alpha = $' + str(AoA)+'[deg]')
     return stack
 
     
@@ -146,8 +144,8 @@ CLCD_plot(bal_sorted2,[(40,1.6),(40,1.8),(40,3.5),(40,17)])
 
 CM_plot(bal_sorted2,[(40,1.6),(40,1.8),(40,3.5),(40,17)])
 
-CM_delta(bal_sorted1,bal_sorted2,bal_sorted3,[(40,1.6),(40,1.8),(40,3.5),(40,17)],7)   
-
+CM_delta(bal_sorted1,bal_sorted2,bal_sorted3,[(40,1.6),(40,1.8),(40,3.5),(40,17)],7)
+   
 
 
 
