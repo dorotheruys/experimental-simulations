@@ -1,5 +1,5 @@
 import numpy as np
-from Corrections.Drag_coefficients import drag_coefficients
+from Drag_coefficients import drag_coefficients
 
 def Solidblockage():
     K3f = 0.91
