@@ -7,7 +7,7 @@ pd.set_option('display.max_rows', None)
 #pd.set_option('display.max_columns', None)
 
 def Thrust_estimation1(J,V,AoA):
-    windmilling = df['rounded_J'] == 17
+    windmilling = df['rounded_J'] == 3.5
     tunnel_velocity = df['rounded_v'] == V
     prop_setting = df['rounded_J'] == J
     aoa_setting = df['rounded_AoA'] == AoA
@@ -44,22 +44,23 @@ def drag_interpolation(V):
     # plt.show()
     return fitted_curve
 
-for index, row in df.iterrows():
-    rounded_J = row['rounded_J']
-    rounded_v = row['rounded_v']
-    rounded_AoA = row['rounded_AoA']
-
-    new_value = Thrust_estimation1(rounded_J, rounded_v, rounded_AoA)
-    new_value = "{:.10f}".format(new_value)
-    df.at[index, 'Thrust coefficient'] = new_value
-
-print(df)
-
-# Specify the file path where you want to save the CSV file
-csv_file_path = 'Sort_data/bal_neg15_corrected.csv'
-
-# Use the to_csv() method to save the dataframe to a CSV file
-df.to_csv(csv_file_path, index=False)
+Thrust_estimation1(1.6,40,7)
+# for index, row in df.iterrows():
+#     rounded_J = row['rounded_J']
+#     rounded_v = row['rounded_v']
+#     rounded_AoA = row['rounded_AoA']
+#
+#     new_value = Thrust_estimation1(rounded_J, rounded_v, rounded_AoA)
+#     new_value = "{:.10f}".format(new_value)
+#     df.at[index, 'Thrust coefficient'] = new_value
+#
+# print(df)
+#
+# # Specify the file path where you want to save the CSV file
+# csv_file_path = 'Sort_data/bal_neg15_corrected.csv'
+#
+# # Use the to_csv() method to save the dataframe to a CSV file
+# df.to_csv(csv_file_path, index=False)
 
 # aoa_lst = [-5,7,12,14]
 #

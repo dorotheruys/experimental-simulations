@@ -1,4 +1,5 @@
 import numpy as np
+from Drag_coefficients import drag_coefficients
 
 def Solidblockage():
     K3f = 0.91
@@ -19,7 +20,8 @@ def Solidblockage():
     e_sb = e_sb_f + e_sb_w
     return e_sb
 
-def Wakeblockage(CD,CD0,CDi):
+def Wakeblockage(J,V,CL):
+    CD0, CDi, CDs, CD_unc = drag_coefficients(J,V,CL)
     D_fuselage = 0.14
     t_c_wing = 0.1
     mac_wing = 0.165
@@ -33,7 +35,9 @@ def Wakeblockage(CD,CD0,CDi):
     C_tunnel = b_wing ** 2 * 1.29 * 0.98
 
     e_wbt = S_ref / (4 * C_tunnel) * CD0
-    e_wbs = 5 * S_ref / (4 * C_tunnel) * (CD - CD0 - CDi)
+    e_wbs = 5 * S_ref / (4 * C_tunnel) * (CD_unc-CD0-CDi)
 
     e_wbt = e_wbt + e_wbs;
     return e_wbt
+
+print(Wakeblockage(1.6,40,2))
