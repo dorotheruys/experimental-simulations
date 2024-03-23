@@ -20,8 +20,10 @@ def get_file_path(filename):
     current_path = os.getcwd()
     # Get the parent directory
     parent_path = os.path.dirname(current_path)
-    total_path = parent_path + str("\\") + filename
+    total_path = os.path.join(parent_path, filename)
     return total_path
+
+print(get_file_path("BAL.mat"))
 
 
 # %%
