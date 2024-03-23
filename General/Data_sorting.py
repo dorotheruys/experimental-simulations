@@ -4,7 +4,7 @@ import numpy as np
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 aoa_lst = [-5,7,12,14]
-df = pd.read_csv('Sort_data/bal_0_corrected.csv')
+df = pd.read_csv('../Sort_data/bal_0_corrected.csv')
 
 #There were two similar rows with the same angle of attack in 0_corrected. Took the average of them
 double_aoa_rows = df[(df['rounded_AoA'] == 4) & (df['rounded_v'] == 20)]

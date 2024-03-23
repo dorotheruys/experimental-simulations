@@ -1,5 +1,5 @@
 import pandas as pd
-from Data_sorting import df
+from General.Data_sorting import df
 import numpy as np
 import matplotlib.pyplot as plt
 

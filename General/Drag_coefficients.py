@@ -1,7 +1,7 @@
 import pandas as pd
-from Data_sorting import *
+from General.Data_sorting import *
 import matplotlib.pyplot as plt
-from Thrust_calculation import drag_interpolation
+from General.Thrust_calculation import drag_interpolation
 
 def drag_coefficients(J,V,CL_unc):
     prop_setting = df['rounded_J'] == J

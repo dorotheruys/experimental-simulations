@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from Lift_interference import *
+from Corrections.Lift_interference import *
 
 def plot_aoa_lift(df):
     return plt.scatter(df["AoA"], df["CL"])
