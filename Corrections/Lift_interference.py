@@ -66,10 +66,10 @@ def lift_interference(df_uncor, df_tailoff):
 if __name__ == "__main__":
     V_target = 40
 
-    file1 = "../Sort_data/bal_sorted1.csv"
+    file1 = "../Sort_data/bal_sorted2.csv"
 
     df_to_process = df_velocity_filter(file1, V_target)
-    df_to_process = df_to_process[df_to_process["rounded_J"] == 3.5]
+    df_to_process = df_to_process[df_to_process["rounded_J"] == 1.6]
     df_tailoff = average_40_tailoff(df_velocity_filter_tailoff(V_target))
 
     aoa_new, CD_new = lift_interference(df_to_process, df_tailoff)

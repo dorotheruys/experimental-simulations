@@ -13,9 +13,9 @@ def plot_aoa_drag(df):
     return plt.scatter(df["AoA"], df["CD"])
 
 
-df_V20 = df_velocity_filter(20)
-df_V40 = df_velocity_filter(40)
-df_V40_cor = average_40(df_V40)
+df_V20 = df_velocity_filter_tailoff(20)
+df_V40 = df_velocity_filter_tailoff(40)
+df_V40_cor = average_40_tailoff(df_V40)
 
 plot_aoa_lift(df_V20)
 plot_aoa_lift(df_V40)
