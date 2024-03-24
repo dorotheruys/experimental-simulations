@@ -21,12 +21,14 @@ bal_sorted_15 = pd.read_csv(file3)
 
 colors = ['b', 'g', 'c', 'r', 'k', 'm', 'tab:orange', 'grey']
 
+
 class FunctionData:
     def __init__(self, tunnel_speed: float, propeller_speed: float, x_variable: str, poly_coeff: np.poly1d):
         self.tunnel_speed: float = tunnel_speed
         self.propeller_speed: float = propeller_speed
         self.x_variable: str = x_variable
         self.poly_coeff: np.poly1d = poly_coeff
+
 
 def get_function_set(data, var1, var2):
     """
@@ -63,8 +65,8 @@ def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_
     :return: a plot of the submitted data
     """
     fig, ax = plt.subplots(figsize=(10, 6))
-    dict = {}
-    keys_lst = []
+    dict_f = {}
+    f_lst = []
 
     for i in range(len(inp_lst)):
         dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
@@ -85,15 +87,9 @@ def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_
 
         # Save the poly coefficients to a class with corresponding var1 and var2
         correspondingClass = FunctionData(var1, var2, x_var_name, curve_fit)
-        dict[f"V_{var1}_J_{var2}"] = correspondingClass
+        dict_f[f"V_{var1}_J_{var2}"] = correspondingClass
+        f_lst.append(correspondingClass)
 
-    #     dataframe_interpolated = pd.DataFrame(data=({'x_range': x_axis_range, 'y_values': curve_fit(x_axis_range)}))
-    #     dfs_lst.append(dataframe_interpolated)
-    #     keys_lst.append([var1, var2])
-    #         # keys= ['V': var1, 'rounded_J': ])
-    #
-    # # Concate all dataframes
-    # dataframe_interpolated_all = pd.concat(dfs_lst)#, keys=keys_lst)
 
     # Set up the plot
     ax.grid()
@@ -102,7 +98,21 @@ def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_
     ax.set_xticks([i for i in np.arange(x_axis_range[0] - 2, x_axis_range[-1] + 2, (x_axis_range[-1] - x_axis_range[0]) / 10)])
     ax.set_xlim([x_axis_range[0], x_axis_range[-1]])
 
-    return dict
+    return f_lst
+
+
+def extract(function_datas: list, tunnel_speed: int, propeller_speed: int):
+    """
+    Extracts the polyline coefficients based on a tunnel and propeller speed combination.
+    :param function_datas: a list of FunctionClass classes that contain the data
+    :param tunnel_speed: the tunnel speed
+    :param propeller_speed: the propeller speed
+    """
+    for function in function_datas:
+        if function.tunnel_speed == tunnel_speed and function.propeller_speed == propeller_speed:
+            return function.poly_coeff
+        else:
+            pass
 
 
 # Slice the zero deflection array such that the new dataframe contains the same data points
@@ -120,7 +130,6 @@ cm_slope = pd.DataFrame(data=({'CM_de': coeff_CM[0]}))
 cm_datapoints = bal_sorted_15.loc[:, ['AoA', 'rounded_AoA', 'V', 'rounded_v', 'J_M1', 'rounded_J']]
 cm_dataframe = pd.concat([cm_datapoints, cm_slope], axis=1)
 
-# Plot the dCM/d deltae and CL for the set of tunnel and propeller speeds combinations
 tunnel_prop_combi = [[{'rounded_v': 40}, {'rounded_J': 1.6}],
                      [{'rounded_v': 40}, {'rounded_J': 1.8}],
                      [{'rounded_v': 40}, {'rounded_J': 3.5}],
@@ -131,8 +140,9 @@ tunnel_prop_combi = [[{'rounded_v': 40}, {'rounded_J': 1.6}],
                      [{'rounded_v': 10}, {'rounded_J': 17}]]
 
 # Get plot for AoA versus dCM/d delta_e, for each V & J combination
-resulting_plots = plot_from_dataframe(cm_dataframe, 2, 'AoA', 'CM_de', tunnel_prop_combi,
-                                         np.linspace(-6, 20, 26), f'$\\alpha$ [deg]', r'$\frac{\partial C_M}{\partial \delta_e}$ [-]')
+cm_plotting_lst = plot_from_dataframe(cm_dataframe, 2, 'AoA', 'CM_de', tunnel_prop_combi,
+                                      np.linspace(-6, 20, 26), f'$\\alpha$ [deg]',
+                                      r'$\frac{\partial C_M}{\partial \delta_e}$ [-]')
 
 # Get plot for AoA vs CL, for each V & J combination
 plot_from_dataframe(bal_sorted_15, 2, 'AoA', 'CL', tunnel_prop_combi,
