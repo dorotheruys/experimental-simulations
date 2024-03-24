@@ -8,7 +8,7 @@ def df_velocity_filter_tailoff(V_target: int):
     df = df.drop("AoS", axis=1)
     margin = 0.5  # [m/s]
     filtered_df = df[(df['Vinf'] >= V_target - margin) & (df['Vinf'] <= V_target + margin)]
-    filtered_df.loc[:,"AoA"] = filtered_df.loc[:,"AoA"].round()  # Round AoA
+    filtered_df.loc[:, "AoA"] = filtered_df.loc[:, "AoA"].round()  # Round AoA
     filtered_df = filtered_df.reset_index(drop=True)
     return filtered_df
 
@@ -29,6 +29,12 @@ def average_40_tailoff(df_original):
     return df_return.reset_index(drop=True)
 
 
+def generate_cl_alpha(df):
+    df['CLa'] = df["CL"].diff() / df["AoA"].diff()
+    df.loc[0, 'CLa'] = df['CLa'].iloc[1]  # Set value of first CLa to value of second CLa to prevent NaN
+    return df
+
+
 def df_velocity_filter(file1, V_target: int):
     df = pd.read_csv(file1)
     margin = 0.5  # [m/s]
@@ -40,10 +46,9 @@ def df_velocity_filter(file1, V_target: int):
 def lift_interference(df_uncor, df_tailoff):
     aoa_uncor = df_uncor["rounded_AoA"]
 
-    aoa_series = pd.Series(aoa_uncor)
-
     # Use the 'isin' function to filter rows in 'df_tailoff' where 'AoA' matches any value in 'aoa_series'
-    filtered = df_tailoff[df_tailoff['AoA'].isin(aoa_series)]
+    # Note: tailoff is already rounded
+    filtered = df_tailoff[df_tailoff['AoA'].isin(aoa_uncor)]
 
     # Extract the 'CL' column and convert it to a numpy array
     CLw = filtered['CL'].values
@@ -63,8 +68,6 @@ def lift_interference(df_uncor, df_tailoff):
     return aoa_cor, CD_cor
 
 
-
-
 def main():
     V_target = 40
 
@@ -77,25 +80,27 @@ def main():
     aoa_new, CD_new = lift_interference(df_to_process, df_tailoff)
     aoa_old, CD_old = df_to_process["AoA"], df_to_process["CD"]
 
-    fig, ax = plt.subplots()
-    ax.scatter(aoa_old, CD_old, label='Old Data')
-    ax.scatter(aoa_new, CD_new, label='New Data')
-    ax.set_xlabel('AoA')
-    ax.set_ylabel('CD')
-    ax.legend()
-    ax.grid(True)
-    plt.show()
+    cl_a = generate_cl_alpha(df_tailoff)
+    print(cl_a)
 
-    fig, ax = plt.subplots()
-    ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
-    ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
-    ax.set_xlabel('AoA')
-    ax.set_ylabel('CL')
-    ax.legend()
-    ax.grid(True)
-    plt.show()
+    # fig, ax = plt.subplots()
+    # ax.scatter(aoa_old, CD_old, label='Old Data')
+    # ax.scatter(aoa_new, CD_new, label='New Data')
+    # ax.set_xlabel('AoA')
+    # ax.set_ylabel('CD')
+    # ax.legend()
+    # ax.grid(True)
+    # plt.show()
+    #
+    # fig, ax = plt.subplots()
+    # ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
+    # ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
+    # ax.set_xlabel('AoA')
+    # ax.set_ylabel('CL')
+    # ax.legend()
+    # ax.grid(True)
+    # plt.show()
 
 
 if __name__ == "__main__":
     main()
-
