@@ -12,18 +12,7 @@ import pandas as pd
 import matlab.engine
 import math
 import os
-
-
-def get_file_path(filename):
-    # works only in case file is one level up
-    # Get the current working directory (i.e., the directory where this script is located)
-    current_path = os.getcwd()
-    # Get the parent directory
-    parent_path = os.path.dirname(current_path)
-    total_path = os.path.join(parent_path, filename)
-    return total_path
-
-print(get_file_path("BAL.mat"))
+from General.Pathfinder import get_file_path
 
 
 # %%

@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from General.Pathfinder import get_file_path
 
 
 def df_velocity_filter_tailoff(V_target: int):
@@ -28,7 +29,7 @@ def average_40_tailoff(df_original):
     return df_return.reset_index(drop=True)
 
 
-def df_velocity_filter(filename, V_target: int):
+def df_velocity_filter(file1, V_target: int):
     df = pd.read_csv(file1)
     margin = 0.5  # [m/s]
     filtered_df = df[(df['V'] >= V_target - margin) & (df['V'] <= V_target + margin)]
@@ -63,10 +64,11 @@ def lift_interference(df_uncor, df_tailoff):
 
 
 
-if __name__ == "__main__":
+
+def main():
     V_target = 40
 
-    file1 = "../Sort_data/bal_sorted2.csv"
+    file1 = get_file_path(filename="bal_sorted2.csv", folder="Sort_data")
 
     df_to_process = df_velocity_filter(file1, V_target)
     df_to_process = df_to_process[df_to_process["rounded_J"] == 1.6]
@@ -93,4 +95,7 @@ if __name__ == "__main__":
     ax.grid(True)
     plt.show()
 
+
+if __name__ == "__main__":
+    main()
 
