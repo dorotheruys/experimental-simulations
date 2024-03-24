@@ -7,7 +7,7 @@ import pandas as pd
 
 import matplotlib.pyplot as plt
 import os
-from General.data_function_maker import plot_from_dataframe, FunctionData
+from General.data_function_maker import plot_from_dataframe
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 

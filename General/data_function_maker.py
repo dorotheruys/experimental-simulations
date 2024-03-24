@@ -6,8 +6,10 @@ import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
+from Plotting.plotter import StylePlot, PlotData
 
 colors = ['b', 'g', 'c', 'r', 'k', 'm', 'tab:orange', 'grey']
+
 
 class FunctionData:
     def __init__(self, tunnel_speed: float, propeller_speed: float, x_variable: str, poly_coeff: np.poly1d):
@@ -36,8 +38,7 @@ def get_function_set(data, var1, var2):
     return layer2.sort_values(by='AoA')
 
 
-def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_var_name: str, inp_lst: list,
-                        x_axis_range: np.array, xlabel: str, ylabel: str):
+def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_var_name: str, inp_lst: list, x_axis_range: np.array, xlabel: str, xunit: str , ylabel: str, yunit: str):
     """
     Plots data from a dataframe based on variables names of x and y. Note that these should be the same names as the
     column names of the dataframe for the function to work.
@@ -54,6 +55,8 @@ def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_
     fig, ax = plt.subplots(figsize=(10, 6))
     dict_f = {}
     f_lst = []
+
+    plot_data = PlotData(xlabel, xunit, ylabel, yunit)
 
     for i in range(len(inp_lst)):
         dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
@@ -76,7 +79,6 @@ def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_
         correspondingClass = FunctionData(var1, var2, x_var_name, curve_fit)
         dict_f[f"V_{var1}_J_{var2}"] = correspondingClass
         f_lst.append(correspondingClass)
-
 
     # Set up the plot
     ax.grid()
