@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+import numpy as np
 from General.Pathfinder import get_file_path
 
 
@@ -32,6 +33,7 @@ def average_40_tailoff(df_original):
 def generate_cl_alpha(df):
     df['CLa'] = df["CL"].diff() / df["AoA"].diff()
     df.loc[0, 'CLa'] = df['CLa'].iloc[1]  # Set value of first CLa to value of second CLa to prevent NaN
+    df["CLa"] = df["CLa"] * 180 / np.pi  # Convert from deg^-1 to rad^-1 for CLa
     return df
 
 
@@ -51,7 +53,8 @@ def lift_interference(df_uncor, df_tailoff):
     filtered = df_tailoff[df_tailoff['AoA'].isin(aoa_uncor)]
 
     # Extract the 'CL' column and convert it to a numpy array
-    CLw = filtered['CL'].values
+    CLw = filtered["CL"].values
+    CLa = filtered["CLa"].values
 
     delta = 0.106  # Boundary correction factor
     S_over_c = 0.2172 / 0.165  # Of main wing
@@ -61,11 +64,12 @@ def lift_interference(df_uncor, df_tailoff):
     d_aoa_sc = tau2 * d_aoa_uw
     d_Cd_w = delta * S_over_c * CLw ** 2
     d_aoa = d_aoa_uw + d_aoa_sc
-    # add formula for d_Cw
+    d_CM25c = 1/8*d_aoa_sc*CLa
 
     aoa_cor = aoa_uncor.values + d_aoa
     CD_cor = df_uncor["CD"].values + d_Cd_w
-    return aoa_cor, CD_cor
+    CM25c_cor = df_uncor["CMpitch25c"].values + d_CM25c
+    return aoa_cor, CD_cor, CM25c_cor
 
 
 def main():
@@ -76,30 +80,37 @@ def main():
     df_to_process = df_velocity_filter(file1, V_target)
     df_to_process = df_to_process[df_to_process["rounded_J"] == 1.6]
     df_tailoff = average_40_tailoff(df_velocity_filter_tailoff(V_target))
+    df_tailoff = generate_cl_alpha(df_tailoff)
 
-    aoa_new, CD_new = lift_interference(df_to_process, df_tailoff)
-    aoa_old, CD_old = df_to_process["AoA"], df_to_process["CD"]
+    aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
+    aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
 
-    cl_a = generate_cl_alpha(df_tailoff)
-    print(cl_a)
+    fig, ax = plt.subplots()
+    ax.scatter(aoa_old, CD_old, label='Old Data')
+    ax.scatter(aoa_new, CD_new, label='New Data')
+    ax.set_xlabel('AoA')
+    ax.set_ylabel('CD')
+    ax.legend()
+    ax.grid(True)
+    plt.show()
 
-    # fig, ax = plt.subplots()
-    # ax.scatter(aoa_old, CD_old, label='Old Data')
-    # ax.scatter(aoa_new, CD_new, label='New Data')
-    # ax.set_xlabel('AoA')
-    # ax.set_ylabel('CD')
-    # ax.legend()
-    # ax.grid(True)
-    # plt.show()
-    #
-    # fig, ax = plt.subplots()
-    # ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
-    # ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
-    # ax.set_xlabel('AoA')
-    # ax.set_ylabel('CL')
-    # ax.legend()
-    # ax.grid(True)
-    # plt.show()
+    fig, ax = plt.subplots()
+    ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
+    ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
+    ax.set_xlabel('AoA')
+    ax.set_ylabel('CL')
+    ax.legend()
+    ax.grid(True)
+    plt.show()
+
+    fig, ax = plt.subplots()
+    ax.scatter(aoa_old, CM_old, label='Old Data')
+    ax.scatter(aoa_new, CM_new, label='New Data')
+    ax.set_xlabel('AoA')
+    ax.set_ylabel('CM')
+    ax.legend()
+    ax.grid(True)
+    plt.show()
 
 
 if __name__ == "__main__":
