@@ -166,6 +166,9 @@ cython_debug/
 #.idea/**/profile_settings.xml
 #.idea/**/vcs.xml
 #
+
+
+/Test_matrices/
 /Test_matrices/Testmatrix.xlsx
 /Test_matrices/Testmatrix_V2.xlsx
 /Test_matrices/Testmatrix_V3.xlsx
@@ -176,4 +179,4 @@ cython_debug/
 /Noisedata_from_matlab/MIC_0.mat
 /Noisedata_from_matlab/MIC_neg15_2.mat
 /Noisedata_from_matlab/MIC_plus15.mat
-/Test_matrices/
+
