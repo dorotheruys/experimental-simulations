@@ -9,7 +9,7 @@ Created on Sun Mar 17 09:46:42 2024
 import scipy as sp
 import numpy as np
 import pandas as pd
-import matlabengine
+import matlab.engine
 import math
 import matplotlib.pyplot as plt
 
