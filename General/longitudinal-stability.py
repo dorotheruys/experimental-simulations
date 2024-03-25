@@ -27,13 +27,14 @@ rows = [0, 12, 17, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 42, 47, 49]
 bal_sorted_0_sliced1 = bal_sorted_0.iloc[rows]
 bal_sorted_0_sliced = pd.concat([bal_sorted_0_sliced1, bal_sorted_0[50:]])
 
-# Plot CM vs AoA for delta = -15
-get_function_from_dataframe(bal_sorted_min15, 2, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
+if __name__ == "__main__":
+    # Plot CM vs AoA for delta = -15
+    get_function_from_dataframe(bal_sorted_min15, 2, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
-# Plot CM vs AoA for delta = 0
-get_function_from_dataframe(bal_sorted_0_sliced, 2, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
+    # Plot CM vs AoA for delta = 0
+    get_function_from_dataframe(bal_sorted_0_sliced, 2, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
-# Plot CM vs AoA for delta = 15
-get_function_from_dataframe(bal_sorted_15, 2, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
+    # Plot CM vs AoA for delta = 15
+    get_function_from_dataframe(bal_sorted_15, 2, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
-plt.show()
+    plt.show()

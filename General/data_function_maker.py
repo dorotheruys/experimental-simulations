@@ -66,7 +66,7 @@ def get_function_set(data, var1, var2):
     return layer2.sort_values(by='AoA')
 
 
-def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_var_name: str, inp_lst: list, x_axis_range: np.array, xlabel: str, ylabel: str):
+def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_var_name: str, inp_lst: list, x_axis_range: np.array, xlabel: [str, None], ylabel: [str, None]):
     """
     Plots data from a dataframe based on variables names of x and y for the given combinations of V and J. Note that these should be the same names as the
     column names of the dataframe for the function to work.
@@ -99,7 +99,7 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
         f_lst.append(correspondingClass)
 
     # Plot
-    if xlabel and ylabel:
+    if xlabel is not None and ylabel is not None:
         plot_function_data(f_lst, xlabel, ylabel, x_axis_range)
     else:
         print("The data has not been plotted. Please fill in the correct fields if wanted.")
