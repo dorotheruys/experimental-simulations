@@ -4,19 +4,47 @@
 
 import numpy as np
 import pandas as pd
-
 import matplotlib.pyplot as plt
-from Plotting.plotter import StylePlot, PlotData
 
-colors = ['b', 'g', 'c', 'r', 'k', 'm', 'tab:orange', 'grey']
+# colors = ['b', 'g', 'c', 'r', 'k', 'm', 'tab:orange', 'grey']
+colors = ["#00A6B6", "#A50034", "#EC6842", "#009B77", "#FFB81C", "#6F1D77", "#EF60A3", "#000000"]
 
 
 class FunctionData:
-    def __init__(self, tunnel_speed: float, propeller_speed: float, x_variable: str, poly_coeff: np.poly1d):
+    """
+    Class to save the polyfit coefficients with the corresponding data
+    """
+    def __init__(self, tunnel_speed: float, propeller_speed: float, x_variable: str, y_variable: str, poly_coeff: np.poly1d, data_points: pd.DataFrame):
         self.tunnel_speed: float = tunnel_speed
         self.propeller_speed: float = propeller_speed
         self.x_variable: str = x_variable
+        self.y_variable: str = y_variable
         self.poly_coeff: np.poly1d = poly_coeff
+        self.data_points: pd.DataFrame = data_points
+
+
+def plot_function_data(plot_data: list, xlabel: str, ylabel: str, x_axis_range: np.array):
+    """
+    Makes a plot of a list of FunctionData classes
+    :param plot_data: list of FunctionData classes
+    :param xlabel: Label for the x-axis, incl unit
+    :param ylabel: Label for y-axis, incl unit
+    :param x_axis_range: range for the x-axis
+    """
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    for i, function in enumerate(plot_data):
+        function_label = f'V = {function.tunnel_speed} m/s, J = {function.propeller_speed}'
+        ax.plot(x_axis_range, function.poly_coeff(x_axis_range), '-.', color=colors[i], label=function_label)
+        ax.scatter(function.data_points[function.x_variable], function.data_points[function.y_variable], color=colors[i])
+
+    ax.grid()
+    ax.legend()
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.set_xticks([i for i in
+                   np.arange(x_axis_range[0] - 2, x_axis_range[-1] + 2.1, (x_axis_range[-1] - x_axis_range[0]) / 10)])
+    ax.set_xlim([x_axis_range[0], x_axis_range[-1]])
 
 
 def get_function_set(data, var1, var2):
@@ -38,9 +66,9 @@ def get_function_set(data, var1, var2):
     return layer2.sort_values(by='AoA')
 
 
-def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_var_name: str, inp_lst: list, x_axis_range: np.array, xlabel: str, xunit: str , ylabel: str, yunit: str):
+def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_var_name: str, inp_lst: list, x_axis_range: np.array, xlabel: str, ylabel: str):
     """
-    Plots data from a dataframe based on variables names of x and y. Note that these should be the same names as the
+    Plots data from a dataframe based on variables names of x and y for the given combinations of V and J. Note that these should be the same names as the
     column names of the dataframe for the function to work.
     :param dataframe: A dataframe of the tunnel data
     :param order: Order of the polyfit
@@ -52,11 +80,8 @@ def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_
     :param ylabel: label for the y-axis
     :return: a plot of the submitted data
     """
-    fig, ax = plt.subplots(figsize=(10, 6))
     dict_f = {}
     f_lst = []
-
-    plot_data = PlotData(xlabel, xunit, ylabel, yunit)
 
     for i in range(len(inp_lst)):
         dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
@@ -68,24 +93,13 @@ def plot_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_
         var1 = round(np.mean(dat['rounded_v']))
         var2 = round(np.mean(dat['rounded_J']))
 
-        lab = f'V = {var1} m/s, J = {var2}'
-
-        # Plot
-        ax.plot(x_axis_range, curve_fit(x_axis_range), '-.', color=colors[i], label=lab)
-        ax.scatter(dat[x_var_name], dat[y_var_name], color=colors[i])
-        ax.legend()
-
         # Save the poly coefficients to a class with corresponding var1 and var2
-        correspondingClass = FunctionData(var1, var2, x_var_name, curve_fit)
+        correspondingClass = FunctionData(var1, var2, x_var_name, y_var_name, curve_fit, dat)
         dict_f[f"V_{var1}_J_{var2}"] = correspondingClass
         f_lst.append(correspondingClass)
 
-    # Set up the plot
-    ax.grid()
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
-    ax.set_xticks([i for i in np.arange(x_axis_range[0] - 2, x_axis_range[-1] + 2, (x_axis_range[-1] - x_axis_range[0]) / 10)])
-    ax.set_xlim([x_axis_range[0], x_axis_range[-1]])
+    # Plot
+    plot_function_data(f_lst, xlabel, ylabel, x_axis_range)
 
     return f_lst
 
