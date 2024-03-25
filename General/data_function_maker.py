@@ -99,7 +99,10 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
         f_lst.append(correspondingClass)
 
     # Plot
-    plot_function_data(f_lst, xlabel, ylabel, x_axis_range)
+    if xlabel and ylabel:
+        plot_function_data(f_lst, xlabel, ylabel, x_axis_range)
+    else:
+        print("The data has not been plotted. Please fill in the correct fields if wanted.")
 
     return f_lst
 
