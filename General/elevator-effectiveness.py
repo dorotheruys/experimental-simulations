@@ -6,7 +6,6 @@ import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
-import os
 from General.data_function_maker import get_function_from_dataframe
 
 
@@ -48,16 +47,9 @@ def get_slope_cm_vs_aoa(cm_datapoints):
 
     return dcm_ddeltae_plotting_lst
 
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
-file1 = os.path.join(current_dir, 'bal_sorted1.csv')
-file2 = os.path.join(current_dir, 'bal_sorted2.csv')
-file3 = os.path.join(current_dir, 'bal_sorted3.csv')
-
-bal_sorted_min15 = pd.read_csv(file1)
-bal_sorted_0 = pd.read_csv(file2)
-bal_sorted_15 = pd.read_csv(file3)
+bal_sorted_min15 = pd.read_csv('../Sort_data/bal_sorted1.csv')
+bal_sorted_0 = pd.read_csv('../Sort_data/bal_sorted2.csv')
+bal_sorted_15 = pd.read_csv('../Sort_data/bal_sorted3.csv')
 
 tunnel_prop_combi = [[{'rounded_v': 40}, {'rounded_J': 1.6}],
                      [{'rounded_v': 40}, {'rounded_J': 1.8}],
