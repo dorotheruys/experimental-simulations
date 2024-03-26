@@ -88,7 +88,7 @@ def lift_interference(df_uncor, df_tailoff):
 
 
 def main():
-    V_target = 10
+    V_target = 40
     J_target = 1.6
 
     file1 = get_file_path(filename="bal_sorted2.csv", folder="Sort_data")

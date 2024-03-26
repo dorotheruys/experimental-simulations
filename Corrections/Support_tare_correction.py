@@ -7,12 +7,15 @@ def strut_correction():
     df = df.rename(columns={"AoA [deg]": "AoA"})
     return df
 
-def get_uncor_data(file, folder)
-
 def main():
     path = get_file_path("bal_sorted2.csv", folder="Sort_data")
-    df = pd.read_csv(path)
-    print(df)
+    df_uncor = pd.read_csv(path)
+    df_strut = strut_correction()
+
+
+    for aoa in df_uncor["rounded_AoA"]:
+        df_strut_aoa.loc[-1] = = df_strut[(df_strut["AoA"] == aoa)]
+        df.loc[-1]
 
 if __name__ == "__main__":
     main()
