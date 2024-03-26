@@ -6,13 +6,14 @@ import numpy as np
 import pandas as pd
 
 import matplotlib.pyplot as plt
-from General.data_function_maker import get_function_from_dataframe
+from General.data_function_maker import get_function_from_dataframe, get_function_set
 
 
 def get_aoa_combis(aoa):
-    combis = [[{'rounded_AoA': aoa}, {'rounded_v': 40}],
-              [{'rounded_AoA': aoa}, {'rounded_v': 20}],
-              [{'rounded_AoA': aoa}, {'rounded_v': 10}]]
+    combis = [[{'rounded_AoA': aoa}, {'rounded_v': 40}]]
+        # ,
+        #       [{'rounded_AoA': aoa}, {'rounded_v': 20}],
+        #       [{'rounded_AoA': aoa}, {'rounded_v': 10}]]
     return combis
 
 
@@ -25,11 +26,14 @@ def get_cm_vs_elevator(cm_datapoints, plot):
     # Make one large dataframe of all relevant data points to construct the graph
     CM_df = pd.concat([CM_min15, CM_0, CM_15], axis=0, ignore_index=True)
 
+    # Get a dataframe for one specific AoA
+    CM_df_AoA7 = get_function_set(CM_df, {'rounded_AoA': 7}, None)
+
     # Plot
     if plot is None:
-        cm_deltae_plotting_lst = get_function_from_dataframe(CM_df, 2, 'delta_e', 'CMpitch', get_aoa_combis(7), np.linspace(-20, 20, 50), None, None)
+        cm_deltae_plotting_lst = get_function_from_dataframe(CM_df_AoA7, 2, 'delta_e', 'CMpitch', tunnel_prop_combi, np.linspace(-20, 20, 50), None, None)
     else:
-        cm_deltae_plotting_lst = get_function_from_dataframe(CM_df, 2, 'delta_e', 'CMpitch', get_aoa_combis(7), np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', r'$C_M$ [-]')
+        cm_deltae_plotting_lst = get_function_from_dataframe(CM_df_AoA7, 2, 'delta_e', 'CMpitch', tunnel_prop_combi, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', r'$C_M$ [-]')
 
     return cm_deltae_plotting_lst
 
