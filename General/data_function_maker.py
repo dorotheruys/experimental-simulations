@@ -112,7 +112,7 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
     return f_lst
 
 
-def extract(function_datas: list, tunnel_speed: int, propeller_speed: int):
+def extract_from_list_classes(function_datas: list, tunnel_speed: int, propeller_speed: float):
     """
     Extracts the polyline coefficients based on a tunnel and propeller speed combination.
     :param function_datas: a list of FunctionClass classes that contain the data
