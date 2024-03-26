@@ -11,6 +11,9 @@ def df_velocity_filter_tailoff(V_target: int):
     filtered_df = df[(df['Vinf'] >= V_target - margin) & (df['Vinf'] <= V_target + margin)]
     filtered_df.loc[:, "AoA"] = filtered_df.loc[:, "AoA"].round()  # Round AoA
     filtered_df = filtered_df.reset_index(drop=True)
+    if V_target == 40:
+        filtered_df = average_40_tailoff(filtered_df)
+    filtered_df = generate_cl_alpha(filtered_df)
     return filtered_df
 
 
@@ -74,13 +77,16 @@ def lift_interference(df_uncor, df_tailoff):
 
 def main():
     V_target = 40
+    J_target = 1.8
 
     file1 = get_file_path(filename="bal_sorted2.csv", folder="Sort_data")
 
     df_to_process = df_velocity_filter(file1, V_target)
-    df_to_process = df_to_process[df_to_process["rounded_J"] == 1.6]
-    df_tailoff = average_40_tailoff(df_velocity_filter_tailoff(V_target))
-    df_tailoff = generate_cl_alpha(df_tailoff)
+    df_to_process = df_to_process[df_to_process["rounded_J"] == J_target]
+
+    df_tailoff = df_velocity_filter_tailoff(V_target)
+    # df_tailoff = average_40_tailoff(df_velocity_filter_tailoff(V_target))
+    # df_tailoff = generate_cl_alpha(df_tailoff)
 
     aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
     aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
