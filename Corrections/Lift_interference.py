@@ -87,7 +87,10 @@ def lift_interference(df_uncor, df_tailoff):
     return aoa_cor, CD_cor, CM25c_cor
 
 
+
+
 def main():
+    plot_checks = False
     V_target = 40
     J_target = 1.6
 
@@ -99,34 +102,37 @@ def main():
     df_tailoff = df_velocity_filter_tailoff(V_target)
 
     aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
+    print(aoa_new)
+
     aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
 
-    fig, ax = plt.subplots()
-    ax.scatter(aoa_old, CD_old, label='Old Data')
-    ax.scatter(aoa_new, CD_new, label='New Data')
-    ax.set_xlabel('AoA')
-    ax.set_ylabel('CD')
-    ax.legend()
-    ax.grid(True)
-    plt.show()
+    if plot_checks:
+        fig, ax = plt.subplots()
+        ax.scatter(aoa_old, CD_old, label='Old Data')
+        ax.scatter(aoa_new, CD_new, label='New Data')
+        ax.set_xlabel('AoA')
+        ax.set_ylabel('CD')
+        ax.legend()
+        ax.grid(True)
+        plt.show()
 
-    fig, ax = plt.subplots()
-    ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
-    ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
-    ax.set_xlabel('AoA')
-    ax.set_ylabel('CL')
-    ax.legend()
-    ax.grid(True)
-    plt.show()
+        fig, ax = plt.subplots()
+        ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
+        ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
+        ax.set_xlabel('AoA')
+        ax.set_ylabel('CL')
+        ax.legend()
+        ax.grid(True)
+        plt.show()
 
-    fig, ax = plt.subplots()
-    ax.scatter(aoa_old, CM_old, label='Old Data')
-    ax.scatter(aoa_new, CM_new, label='New Data')
-    ax.set_xlabel('AoA')
-    ax.set_ylabel('CM')
-    ax.legend()
-    ax.grid(True)
-    plt.show()
+        fig, ax = plt.subplots()
+        ax.scatter(aoa_old, CM_old, label='Old Data')
+        ax.scatter(aoa_new, CM_new, label='New Data')
+        ax.set_xlabel('AoA')
+        ax.set_ylabel('CM')
+        ax.legend()
+        ax.grid(True)
+        plt.show()
 
 
 if __name__ == "__main__":
