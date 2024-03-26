@@ -59,11 +59,13 @@ def get_function_set(data, var1, var2):
     group1 = data.groupby(name1)      # eg: 'rounded_v'
     layer1 = group1.get_group(var1[name1])
 
-    name2 = list(var2.keys())[0]
-    group2 = layer1.groupby(name2)    # eg: 'rounded_J'
-    layer2 = group2.get_group(var2[name2])
-
-    return layer2.sort_values(by='AoA')
+    if var2 is not None:
+        name2 = list(var2.keys())[0]
+        group2 = layer1.groupby(name2)    # eg: 'rounded_J'
+        layer2 = group2.get_group(var2[name2])
+        return layer2.sort_values(by='AoA')
+    else:
+        return layer1.sort_values(by='AoA')
 
 
 def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name: str, y_var_name: str, inp_lst: list, x_axis_range: np.array, xlabel: [str, None], ylabel: [str, None]):
@@ -84,6 +86,8 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
     f_lst = []
 
     for i in range(len(inp_lst)):
+        test1 = inp_lst[i][0]
+        test2 = inp_lst[i][1]
         dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
 
         # Use a polynomial data fit with prescribed order
@@ -91,7 +95,8 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
 
         # Create label with V and J
         var1 = round(np.mean(dat['rounded_v']))
-        var2 = round(np.mean(dat['rounded_J']))
+        var15 = dat['rounded_J']
+        var2 = round(np.mean(dat['rounded_J']), 2)
 
         # Save the poly coefficients to a class with corresponding var1 and var2
         correspondingClass = FunctionData(var1, var2, x_var_name, y_var_name, curve_fit, dat)
