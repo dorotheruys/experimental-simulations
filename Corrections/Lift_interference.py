@@ -5,7 +5,8 @@ from General.Pathfinder import get_file_path
 
 
 def df_velocity_filter_tailoff(V_target: int):
-    df = pd.read_excel("TailOffData.xlsx", sheet_name="AoS = 0 deg")
+    tailoff_path = get_file_path("TailOffData.xlsx", 'Corrections')
+    df = pd.read_excel(tailoff_path, sheet_name="AoS = 0 deg")
     df = df.drop("AoS", axis=1)
     margin = 0.5  # [m/s]
     filtered_df = df[(df['Vinf'] >= V_target - margin) & (df['Vinf'] <= V_target + margin)]
