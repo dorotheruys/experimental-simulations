@@ -20,7 +20,7 @@ def get_aoa_combis(aoa):
 def get_cm_vs_elevator(cm_datapoints, plot):
     # Extract each CM from the data (and reset the indices of the zero angle)
     CM_min15 = pd.concat([cm_datapoints, pd.DataFrame({'delta_e': [-15]*len(cm_datapoints)}), bal_sorted_min15['CMpitch']], axis=1)
-    CM_0 = pd.concat([cm_datapoints, pd.DataFrame({'delta_e': [0]*len(cm_datapoints)}), bal_sorted_0_sliced['CMpitch'].reset_index(drop=True)], axis=1)
+    CM_0 = pd.concat([bal_sorted_0[['AoA', 'rounded_AoA', 'V', 'rounded_v', 'J_M1', 'rounded_J']], pd.DataFrame({'delta_e': [0]*len(bal_sorted_0)}), bal_sorted_0['CMpitch'].reset_index(drop=True)], axis=1)
     CM_15 = pd.concat([cm_datapoints, pd.DataFrame({'delta_e': [15]*len(cm_datapoints)}), bal_sorted_15['CMpitch']], axis=1)
 
     # Make one large dataframe of all relevant data points to construct the graph
