@@ -1,5 +1,6 @@
 import pandas as pd
 from General.Data_sorting import df
+from General.data_function_maker import *
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -20,15 +21,24 @@ def Thrust_estimation1(J,V,AoA):
     tancoef = filtered_df['CD'].iloc[0]
     return -(tancoef-windmilling_drag)/np.cos(AoA*np.pi/180)
 
- #Thrust_estimation1(3.5,40,7))
-def Thrust_estimation2(J,V,AoA):
-    tunnel_velocity = df['rounded_v'] == V
-    prop_setting = df['rounded_J'] == J
-    aoa_setting = df['rounded_AoA'] == AoA
+def Thrust_estimation(J,V,AoA):
+    # tunnel_velocity = df['rounded_v'] == V
+    # prop_setting = df['rounded_J'] == J
+    # aoa_setting = df['rounded_AoA'] == AoA
     curve = drag_interpolation()
     windmilling_drag = curve(AoA)
-    filtered_df = df.loc[(prop_setting) & (tunnel_velocity) & (aoa_setting)].copy()
-    tancoef = filtered_df['CD'].iloc[0]
+    # filtered_df = df.loc[(prop_setting) & (tunnel_velocity) & (aoa_setting)].copy()
+    #tancoef = filtered_df['CD'].iloc[0]
+
+    #Interpolate CD data for all angles of attack
+    tunnel_prop_combi = [[{'rounded_v': V}, {'rounded_J': J}]]
+    CD_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD', tunnel_prop_combi, np.linspace(-6, 20, 26),None, None)
+    CD_array = CD_alpha_function[0].poly_coeff(np.arange(-5, 14.1, 1))
+    # aoa = np.arange(-5,14.1,1)
+    # plt.plot(aoa, CD_array)
+    # plt.plot(aoa, CD_array)
+    # plt.show()
+    tancoef = CD_array[AoA+5]
     return -(tancoef-windmilling_drag)/np.cos(AoA*np.pi/180)
 
 def Windmilling_dragcoefficients():
@@ -39,7 +49,8 @@ def Windmilling_dragcoefficients():
     lower_linear_regime = df.loc[(lower_advance_ratio) & (tunnel_velocity)]
     upper_resulting_CD = upper_linear_regime['CD']
     lower_resulting_CD = lower_linear_regime['CD']
-    lower_resulting_CD = lower_resulting_CD.drop(lower_resulting_CD.index[1])  #Remove zero AoA
+    if len(lower_resulting_CD) == 5:
+        lower_resulting_CD = lower_resulting_CD.drop(lower_resulting_CD.index[1])  #Remove zero AoA
     lst_CD_windmilling = []
     if len(upper_resulting_CD)!=len(lower_resulting_CD):
         print('Lengths are not the same')
@@ -75,7 +86,7 @@ def drag_interpolation():
     # plt.show()
     return fitted_curve
 
-#print(Thrust_estimation2(1.6,40,11))
+#print(Thrust_estimation(3.5,40,5))
 #Append thrust coefficient to dataframe
 # for index, row in df.iterrows():
 #     rounded_J = row['rounded_J']
