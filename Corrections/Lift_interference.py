@@ -44,9 +44,7 @@ def generate_cl_alpha(df):
     return df
 
 
-def df_velocity_filter(file1, V_target: int):
-    df = pd.read_csv(file1)
-
+def df_velocity_filter(df, V_target: int):
     # There were two similar rows with the same angle of attack in 0_corrected. Took the average of them
     double_aoa_rows = df[(df['rounded_AoA'] == 4) & (df['rounded_v'] == 20)]
     row_indices = double_aoa_rows.index
@@ -87,22 +85,22 @@ def lift_interference(df_uncor, df_tailoff):
     return aoa_cor, CD_cor, CM25c_cor
 
 
-
-
 def main():
-    plot_checks = False
-    V_target = 40
+    plot_checks = True
+    V_target = 20
     J_target = 1.6
 
-    file1 = get_file_path(filename="bal_sorted2.csv", folder="Sort_data")
+    filename = "bal_sorted2.csv"
+    folder = "Sort_data"
 
-    df_to_process = df_velocity_filter(file1, V_target)
-    df_to_process = df_to_process[df_to_process["rounded_J"] == J_target]
+    df = pd.read_csv(get_file_path(filename=filename, folder=folder))
+
+    df_to_process = df_velocity_filter(df, V_target)
+    # df_to_process = df_to_process[df_to_process["rounded_J"] == J_target]
 
     df_tailoff = df_velocity_filter_tailoff(V_target)
 
     aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
-    print(aoa_new)
 
     aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
 
