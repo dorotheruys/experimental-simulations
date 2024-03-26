@@ -18,6 +18,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from General.data_function_maker import get_function_from_dataframe
 from General.elevator_effectiveness import get_cm_vs_elevator
+from Corrections.Lift_interference import df_velocity_filter_tailoff
 
 # Get the data
 bal_sorted_min15 = pd.read_csv('../Sort_data/bal_sorted1.csv')
@@ -25,7 +26,8 @@ bal_sorted_0 = pd.read_csv('../Sort_data/bal_sorted2.csv')
 bal_sorted_15 = pd.read_csv('../Sort_data/bal_sorted3.csv')
 
 bal_sorted_min15_zero = pd.read_csv('../Sort_data/delta_neg15_zero.csv')
-# bal_sorted_0_zero = pd.read_csv('../Sort_data/delta_0_zero.csv')
+data_tailoff_40 = df_velocity_filter_tailoff(40)
+data_tailoff_20 = df_velocity_filter_tailoff(20)
 
 cm_data_points = bal_sorted_15.loc[:, ['AoA', 'rounded_AoA', 'V', 'rounded_v', 'J_M1', 'rounded_J']]
 
