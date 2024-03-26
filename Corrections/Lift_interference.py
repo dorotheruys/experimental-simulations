@@ -5,6 +5,9 @@ from General.Pathfinder import get_file_path
 
 
 def df_velocity_filter_tailoff(V_target: int):
+    if V_target == 10:
+        print("Reset V_target to 20")
+        V_target = 20
     tailoff_path = get_file_path("TailOffData.xlsx", 'Corrections')
     df = pd.read_excel(tailoff_path, sheet_name="AoS = 0 deg")
     df = df.drop("AoS", axis=1)
@@ -43,26 +46,18 @@ def generate_cl_alpha(df):
 
 def df_velocity_filter(file1, V_target: int):
     df = pd.read_csv(file1)
+
+    # There were two similar rows with the same angle of attack in 0_corrected. Took the average of them
+    double_aoa_rows = df[(df['rounded_AoA'] == 4) & (df['rounded_v'] == 20)]
+    row_indices = double_aoa_rows.index
+    average_values = (df.loc[row_indices[0]] + df.loc[row_indices[1]]) / 2
+    df.loc[row_indices[0]] = average_values
+    df.drop(row_indices[1], inplace=True)
+    df.reset_index(drop=True, inplace=True)
     margin = 0.5  # [m/s]
     filtered_df = df[(df['V'] >= V_target - margin) & (df['V'] <= V_target + margin)]
     filtered_df = filtered_df.reset_index(drop=True)
     return filtered_df
-
-
-def aoa_combination(df):
-    aoa_range = df["rounded_AoA"]
-
-    df_4 = df.loc[df['rounded_AoA'] == 4]
-    print(df)
-    df_new_4 = df_4.mean(axis = 0)
-    # print(type(df_new_4))
-
-    df.drop(df_4, inplace=True)
-    # print(df)
-
-
-
-
 
 
 def lift_interference(df_uncor, df_tailoff):
@@ -93,7 +88,7 @@ def lift_interference(df_uncor, df_tailoff):
 
 
 def main():
-    V_target = 20
+    V_target = 10
     J_target = 1.6
 
     file1 = get_file_path(filename="bal_sorted2.csv", folder="Sort_data")
@@ -101,39 +96,37 @@ def main():
     df_to_process = df_velocity_filter(file1, V_target)
     df_to_process = df_to_process[df_to_process["rounded_J"] == J_target]
 
-    aoa_combination(df_to_process)
+    df_tailoff = df_velocity_filter_tailoff(V_target)
 
-    # df_tailoff = df_velocity_filter_tailoff(V_target)
-    #
-    # aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
-    # aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
-    #
-    # fig, ax = plt.subplots()
-    # ax.scatter(aoa_old, CD_old, label='Old Data')
-    # ax.scatter(aoa_new, CD_new, label='New Data')
-    # ax.set_xlabel('AoA')
-    # ax.set_ylabel('CD')
-    # ax.legend()
-    # ax.grid(True)
-    # plt.show()
-    #
-    # fig, ax = plt.subplots()
-    # ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
-    # ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
-    # ax.set_xlabel('AoA')
-    # ax.set_ylabel('CL')
-    # ax.legend()
-    # ax.grid(True)
-    # plt.show()
-    #
-    # fig, ax = plt.subplots()
-    # ax.scatter(aoa_old, CM_old, label='Old Data')
-    # ax.scatter(aoa_new, CM_new, label='New Data')
-    # ax.set_xlabel('AoA')
-    # ax.set_ylabel('CM')
-    # ax.legend()
-    # ax.grid(True)
-    # plt.show()
+    aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
+    aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
+
+    fig, ax = plt.subplots()
+    ax.scatter(aoa_old, CD_old, label='Old Data')
+    ax.scatter(aoa_new, CD_new, label='New Data')
+    ax.set_xlabel('AoA')
+    ax.set_ylabel('CD')
+    ax.legend()
+    ax.grid(True)
+    plt.show()
+
+    fig, ax = plt.subplots()
+    ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
+    ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
+    ax.set_xlabel('AoA')
+    ax.set_ylabel('CL')
+    ax.legend()
+    ax.grid(True)
+    plt.show()
+
+    fig, ax = plt.subplots()
+    ax.scatter(aoa_old, CM_old, label='Old Data')
+    ax.scatter(aoa_new, CM_new, label='New Data')
+    ax.set_xlabel('AoA')
+    ax.set_ylabel('CM')
+    ax.legend()
+    ax.grid(True)
+    plt.show()
 
 
 if __name__ == "__main__":
