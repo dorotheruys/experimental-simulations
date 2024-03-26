@@ -50,6 +50,7 @@ def get_slope_cm_vs_aoa(cm_datapoints):
 
     return dcm_ddeltae_plotting_lst
 
+
 bal_sorted_min15 = pd.read_csv('../Sort_data/bal_sorted1.csv')
 bal_sorted_0 = pd.read_csv('../Sort_data/bal_sorted2.csv')
 bal_sorted_15 = pd.read_csv('../Sort_data/bal_sorted3.csv')
@@ -78,11 +79,10 @@ if __name__ == "__main__":
     # 2. Get dCM/d delta_e vs AoA curve
     # get_slope_cm_vs_aoa(cm_data_points)
 
-    # # Get plot for AoA vs CL, for each V & J combination
+    # Get plot for AoA vs CL, for each V & J combination
     get_function_from_dataframe(bal_sorted_15, 2, 'AoA', 'CL', tunnel_prop_combi, np.linspace(-6, 20, 26), f'$\\alpha$ [deg]', f'$C_L$ [-]')
-    #
-    # # Get plot for CD vs CL, for each V & J combination
-    # get_function_from_dataframe(bal_sorted_15, 2, 'CL', 'CD', tunnel_prop_combi, np.linspace(-1, 1.7, 26), f'$C_L$ [-]', f'$C_D$ [-]')
 
+    # Get plot for CD vs CL, for each V & J combination
+    # get_function_from_dataframe(bal_sorted_15, 2, 'CL', 'CD', tunnel_prop_combi, np.linspace(-1, 1.7, 26), f'$C_L$ [-]', f'$C_D$ [-]')
 
     plt.show()

@@ -24,6 +24,9 @@ bal_sorted_min15 = pd.read_csv('../Sort_data/bal_sorted1.csv')
 bal_sorted_0 = pd.read_csv('../Sort_data/bal_sorted2.csv')
 bal_sorted_15 = pd.read_csv('../Sort_data/bal_sorted3.csv')
 
+bal_sorted_min15_zero = pd.read_csv('../Sort_data/delta_neg15_zero.csv')
+# bal_sorted_0_zero = pd.read_csv('../Sort_data/delta_0_zero.csv')
+
 cm_data_points = bal_sorted_15.loc[:, ['AoA', 'rounded_AoA', 'V', 'rounded_v', 'J_M1', 'rounded_J']]
 
 # Slice the zero deflection array such that the new dataframe contains the same data points
