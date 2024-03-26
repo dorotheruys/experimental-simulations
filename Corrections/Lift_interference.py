@@ -48,6 +48,22 @@ def df_velocity_filter(file1, V_target: int):
     return filtered_df
 
 
+def aoa_combination(df):
+    aoa_range = df["rounded_AoA"]
+
+    df_4 = df.loc[df['rounded_AoA'] == 4]
+    print(df)
+    df_new_4 = df_4.mean(axis = 0)
+    # print(type(df_new_4))
+
+    df.drop(df_4, inplace=True)
+    # print(df)
+
+
+
+
+
+
 def lift_interference(df_uncor, df_tailoff):
     aoa_uncor = df_uncor["rounded_AoA"]
 
@@ -67,7 +83,7 @@ def lift_interference(df_uncor, df_tailoff):
     d_aoa_sc = tau2 * d_aoa_uw
     d_Cd_w = delta * S_over_c * CLw ** 2
     d_aoa = d_aoa_uw + d_aoa_sc
-    d_CM25c = 1/8*d_aoa_sc*CLa
+    d_CM25c = 1 / 8 * d_aoa_sc * CLa
 
     aoa_cor = aoa_uncor.values + d_aoa
     CD_cor = df_uncor["CD"].values + d_Cd_w
@@ -76,47 +92,47 @@ def lift_interference(df_uncor, df_tailoff):
 
 
 def main():
-    V_target = 40
-    J_target = 1.8
+    V_target = 20
+    J_target = 1.6
 
     file1 = get_file_path(filename="bal_sorted2.csv", folder="Sort_data")
 
     df_to_process = df_velocity_filter(file1, V_target)
     df_to_process = df_to_process[df_to_process["rounded_J"] == J_target]
 
-    df_tailoff = df_velocity_filter_tailoff(V_target)
-    # df_tailoff = average_40_tailoff(df_velocity_filter_tailoff(V_target))
-    # df_tailoff = generate_cl_alpha(df_tailoff)
+    aoa_combination(df_to_process)
 
-    aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
-    aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
-
-    fig, ax = plt.subplots()
-    ax.scatter(aoa_old, CD_old, label='Old Data')
-    ax.scatter(aoa_new, CD_new, label='New Data')
-    ax.set_xlabel('AoA')
-    ax.set_ylabel('CD')
-    ax.legend()
-    ax.grid(True)
-    plt.show()
-
-    fig, ax = plt.subplots()
-    ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
-    ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
-    ax.set_xlabel('AoA')
-    ax.set_ylabel('CL')
-    ax.legend()
-    ax.grid(True)
-    plt.show()
-
-    fig, ax = plt.subplots()
-    ax.scatter(aoa_old, CM_old, label='Old Data')
-    ax.scatter(aoa_new, CM_new, label='New Data')
-    ax.set_xlabel('AoA')
-    ax.set_ylabel('CM')
-    ax.legend()
-    ax.grid(True)
-    plt.show()
+    # df_tailoff = df_velocity_filter_tailoff(V_target)
+    #
+    # aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
+    # aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
+    #
+    # fig, ax = plt.subplots()
+    # ax.scatter(aoa_old, CD_old, label='Old Data')
+    # ax.scatter(aoa_new, CD_new, label='New Data')
+    # ax.set_xlabel('AoA')
+    # ax.set_ylabel('CD')
+    # ax.legend()
+    # ax.grid(True)
+    # plt.show()
+    #
+    # fig, ax = plt.subplots()
+    # ax.scatter(aoa_old, df_to_process["CL"], label='Old Data')
+    # ax.scatter(aoa_new, df_to_process["CL"], label='New Data')
+    # ax.set_xlabel('AoA')
+    # ax.set_ylabel('CL')
+    # ax.legend()
+    # ax.grid(True)
+    # plt.show()
+    #
+    # fig, ax = plt.subplots()
+    # ax.scatter(aoa_old, CM_old, label='Old Data')
+    # ax.scatter(aoa_new, CM_new, label='New Data')
+    # ax.set_xlabel('AoA')
+    # ax.set_ylabel('CM')
+    # ax.legend()
+    # ax.grid(True)
+    # plt.show()
 
 
 if __name__ == "__main__":
