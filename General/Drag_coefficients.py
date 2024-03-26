@@ -11,7 +11,7 @@ def drag_coefficients(J,V,CL_unc):
     CL_array = filtered_df['CL'].values                                 #Find relevant lift coefficients
     #windmilling = df['rounded_J'] == 17
     #windmilling_df = df.loc[(windmilling) & (tunnel_velocity)].copy()
-    CD_curve = drag_interpolation(V)                                    #Interpolation for drag curve
+    CD_curve = drag_interpolation()                                    #Interpolation for drag curve
     unique_aoa = filtered_df['rounded_AoA'].unique()
     CD_array = CD_curve(unique_aoa)                                     #Find drag coefficients as function of aoa
     negative_indices = np.where(unique_aoa < 0)[0]                      #Remove negative aoa for drag analysis
@@ -43,9 +43,9 @@ def drag_coefficients(J,V,CL_unc):
     plt.scatter(CL_squared_array, CD_positive_array)
     plt.xlabel('CL^2')
     plt.ylabel('CD')
-    #plt.show()
+    plt.show()
     # Show the plot
 
     return CD0, CDi, CDs, CD_unc
 
-#print(drag_coefficients(1.6,40, 1))
+print(drag_coefficients(1.8,40, 1))
