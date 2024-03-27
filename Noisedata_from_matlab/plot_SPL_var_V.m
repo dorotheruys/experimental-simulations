@@ -30,11 +30,11 @@ for j = 1:length(inp_DPN)
             end
             
             run = find(opp_dat.opp{1}.DPN == inp_DPN_0(j));
-    
+            BPF=opp_dat.opp{1}.RPS_M1(run)*6/(2*pi);
             %plot
             subplot(2,2,plot_number), box on, hold on;
             lab=['V = ',num2str(round(opp_dat.opp{1}.vInf(run),2))];
-            plot(mic_dat.MIC{1}.f{run}/opp_dat.opp{1}.RPS_M1(run),mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
+            plot(mic_dat.MIC{1}.f{run}/BPF,mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
             %plot(mic_dat.MIC{1}.f{run}/opp_dat.opp{1}.RPS_M1(run),mic_dat.MIC{1}.PXX{run}(:,7),'DisplayName','Inflow mic');
             grid on
             legend

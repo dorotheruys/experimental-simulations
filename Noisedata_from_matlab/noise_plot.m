@@ -25,11 +25,11 @@ opp_15 = load(opp_file_15);
 run_number = 17;
 
 %plot
-plot_p_PSD(MIC_0,opp_0,run_number)
-% plot_SPL_var_J(MIC_0,opp_0,15)
-% plot_PSD_var_J(MIC_0,opp_0,15)
-% plot_SPL_var_V(MIC_0,opp_0,0)
-% plot_PSD_var_V(MIC_0,opp_0,0)
+% plot_p_PSD(MIC_0,opp_0,run_number)
+% plot_SPL_var_J(MIC_0,opp_0,0)
+% plot_PSD_var_J(MIC_0,opp_0,0)
+plot_SPL_var_V(MIC_0,opp_0,0)
+plot_PSD_var_V(MIC_0,opp_0,0)
 % plot_p_SPL(MIC_0,opp_0,run_number)
 % plot_p_PSD(MIC_0,opp_0,run_number)
 % plot_p_SPL(MIC_0,opp_0,[24])
