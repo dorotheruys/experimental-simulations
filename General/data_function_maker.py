@@ -56,8 +56,7 @@ def get_function_set(data, var1, var2):
     """
 
     name1 = list(var1.keys())[0]
-    group1 = data.groupby(name1)      # eg: 'rounded_v'
-    layer1 = group1.get_group(var1[name1])
+    layer1 = data[(data[name1] <= var1[name1] + 0.1) & (data[name1] >= var1[name1] - 0.1)]
 
     if var2 is not None:
         name2 = list(var2.keys())[0]
@@ -86,16 +85,15 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
     f_lst = []
 
     for i in range(len(inp_lst)):
-        test1 = inp_lst[i][0]
-        test2 = inp_lst[i][1]
         dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
 
         # Use a polynomial data fit with prescribed order
-        curve_fit = np.poly1d(np.polyfit(dat[x_var_name], dat[y_var_name], order))
+        polyfit = np.polyfit(dat[x_var_name], dat[y_var_name], order, full=True)
+        curve_fit = np.poly1d(polyfit[0])
+        print(f"Residual values for {order} order fit: {polyfit[1]}")
 
         # Create label with V and J
         var1 = round(np.mean(dat['rounded_v']))
-        var15 = dat['rounded_J']
         var2 = round(np.mean(dat['rounded_J']), 2)
 
         # Save the poly coefficients to a class with corresponding var1 and var2
