@@ -115,7 +115,7 @@ def lift_interference(df):
 
         # Append the temporary DataFrame to the main DataFrame
         df_correction_factors = pd.concat([df_correction_factors, df_temp], ignore_index=True)
-
+    df_correction_factors = pd.concat([df, df_correction_factors], axis=1)
     return df_correction_factors
 
 

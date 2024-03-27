@@ -2,7 +2,7 @@ import pandas as pd
 from General.Data_sorting import *
 from General.data_function_maker import *
 import matplotlib.pyplot as plt
-from General.Thrust_calculation import drag_interpolation
+from General.Thrust_calculation import *
 
 def drag_coefficients(J,V,CL_unc):
     prop_setting = df['rounded_J'] == J
@@ -12,7 +12,7 @@ def drag_coefficients(J,V,CL_unc):
     CL_alpha_function = get_function_from_dataframe(df, 2, 'AoA', 'CL', tunnel_prop_combi,np.linspace(-6, 20, 26),None,None)
     CL_array = CL_alpha_function[0].poly_coeff(np.arange(-5,14.1,1))
     #CL_array = filtered_df['CL'].values                                 #Find relevant lift coefficients
-    CD_curve = drag_interpolation()                                     #Interpolation for drag curve
+    CD_curve = drag_interpolation(V)                                     #Interpolation for drag curve
     unique_aoa = np.arange(-5,14.1,1)#filtered_df['rounded_AoA'].unique()
     CD_array = CD_curve(unique_aoa)                                     #Find drag coefficients as function of aoa
     negative_indices = np.where(unique_aoa < 0)[0]                      #Remove negative aoa for drag analysis
@@ -50,9 +50,28 @@ def drag_coefficients(J,V,CL_unc):
     plt.scatter(CL_squared_array, CD_positive_array)
     plt.xlabel('CL^2')
     plt.ylabel('CD')
-    plt.show()
-    # Show the plot
-
+    #plt.show()
     return CD0, CDi, CDs, CD_unc
 
-print(drag_coefficients(3.5,40, 1))
+def CD_CT(df):
+    df_drag_thrust_coefficient = pd.DataFrame(columns=['Drag coefficient', 'Thrust coefficient'])
+    for index, row in df.iterrows():
+        Vunc = row["rounded_v"]
+        J = row["rounded_J"]
+        curve = drag_interpolation(Vunc)
+        AoA = row['rounded_AoA']
+        CDunc = curve(AoA)
+        CT = Thrust_estimation(J,Vunc,AoA)
+
+        add_columns = [CDunc, CT]
+
+        # Create a temporary DataFrame to hold the current row
+        df_temp = pd.DataFrame([add_columns], columns=['Drag coefficient', 'Thrust coefficient'])
+
+        # Drop empty or all-NA columns from df_temp
+        df_drag_thrust_coefficient = df_drag_thrust_coefficient.dropna(axis=1, how='all')
+
+        # Append the temporary DataFrame to the main DataFrame
+        df_drag_thrust_coefficient = pd.concat([df_drag_thrust_coefficient, df_temp], ignore_index=True)
+    df_drag_thrust_coefficient = pd.concat([df, df_drag_thrust_coefficient], axis=1)
+    return df_drag_thrust_coefficient

@@ -1,11 +1,12 @@
 import numpy as np
 from General.Drag_coefficients import drag_coefficients
+from General.Thrust_calculation import *
 
 def Solidblockage():
     K3f = 0.91     #d/l=0.10
     K3n = 0.93     #d=sqrt(0.0007921/0.345/pi)*2 l=0.345 d/l=0.15
     tau1 = 0.88    #B/H=1.5 2b/B=0.775
-    C = 1.8*1.25-0.3**2/2*4
+    C = 1.8*1.25-0.3**2/2*4 #Removed the corners
     V_fus = 0.0160632
     V_nac = 0.0007921
     K1_w = 0.965   #t/c=0.09395930576700445
@@ -18,8 +19,6 @@ def Solidblockage():
     e_sb_w = tau1 * (K1_w * V_w + K1_ht * V_ht + K1_vt * V_vt) / (C ** 1.5)
     e_sb = e_sb_f + e_sb_w
     return e_sb
-
-Solidblockage()
 
 def Wakeblockage(J,V,CL):
     CD0, CDi, CDs, CD_unc = drag_coefficients(J,V,CL)
@@ -40,4 +39,61 @@ def Wakeblockage(J,V,CL):
     e_wbt = e_wbt + e_wbs
     return e_wbt
 
-print(Wakeblockage(1.6,40,2))
+def slipstream(J,V,AoA):
+    thrust_coefficient1 = Thrust_estimation(J,V,AoA)
+    Dprop = 0.2032
+    Sp = np.pi / 4 * Dprop ** 2
+    C = 1.8*1.25-0.3**2/2*4
+    n = V/(Dprop*J)
+    prop_setting = df['rounded_J'] == J
+    tunnel_velocity = df['rounded_v'] == V
+    filtered_df = df.loc[(prop_setting) & (tunnel_velocity)].copy()
+    rho = filtered_df['rho'].mean()
+    thrust = thrust_coefficient1 * rho * n ** 2 * Dprop ** 4
+    thrust_coefficient2 = thrust/(rho*V**2*Sp)
+    e_ss = - thrust_coefficient2/(2*np.sqrt(1+2*thrust_coefficient2))*Sp/C
+    return e_ss
+
+def Full_blockage(df):
+    df_blockage_corrections = pd.DataFrame(columns=['Vbcor', 'qbcor', 'CLbcor', 'CDbcor', 'CMbcor'])
+    for index, row in df.iterrows():
+        #Solid blockage
+        e_sb = Solidblockage()
+
+        #Wake blockage
+        J = row['rounded_J']
+        Vunc = row["rounded_v"]
+        CLunc = row['CL_strut_cor']
+        e_wbt = Wakeblockage(J,Vunc,CLunc)
+
+        #Slipstream blockage
+        AoA = row['rounded_AoA']
+        e_ss = slipstream(J,Vunc,AoA)
+
+        #Total blockage
+        e_total = e_sb+e_wbt+e_ss
+
+        # Corrections
+        qunc = row['q']
+        CDunc = row['CD_strut_cor']       #Still need to change the CD
+        CMunc = row['CMpitch25c_strut_cor']
+
+
+        V = Vunc*(1+e_total)
+        q = qunc*(1+e_total)**2
+        CL = CLunc*(1+e_total)**(-2)
+        CD = CDunc*(1+e_total)**(-2)
+        CM = CMunc * (1 + e_total) ** (-2)
+
+        add_columns = [V, q, CL, CD, CM]
+
+        # Create a temporary DataFrame to hold the current row
+        df_temp = pd.DataFrame([add_columns], columns=['Vbcor', 'qbcor', 'CLbcor', 'CDbcor', 'CMbcor'])
+
+        # Drop empty or all-NA columns from df_temp
+        df_blockage_corrections = df_blockage_corrections.dropna(axis=1, how='all')
+
+        # Append the temporary DataFrame to the main DataFrame
+        df_blockage_corrections = pd.concat([df_blockage_corrections, df_temp], ignore_index=True)
+    df_blockage_corrections = pd.concat([df, df_blockage_corrections], axis=1)
+    return df_blockage_corrections

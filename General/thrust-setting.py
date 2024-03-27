@@ -40,7 +40,7 @@ CP_values = get_CP(J_values)
 eff_values = get_eff(J_values)
 
 #Experimental data
-CT_exp = [0.24, 0.195, 0.16, 0.125, 0.08, 0.02]
+CT_exp = [0.24, 0.195, 0.16, 0.125, 0.08, 0.03]
 J_exp = [1.8, 1.9, 2, 2.1, 2.2, 2.3]
 # Plot the results
 plt.plot(J_values, CT_values, label='Relationship')
