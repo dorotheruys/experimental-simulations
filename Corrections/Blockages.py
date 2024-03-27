@@ -5,7 +5,7 @@ def Solidblockage():
     K3f = 0.91     #d/l=0.10
     K3n = 0.93     #d=sqrt(0.0007921/0.345/pi)*2 l=0.345 d/l=0.15
     tau1 = 0.88    #B/H=1.5 2b/B=0.775
-    C = 1.29*0.89*1.397**2
+    C = 1.8*1.25-0.3**2/2*4
     V_fus = 0.0160632
     V_nac = 0.0007921
     K1_w = 0.965   #t/c=0.09395930576700445
@@ -33,7 +33,7 @@ def Wakeblockage(J,V,CL):
     b_vtail = 0.258
 
     S_ref = np.pi * D_fuselage ** 2 / 4 + t_c_wing * mac_wing * b_wing + np.pi * D_prop ** 2 / 4 + t_c_vtail * mac_vtail * b_vtail
-    C_tunnel = b_wing ** 2 * 1.29 * 0.89
+    C_tunnel = 1.8*1.25-0.3**2/2*4
     e_wbt = S_ref / (4 * C_tunnel) * CD0
     e_wbs = 5 * S_ref / (4 * C_tunnel) * (CD_unc-CD0-CDi)
 
