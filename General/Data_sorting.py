@@ -4,9 +4,9 @@ import numpy as np
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 
-df = pd.read_csv('../Sort_data/bal_0_corrected.csv')
+df = pd.read_csv('../Sort_data/bal_sorted2.csv')
 
-#There were two similar rows with the same angle of attack in 0_corrected. Took the average of them
+#There were two similar rows with the same angle of attack in bal_sorted2. Took the average of them
 double_aoa_rows = df[(df['rounded_AoA'] == 4) & (df['rounded_v'] == 20)]
 row_indices = double_aoa_rows.index
 average_values = (df.loc[row_indices[0]] + df.loc[row_indices[1]]) / 2
