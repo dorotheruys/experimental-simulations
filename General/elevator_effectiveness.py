@@ -31,9 +31,9 @@ def get_cm_vs_elevator(cm_datapoints, plot):
 
     # Plot
     if plot is None:
-        cm_deltae_plotting_lst = get_function_from_dataframe(CM_df_AoA7, 2, 'delta_e', 'CMpitch', tunnel_prop_combi, np.linspace(-20, 20, 50), None, None)
+        cm_deltae_plotting_lst = get_function_from_dataframe(CM_df_AoA7, 1, 'delta_e', 'CMpitch', tunnel_prop_combi, np.linspace(-20, 20, 50), None, None)
     else:
-        cm_deltae_plotting_lst = get_function_from_dataframe(CM_df_AoA7, 2, 'delta_e', 'CMpitch', tunnel_prop_combi, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', r'$C_M$ [-]')
+        cm_deltae_plotting_lst = get_function_from_dataframe(CM_df_AoA7, 1, 'delta_e', 'CMpitch', tunnel_prop_combi, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', r'$C_M$ [-]')
 
     return cm_deltae_plotting_lst
 
@@ -63,10 +63,7 @@ tunnel_prop_combi = [[{'rounded_v': 40}, {'rounded_J': 1.6}],
                      [{'rounded_v': 40}, {'rounded_J': 1.8}],
                      [{'rounded_v': 40}, {'rounded_J': 3.5}],
                      [{'rounded_v': 20}, {'rounded_J': 1.6}],
-                     [{'rounded_v': 10}, {'rounded_J': 1.6}],
-                     [{'rounded_v': 40}, {'rounded_J': 17}],
-                     [{'rounded_v': 20}, {'rounded_J': 17}],
-                     [{'rounded_v': 10}, {'rounded_J': 17}]]
+                     [{'rounded_v': 10}, {'rounded_J': 1.6}]]
 
 # Slice the zero deflection array such that the new dataframe contains the same data points
 rows = [0, 12, 17, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 42, 47, 49]
@@ -78,13 +75,19 @@ cm_data_points = bal_sorted_15.loc[:, ['AoA', 'rounded_AoA', 'V', 'rounded_v', '
 
 if __name__ == "__main__":
     # 1. Get CM vs delta_e curve
+    print(f'\n C_M versus delta_e')
     get_cm_vs_elevator(cm_data_points, True)
 
     # 2. Get dCM/d delta_e vs AoA curve
     # get_slope_cm_vs_aoa(cm_data_points)
 
     # Get plot for AoA vs CL, for each V & J combination
+    print(f'\n C_L vs AoA for delta = 15 deg')
     get_function_from_dataframe(bal_sorted_15, 2, 'AoA', 'CL', tunnel_prop_combi, np.linspace(-6, 20, 26), f'$\\alpha$ [deg]', f'$C_L$ [-]')
+
+    # Get plot for AoA vs CM, for each V & J combination
+    print(f'\n C_M vs AoA for delta = 15 deg')
+    get_function_from_dataframe(bal_sorted_15, 2, 'AoA', 'CMpitch', tunnel_prop_combi[:3], np.linspace(-6, 15, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
     # Get plot for CD vs CL, for each V & J combination
     # get_function_from_dataframe(bal_sorted_15, 2, 'CL', 'CD', tunnel_prop_combi, np.linspace(-1, 1.7, 26), f'$C_L$ [-]', f'$C_D$ [-]')
