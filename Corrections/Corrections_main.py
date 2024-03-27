@@ -2,13 +2,15 @@ import pandas as pd
 
 from Corrections.Support_tare_correction import strut_correction
 from Corrections.Lift_interference import lift_interference
+
 from General.Pathfinder import get_file_path
 
 
 def corrections_combined(df):
     df_with_strut = strut_correction(df)
-    lift_interference_cor = lift_interference(df)
     print(df_with_strut)
+
+    lift_interference_cor = lift_interference(df_with_strut)
     print(lift_interference_cor)
 
 
