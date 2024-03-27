@@ -171,5 +171,7 @@ for i, V in enumerate([10, 20, 40]):
 
 CM_ref_result = pd.concat(CM_ref_lst, axis=0)
 
+# Get CM vs delta_e for AoA = 7
+CM_ref_relevant = get_function_set(CM_ref_result, {'AoA': 7}, None)
 get_function_from_dataframe(CM_ref_result, 2, 'delta_e', 'CM_0.25c_total', tunnel_prop_combi, np.linspace(-6, 15, 50),f'$\\delta_e$ [deg]', f'$C_M$ [-]')
 plt.show()

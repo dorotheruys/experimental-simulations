@@ -56,8 +56,7 @@ def get_function_set(data, var1, var2):
     """
 
     name1 = list(var1.keys())[0]
-    group1 = data.groupby(name1)      # eg: 'rounded_v'
-    layer1 = group1.get_group(var1[name1])
+    layer1 = data[(data[name1] <= var1[name1] + 0.1) & (data[name1] >= var1[name1] - 0.1)]
 
     if var2 is not None:
         name2 = list(var2.keys())[0]
