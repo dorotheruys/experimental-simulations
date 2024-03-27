@@ -13,12 +13,11 @@ def corrections_combined(df):
     df_dragthrust_coefficients = CD_CT(df)
 
     df_with_strut = strut_correction(df_dragthrust_coefficients)
-    #print(df_with_strut)
 
     df_with_bcor = Full_blockage(df_with_strut)
 
     lift_interference_cor = lift_interference(df_with_bcor)
-    #print(lift_interference_cor)
+    print(lift_interference_cor)
 
 
 def main():
