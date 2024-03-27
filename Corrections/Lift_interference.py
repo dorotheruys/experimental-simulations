@@ -6,7 +6,7 @@ from General.Pathfinder import get_file_path
 
 def df_velocity_filter_tailoff(V_target: int):
     if V_target == 10:
-        print("Reset V_target to 20")
+        # Reset V_target to 20
         V_target = 20
     tailoff_path = get_file_path("TailOffData.xlsx", 'Corrections')
     df = pd.read_excel(tailoff_path, sheet_name="AoS = 0 deg")
@@ -58,7 +58,7 @@ def df_velocity_filter(df, V_target: int):
     return filtered_df
 
 
-def lift_interference(df_uncor, df_tailoff):
+def lift_interference_old(df_uncor, df_tailoff):
     aoa_uncor = df_uncor["rounded_AoA"]
 
     # Use the 'isin' function to filter rows in 'df_tailoff' where 'AoA' matches any value in 'aoa_series'
@@ -85,8 +85,42 @@ def lift_interference(df_uncor, df_tailoff):
     return aoa_cor, CD_cor, CM25c_cor
 
 
-def main():
-    plot_checks = True
+def lift_interference(df):
+    delta = 0.106  # Boundary correction factor
+    S_over_c = 0.2172 / 0.165  # Of main wing
+    tau2 = 1  # (placeholder) # Depends on tail, gotta check
+
+    df_cor = pd.DataFrame()  # Initialize as an empty DataFrame
+
+    for index, row in df.iterrows():
+        V = row["rounded_v"]
+        aoa_uncor = row["rounded_AoA"]
+
+        df_tailoff = df_velocity_filter_tailoff(V)
+        df_tailoff = df_tailoff[df_tailoff["AoA"] == aoa_uncor]
+
+        CLw = df_tailoff["CL"].values
+        CLa = df_tailoff["CLa"].values
+
+        d_aoa_uw = delta * S_over_c * CLw
+        d_aoa_sc = tau2 * d_aoa_uw
+        d_Cd_w = delta * S_over_c * CLw ** 2
+        d_aoa = d_aoa_uw + d_aoa_sc
+        d_CM25c = 1 / 8 * d_aoa_sc * CLa
+
+        # aoa_cor = aoa_uncor + d_aoa
+        # CD_cor = row["CD"] + d_Cd_w
+        # CM25c_cor = row["CMpitch25c"] + d_CM25c
+
+        df_strut_aoa = pd.DataFrame()  # Initialize as an empty DataFrame
+        for aoa in df["rounded_AoA"]:
+            df_strut_aoa = pd.concat([df_strut_aoa, df_strut[df_strut["AoA"] == aoa]], ignore_index=True)
+        df_strut_aoa.reset_index(drop=True, inplace=True)
+        print(aoa_cor, CD_cor, CM25c_cor)
+
+
+def main_old():
+    plot_checks = False
     V_target = 20
     J_target = 1.6
 
@@ -96,11 +130,12 @@ def main():
     df = pd.read_csv(get_file_path(filename=filename, folder=folder))
 
     df_to_process = df_velocity_filter(df, V_target)
-    # df_to_process = df_to_process[df_to_process["rounded_J"] == J_target]
+    df_to_process = df_to_process[df_to_process["rounded_J"] == J_target]
+    print(df_to_process)
 
     df_tailoff = df_velocity_filter_tailoff(V_target)
 
-    aoa_new, CD_new, CM_new = lift_interference(df_to_process, df_tailoff)
+    aoa_new, CD_new, CM_new = lift_interference_old(df_to_process, df_tailoff)
 
     aoa_old, CD_old, CM_old = df_to_process["AoA"], df_to_process["CD"], df_to_process["CMpitch25c"]
 
@@ -131,6 +166,14 @@ def main():
         ax.legend()
         ax.grid(True)
         plt.show()
+
+def main():
+    filename = "bal_sorted2.csv"
+    folder = "Sort_data"
+
+    df = pd.read_csv(get_file_path(filename=filename, folder=folder))
+
+    lift_interference(df)
 
 
 if __name__ == "__main__":
