@@ -119,7 +119,6 @@ def lift_interference(df):
     return df_correction_factors
 
 
-
 # def main_old():
 #     plot_checks = False
 #     V_target = 20

@@ -2,16 +2,15 @@ import pandas as pd
 from General.Pathfinder import get_file_path
 
 
-def strut_correction():
+def get_strut_data():
     file = get_file_path("modelOffData.xlsx", folder="Corrections")
     df = pd.read_excel(file, header=10, skipfooter=4, usecols="A:H")
     df = df.rename(columns={"AoA [deg]": "AoA"})
     return df
 
 
-def add_modeloff_corrections(filename, folder):
-    df = pd.read_csv(get_file_path(filename, folder=folder))
-    df_strut = strut_correction()
+def strut_correction(df):
+    df_strut = get_strut_data()
 
     df_strut_aoa = pd.DataFrame()  # Initialize as an empty DataFrame
     for aoa in df["rounded_AoA"]:
@@ -25,7 +24,7 @@ def add_modeloff_corrections(filename, folder):
 
 
 def main():
-    add_modeloff_corrections()
+    strut_correction()
 
 
 if __name__ == "__main__":
