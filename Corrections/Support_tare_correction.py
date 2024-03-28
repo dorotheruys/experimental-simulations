@@ -18,7 +18,6 @@ def strut_correction(df):
     df_strut_aoa.reset_index(drop=True, inplace=True)
 
     df["CL_strut_cor"] = df["CL"] - df_strut_aoa["CL"]
-    df["CD_strut_cor"] = df["Drag coefficient"] - df_strut_aoa["CD"]
     df["CMpitch25c_strut_cor"] = df["CMpitch25c"] - df_strut_aoa["CMpitch"]
     return df
 

@@ -20,8 +20,8 @@ def Solidblockage():
     e_sb = e_sb_f + e_sb_w
     return e_sb
 
-def Wakeblockage(J,V,CL):
-    CD0, CDi, CDs, CD_unc = drag_coefficients(J,V,CL)
+def Wakeblockage(J,V,CL,df):
+    CD0, CDi, CDs, CD_unc = drag_coefficients(J,V,CL,df)
     D_fuselage = 0.14
     t_c_wing = 0.09395930576700445
     mac_wing = 0.165
@@ -64,7 +64,7 @@ def Full_blockage(df):
         J = row['rounded_J']
         Vunc = row["rounded_v"]
         CLunc = row['CL_strut_cor']
-        e_wbt = Wakeblockage(J,Vunc,CLunc)
+        e_wbt = Wakeblockage(J,Vunc,CLunc,df)
 
         #Slipstream blockage
         AoA = row['rounded_AoA']
@@ -73,12 +73,12 @@ def Full_blockage(df):
         #Total blockage
         e_total = e_sb+e_wbt+e_ss
 
-        # Corrections
+        #Other variables
         qunc = row['q']
-        CDunc = row['CD_strut_cor']       #Still need to change the CD
+        CDunc = row['Drag coefficient']
         CMunc = row['CMpitch25c_strut_cor']
 
-
+        #Corrections
         V = Vunc*(1+e_total)
         q = qunc*(1+e_total)**2
         CL = CLunc*(1+e_total)**(-2)
@@ -88,7 +88,7 @@ def Full_blockage(df):
         add_columns = [V, q, CL, CD, CM]
 
         # Create a temporary DataFrame to hold the current row
-        df_temp = pd.DataFrame([add_columns], columns=['Vbcor', 'qbcor', 'CLbcor', 'CDbcor', 'CMbcor'])
+        df_temp = pd.DataFrame([add_columns], columns=['Vbcor', 'qbcor', 'CDbcor', 'CMbcor', 'CL cor'])
 
         # Drop empty or all-NA columns from df_temp
         df_blockage_corrections = df_blockage_corrections.dropna(axis=1, how='all')
