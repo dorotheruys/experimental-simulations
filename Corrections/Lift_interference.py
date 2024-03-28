@@ -94,7 +94,7 @@ def lift_interference(df):
     tau2_wing = 0.15
     tau2_tail = 0.75
 
-    dCM_dalphatail = 1  # placeholder
+    dCM_dalphatail = 5.73 * 3.22 * 0.165  # CLalpha of airfoil (found online) * arm
 
     df_correction_factors = pd.DataFrame(columns=['dAoA', 'dCD', 'dCM25c'])
     for index, row in df.iterrows():
@@ -114,7 +114,7 @@ def lift_interference(df):
         d_aoa = d_aoa_uw + d_aoa_sc
         d_Cd_w = delta * S_over_C * CLw ** 2
         d_CM25c_uw = 1 / 8 * d_aoa_sc * CLa
-        d_CM25c_t = dCM_dalphatail * d_alpha_tail  # Placeholder
+        d_CM25c_t = dCM_dalphatail * d_alpha_tail
         d_CM25c = d_CM25c_uw + d_CM25c_t
 
         # Create a temporary DataFrame to hold the current row
