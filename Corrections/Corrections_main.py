@@ -1,9 +1,6 @@
-import pandas as pd
-
 from Corrections.Support_tare_correction import strut_correction
 from Corrections.Lift_interference import lift_interference
 from Corrections.Blockages import *
-from General.Pathfinder import get_file_path
 from General.Drag_coefficients import *
 from General.Data_sorting import *
 
@@ -27,7 +24,6 @@ def main():
     # folder = "Sort_data"
     #
     # df = pd.read_csv(get_file_path(filename=filename, folder=folder))
-
     corrections_combined(df)
 
 
