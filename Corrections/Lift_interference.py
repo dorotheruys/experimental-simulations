@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from General.Pathfinder import get_file_path
 
-
 def df_velocity_filter_tailoff(V_target: int):
     if V_target == 10:
         # Reset V_target to 20
@@ -93,7 +92,7 @@ def lift_interference(df):
     S_over_c = 0.03556930958485662 # Based on stuff above
     tau2 = 1  # (placeholder) # Depends on tail, gotta check
 
-    df_correction_factors = pd.DataFrame(columns=['d_aoa', 'd_Cd_w', 'd_CM25c'])
+    df_correction_factors = pd.DataFrame(columns=['dAoA', 'dCD', 'dCM25c'])
     for index, row in df.iterrows():
         V = row["rounded_v"]
         aoa_uncor = row["rounded_AoA"]
@@ -108,19 +107,25 @@ def lift_interference(df):
         d_aoa_sc = tau2 * d_aoa_uw
         d_aoa = d_aoa_uw + d_aoa_sc
         d_Cd_w = delta * S_over_c * CLw ** 2
-        d_CM25c = 1 / 8 * d_aoa_sc * CLa
+        d_CM25c_uw = 1 / 8 * d_aoa_sc * CLa
+        d_CM25c_t = 0   #Placeholder
+        d_CM25c = d_CM25c_uw+d_CM25c_t
 
         # Create a temporary DataFrame to hold the current row
-        df_temp = pd.DataFrame([[d_aoa, d_Cd_w, d_CM25c]], columns=['dAoA LI', 'dCD LI', 'dCM25c LI'])
+        df_temp = pd.DataFrame([[d_aoa, d_Cd_w, d_CM25c]], columns=['dAoA', 'dCD', 'dCM25c'])
 
         # Drop empty or all-NA columns from df_temp
         df_correction_factors = df_correction_factors.dropna(axis=1, how='all')
 
         # Append the temporary DataFrame to the main DataFrame
         df_correction_factors = pd.concat([df_correction_factors, df_temp], ignore_index=True)
+
+        # Add the lift interferences and create new columns
+        df_correction_factors['AoA cor'] = df['rounded_AoA'] + df_correction_factors['dAoA']
+        df_correction_factors['CD cor'] = df['CDbcor'] + df_correction_factors['dCD']
+        df_correction_factors['CM cor'] = df['CMbcor'] + df_correction_factors['dCM25c']
     df_correction_factors = pd.concat([df, df_correction_factors], axis=1)
     return df_correction_factors
-
 
 # def main_old():
 #     plot_checks = False
