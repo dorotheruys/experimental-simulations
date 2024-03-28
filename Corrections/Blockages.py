@@ -77,7 +77,7 @@ def Full_blockage(df):
         qunc = row['q']
         CDunc = row['Drag coefficient']
         CMunc = row['CMpitch25c_strut_cor']
-
+        print(CDunc,e_total)
         #Corrections
         V = Vunc*(1+e_total)
         q = qunc*(1+e_total)**2
@@ -85,7 +85,7 @@ def Full_blockage(df):
         CD = CDunc*(1+e_total)**(-2)
         CM = CMunc * (1 + e_total) ** (-2)
 
-        add_columns = [V, q, CL, CD, CM]
+        add_columns = [V, q, CD, CM, CL]
 
         # Create a temporary DataFrame to hold the current row
         df_temp = pd.DataFrame([add_columns], columns=['Vbcor', 'qbcor', 'CDbcor', 'CMbcor', 'CL cor'])
