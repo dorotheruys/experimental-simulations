@@ -23,6 +23,7 @@ pd.set_option('display.max_rows', None)
 #     return -(tancoef-windmilling_drag)/np.cos(AoA*np.pi/180)
 
 def Windmilling_dragcoefficients(V):
+    #Define set advance ratio's and velocity
     first_advance_ratio = df['rounded_J'] == 1.6
     upper_advance_ratio = df['rounded_J'] == 1.8
     V40_guess = 2.43                            #(2.359+2.5)/2
@@ -30,14 +31,19 @@ def Windmilling_dragcoefficients(V):
     V10_guess = 2.28                            #(2.359+2.5)/2-0.15
     lower_advance_ratio = df['rounded_J'] == 3.5
     tunnel_velocity = df['rounded_v'] == 40
-    first_advance_regime = df.loc[(first_advance_ratio) & (tunnel_velocity)]
-    upper_linear_regime = df.loc[(upper_advance_ratio) & (tunnel_velocity)]
-    lower_linear_regime = df.loc[(lower_advance_ratio) & (tunnel_velocity)]
+    aoa_lst = [-5, 7, 12, 14]
+    General_AoA_values = df['rounded_AoA'].isin(aoa_lst)
+
+    #Find CX for all advance ratio's and V=40 m/s
+    #Only interested in angles of attack -5, 7, 12, 14
+    first_advance_regime = df.loc[(first_advance_ratio) & (tunnel_velocity) & (General_AoA_values)]
+    upper_linear_regime = df.loc[(upper_advance_ratio) & (tunnel_velocity) & (General_AoA_values)]
+    lower_linear_regime = df.loc[(lower_advance_ratio) & (tunnel_velocity) & (General_AoA_values)]
     first_resulting_CD = first_advance_regime['CD']
     upper_resulting_CD = upper_linear_regime['CD']
     lower_resulting_CD = lower_linear_regime['CD']
-    if len(lower_resulting_CD) == 5:
-        lower_resulting_CD = lower_resulting_CD.drop(lower_resulting_CD.index[1])  #Remove zero AoA
+
+    #Find slope and windmilling drag between J=1.8 and J=3.5 for V=40
     lst_CD_windmilling = []
     if len(upper_resulting_CD)!=len(lower_resulting_CD):
         print('Lengths are not the same')
@@ -52,33 +58,34 @@ def Windmilling_dragcoefficients(V):
         'rounded_AoA': upper_linear_regime['rounded_AoA'].reset_index(drop=True),
         'CD_windmilling': lst_CD_windmilling
     })
-    aoa_lst = [-5, 7, 12, 14]
-    if V!=40:
 
+    #Find windmilling drag for other velocities than 40 m/s
+    if V!=40:
         lst_difference = []
         lst_CD = []
-        i=0
-        slow = df.loc[(df['rounded_J'] == 1.6) & (df['rounded_v'] == V)]
+        # Only points available are at J=1.6
+        slow = df.loc[(df['rounded_J'] == 1.6) & (df['rounded_v'] == V) & (General_AoA_values)]
         slow_CD = slow['CD']
-        for aoa in aoa_lst:
-            baseline = first_resulting_CD.iloc[int(aoa+5)]
+        for i in range(len(aoa_lst)):
+            #Baseline from 40 m/s at J=1.6
+            baseline = first_resulting_CD.iloc[i]
+            #Value for slower velocity at J=1.6
+            CD = slow_CD.iloc[int(i)]
+            lst_CD.append(CD)
+            #Calculate difference
             if V==10:
-                CD = slow_CD.iloc[int(i)]
                 lst_difference.append(baseline - CD - slope_lst[i] * (V40_guess - V10_guess))   #Also account for different J for windmilling
-                lst_CD.append(CD)
             elif V==20:
-                CD = slow_CD.iloc[int(aoa+5)]
                 lst_difference.append(baseline-CD-slope_lst[i]*(V40_guess-V20_guess))           #Also account for different J for windmilling
-                lst_CD.append(CD)
-            i += 1
-        #plt.scatter(1.6, slow_CD.iloc[2])
-        #plt.scatter(aoa_lst, lst_CD)
+        #Apply difference
         windmilling_df['CD_windmilling'] = windmilling_df['CD_windmilling'] - lst_difference
-    J = [1.6, 1.8, V40_guess, 3.5]
-    CD_w = windmilling_df['CD_windmilling'].values
-    if V==40:
-        CD = [first_resulting_CD.iloc[17], upper_resulting_CD.iloc[1], CD_w[1], lower_resulting_CD.iloc[1]]
-        #plt.scatter(aoa_lst,[first_resulting_CD.iloc[0],first_resulting_CD.iloc[12],first_resulting_CD.iloc[17],first_resulting_CD.iloc[19]])
+
+    #Plotting
+    # J = [1.6, 1.8, V40_guess, 3.5]
+    # CD_w = windmilling_df['CD_windmilling'].values
+    # if V==40:
+    #     CD = [first_resulting_CD.iloc[1], upper_resulting_CD.iloc[1], CD_w[1], lower_resulting_CD.iloc[1]]
+    #     plt.scatter(aoa_lst,[first_resulting_CD.iloc[0],first_resulting_CD.iloc[1],first_resulting_CD.iloc[2],first_resulting_CD.iloc[3]])
 
     # CD_nowindmill = [first_resulting_CD.iloc[1], upper_resulting_CD.iloc[1], lower_resulting_CD.iloc[1]]
     # J = [1.6,1.8,3.5]
@@ -99,11 +106,14 @@ def Windmilling_dragcoefficients(V):
 # plt.show()
 
 def drag_interpolation(V):
+    #Interpolate windmilling drag coefficient for all angles of attack
     windmilling_df = Windmilling_dragcoefficients(V)
     windmilling_drag = windmilling_df['CD_windmilling'].values
     windmilling_aoa = windmilling_df['rounded_AoA'].values
     coefficients = np.polyfit(windmilling_aoa, windmilling_drag, deg=4)
     fitted_curve = np.poly1d(coefficients)
+
+    #Plotting
     # aoa = df['rounded_AoA'].unique()
     # plt.scatter(windmilling_aoa, windmilling_drag)
     # plt.plot(aoa, fitted_curve(aoa), color='red', label='Fitted Curve')
@@ -126,15 +136,17 @@ def Thrust_estimation(J, V, AoA):
     curve = drag_interpolation(V)
     windmilling_drag = curve(AoA)
 
-    # Interpolate CD data for all angles of attack
+    # Interpolate CX data for all angles of attack
     tunnel_prop_combi = [[{'rounded_v': V}, {'rounded_J': J}]]
-    CD_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD', tunnel_prop_combi, np.linspace(-6, 20, 26),
+    CX_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD', tunnel_prop_combi, np.linspace(-6, 20, 26),
                                                     None, None)
-    CD_array = CD_alpha_function[0].poly_coeff(np.arange(-5, 14.1, 1))
-    tancoef = CD_array[int(AoA + 5)]
+    CX_array = CX_alpha_function[0].poly_coeff(np.arange(-5, 14.1, 1))
+    #Find tangential coefficient for desired angle of attack in range -5.......14
+    tancoef = CX_array[int(AoA + 5)]
+    #Calculate thrust coefficient
     thrust_coefficient = -(tancoef - windmilling_drag) / np.cos(AoA * np.pi / 180)
 
-    # Plotting stuff
+    # Plotting
     # aoa = np.arange(-5,14.1,1)
     # plt.plot(aoa, curve(aoa), label='Windmill')
     # plt.scatter(short_aoa, tancoef)

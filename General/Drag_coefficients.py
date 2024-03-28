@@ -1,7 +1,3 @@
-import pandas as pd
-from General.Data_sorting import *
-from General.data_function_maker import *
-import matplotlib.pyplot as plt
 from General.Thrust_calculation import *
 
 def drag_coefficients(J,V,CL_unc):

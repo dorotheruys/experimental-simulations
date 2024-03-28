@@ -167,14 +167,14 @@ def lift_interference(df):
 #         ax.grid(True)
 #         plt.show()
 
-def main():
-    filename = "bal_sorted2.csv"
-    folder = "Sort_data"
-
-    df = pd.read_csv(get_file_path(filename=filename, folder=folder))
-
-    print(df)
-
-
-if __name__ == "__main__":
-    main()
+# def main():
+#     filename = "bal_sorted2.csv"
+#     folder = "Sort_data"
+#
+#     df = pd.read_csv(get_file_path(filename=filename, folder=folder))
+#
+#     print(df)
+#
+#
+# if __name__ == "__main__":
+#     main()

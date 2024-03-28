@@ -5,6 +5,7 @@ from Corrections.Lift_interference import lift_interference
 from Corrections.Blockages import *
 from General.Pathfinder import get_file_path
 from General.Drag_coefficients import *
+from General.Data_sorting import *
 
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
@@ -21,10 +22,11 @@ def corrections_combined(df):
 
 
 def main():
-    filename = "bal_sorted2.csv"
-    folder = "Sort_data"
-
-    df = pd.read_csv(get_file_path(filename=filename, folder=folder))
+    # The dataframe is now imported from Data_sorting
+    # filename = "bal_sorted2.csv"
+    # folder = "Sort_data"
+    #
+    # df = pd.read_csv(get_file_path(filename=filename, folder=folder))
 
     corrections_combined(df)
 

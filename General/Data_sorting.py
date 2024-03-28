@@ -4,15 +4,25 @@ import numpy as np
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 
-df = pd.read_csv('../Sort_data/bal_sorted2.csv')
+filename = int(input('Enter elevator deflection (1, 2 or 3): '))
 
-#There were two similar rows with the same angle of attack in bal_sorted2. Took the average of them
-double_aoa_rows = df[(df['rounded_AoA'] == 4) & (df['rounded_v'] == 20)]
-row_indices = double_aoa_rows.index
-average_values = (df.loc[row_indices[0]] + df.loc[row_indices[1]]) / 2
-df.loc[row_indices[0]] = average_values
-df.drop(row_indices[1], inplace=True)
-df.reset_index(drop=True, inplace=True)
+if filename==1:
+    df = pd.read_csv('../Sort_data/bal_sorted1.csv')
+elif filename==2:
+    df = pd.read_csv('../Sort_data/bal_sorted2.csv')
+
+    # There were two similar rows with the same angle of attack in bal_sorted2. Took the average of them
+    double_aoa_rows = df[(df['rounded_AoA'] == 4) & (df['rounded_v'] == 20)]
+    row_indices = double_aoa_rows.index
+    average_values = (df.loc[row_indices[0]] + df.loc[row_indices[1]]) / 2
+    df.loc[row_indices[0]] = average_values
+    df.drop(row_indices[1], inplace=True)
+    df.reset_index(drop=True, inplace=True)
+elif filename == 3:
+    df = pd.read_csv('../Sort_data/bal_sorted3.csv')
+else:
+    print('WRONG FILE SPECIFIED')
+
 
 
 # tunnel_velocity = df['rounded_v'] == 40

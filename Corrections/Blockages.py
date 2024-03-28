@@ -1,4 +1,4 @@
-import numpy as np
+
 from General.Drag_coefficients import drag_coefficients
 from General.Thrust_calculation import *
 
