@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from General.Pathfinder import get_file_path
 
+
 def df_velocity_filter_tailoff(V_target: int):
     if V_target == 10:
         # Reset V_target to 20
@@ -85,12 +86,15 @@ def df_velocity_filter(df, V_target: int):
 
 
 def lift_interference(df):
-    delta = 0.106  # Boundary correction factor
-    # S_over_c = 0.2172 / 0.165  # Of main wing  # old
+    delta = 0.104  # Boundary correction factor
+    # S_over_C = 0.2172 / 0.165  # Of main wing  # old
     # Sref = 0.0736284708406532
     # C_tunnel = 2.07
-    S_over_c = 0.03556930958485662 # Based on stuff above
-    tau2 = 1  # (placeholder) # Depends on tail, gotta check
+    S_over_C = 0.03556930958485662  # Based on stuff above
+    tau2_wing = 0.15
+    tau2_tail = 0.75
+
+    dCM_dalphatail = 1  # placeholder
 
     df_correction_factors = pd.DataFrame(columns=['dAoA', 'dCD', 'dCM25c'])
     for index, row in df.iterrows():
@@ -103,13 +107,15 @@ def lift_interference(df):
         CLw = df_tailoff["CL"].values[0]
         CLa = df_tailoff["CLa"].values[0]
 
-        d_aoa_uw = delta * S_over_c * CLw
-        d_aoa_sc = tau2 * d_aoa_uw
+        d_alpha_tail = delta * S_over_C * CLw * (1 + tau2_tail)
+
+        d_aoa_uw = delta * S_over_C * CLw
+        d_aoa_sc = tau2_wing * d_aoa_uw
         d_aoa = d_aoa_uw + d_aoa_sc
-        d_Cd_w = delta * S_over_c * CLw ** 2
+        d_Cd_w = delta * S_over_C * CLw ** 2
         d_CM25c_uw = 1 / 8 * d_aoa_sc * CLa
-        d_CM25c_t = 0   #Placeholder
-        d_CM25c = d_CM25c_uw+d_CM25c_t
+        d_CM25c_t = dCM_dalphatail * d_alpha_tail  # Placeholder
+        d_CM25c = d_CM25c_uw + d_CM25c_t
 
         # Create a temporary DataFrame to hold the current row
         df_temp = pd.DataFrame([[d_aoa, d_Cd_w, d_CM25c]], columns=['dAoA', 'dCD', 'dCM25c'])
