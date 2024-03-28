@@ -87,7 +87,10 @@ def df_velocity_filter(df, V_target: int):
 
 def lift_interference(df):
     delta = 0.106  # Boundary correction factor
-    S_over_c = 0.2172 / 0.165  # Of main wing
+    # S_over_c = 0.2172 / 0.165  # Of main wing  # old
+    # Sref = 0.0736284708406532
+    # C_tunnel = 2.07
+    S_over_c = 0.03556930958485662 # Based on stuff above
     tau2 = 1  # (placeholder) # Depends on tail, gotta check
 
     df_correction_factors = pd.DataFrame(columns=['d_aoa', 'd_Cd_w', 'd_CM25c'])
