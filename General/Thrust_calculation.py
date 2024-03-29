@@ -1,5 +1,5 @@
 import pandas as pd
-from General.Data_sorting import df
+from General.Data_sorting import *
 from General.data_function_maker import *
 from Corrections.Support_tare_correction import *
 import numpy as np
@@ -8,22 +8,7 @@ plt.rcParams.update({'font.size': 25})
 pd.set_option('display.max_rows', None)
 #pd.set_option('display.max_columns', None)
 
-# Old stuff
-# def Thrust_estimation1(J,V,AoA):
-#     #windmilling = df['rounded_J'] == 17
-#     tunnel_velocity = df['rounded_v'] == V
-#     prop_setting = df['rounded_J'] == J
-#     aoa_setting = df['rounded_AoA'] == AoA
-#     #windmilling_df = df.loc[(windmilling) & (tunnel_velocity) & (aoa_setting)].copy()
-#     #windmilling_drag = windmilling_df['CD'].iloc[0]
-#     windmilling_df = Windmilling_dragcoefficients()
-#     windmilling_df = windmilling_df[(windmilling_df['rounded_AoA'] == AoA)].copy()
-#     windmilling_drag = windmilling_df['CD_windmilling'].iloc[0]
-#     filtered_df = df.loc[(prop_setting) & (tunnel_velocity) & (aoa_setting)].copy()
-#     tancoef = filtered_df['CD'].iloc[0]
-#     return -(tancoef-windmilling_drag)/np.cos(AoA*np.pi/180)
-
-def Windmilling_dragcoefficients(V):
+def Windmilling_dragcoefficients(V, df):
     #Define set advance ratio's and velocity
     first_advance_ratio = df['rounded_J'] == 1.6
     upper_advance_ratio = df['rounded_J'] == 1.8
@@ -106,9 +91,9 @@ def Windmilling_dragcoefficients(V):
 #     plt.plot(aoa,CD_windmill)
 # plt.show()
 
-def drag_interpolation(V):
+def drag_interpolation(V, df):
     #Interpolate windmilling drag coefficient for all angles of attack
-    windmilling_df = Windmilling_dragcoefficients(V)
+    windmilling_df = Windmilling_dragcoefficients(V, df)
 
     #Get strut drag to subtract
     df_strut = get_strut_data()
@@ -129,7 +114,7 @@ def drag_interpolation(V):
     # plt.show()
     return fitted_curve
 
-def Thrust_estimation(J, V, AoA):
+def Thrust_estimation(J, V, AoA, df):
     # Old stuff
     # tunnel_velocity = df['rounded_v'] == V
     # prop_setting = df['rounded_J'] == J
@@ -139,7 +124,7 @@ def Thrust_estimation(J, V, AoA):
     # short_aoa = filtered_df['rounded_AoA'].values
 
     # Find willing drag coefficients
-    curve = drag_interpolation(V)
+    curve = drag_interpolation(V, df)
     windmilling_drag = curve(AoA)
 
     # Interpolate CX data for all angles of attack

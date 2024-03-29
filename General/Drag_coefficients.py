@@ -8,7 +8,7 @@ def drag_coefficients(J,V,CL_unc,df):
     CL_alpha_function = get_function_from_dataframe(df, 2, 'AoA', 'CL_strut_cor', tunnel_prop_combi,np.linspace(-6, 20, 26),None,None)
     CL_array = CL_alpha_function[0].poly_coeff(np.arange(-5,14.1,1))
     #CL_array = filtered_df['CL'].values                                 #Find relevant lift coefficients
-    CD_curve = drag_interpolation(V)                                     #Interpolation for drag curve
+    CD_curve = drag_interpolation(V, df)                                     #Interpolation for drag curve
     unique_aoa = np.arange(-5,14.1,1)#filtered_df['rounded_AoA'].unique()
     CD_array = CD_curve(unique_aoa)                                     #Find drag coefficients as function of aoa
     negative_indices = np.where(unique_aoa < 0)[0]                      #Remove negative aoa for drag analysis
@@ -54,10 +54,10 @@ def CD_CT(df):
     for index, row in df.iterrows():
         Vunc = row["rounded_v"]
         J = row["rounded_J"]
-        curve = drag_interpolation(Vunc)
+        curve = drag_interpolation(Vunc, df)
         AoA = row['rounded_AoA']
         CDunc = curve(AoA)
-        CT = Thrust_estimation(J,Vunc,AoA)
+        CT = Thrust_estimation(J,Vunc,AoA, df)
 
         add_columns = [CDunc, CT]
 
