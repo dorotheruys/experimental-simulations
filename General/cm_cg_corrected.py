@@ -23,14 +23,14 @@ def get_decoupled_lift(df_data: pd.DataFrame, df_data_tailoff: pd.DataFrame, tun
     CL_wing_poly_coeff = np.poly1d(np.polyfit(df_wing['AoA'], df_wing['CL'], 2))
 
     # Construct a new dataframe including a tail-off lift coefficient for the AoA in the data and lift coefficient for the tail
-    merged_df = df_total_relevant_data
-    merged_df['CL_wing'] = CL_wing_poly_coeff(merged_df['AoA'])
-    merged_df['CL_tail'] = merged_df['CL'] - merged_df['CL_wing']
+    # merged_df = df_total_relevant_data
+    df_total_relevant_data['CL_wing'] = CL_wing_poly_coeff(df_total_relevant_data['AoA'])
+    df_total_relevant_data['CL_tail'] = df_total_relevant_data['CL'] - df_total_relevant_data['CL_wing']
 
     # Make a pretty dataframe for output
-    result_df = merged_df[['AoA', 'rounded_v', 'V', 'rounded_J', 'delta_e', 'CL', 'CL_wing', 'CL_tail']]
-    result_df = result_df.rename(columns={'CL': 'CL_total'})
-    return result_df
+    # result_df = merged_df[['AoA', 'rounded_v', 'V', 'rounded_J', 'delta_e', 'CL', 'CL_wing', 'CL_tail']]
+    df_total_relevant_data = df_total_relevant_data.rename(columns={'CL': 'CL_total'})
+    return df_total_relevant_data
 
 
 def get_cm_cg_corrected(df_data: pd.DataFrame, df_data_tailoff: pd.DataFrame, tunnel_speed: [int, float], arm_ac_wing: float, arm_ac_ht: float, arm_cg: float, mac_wing: float):

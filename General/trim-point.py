@@ -22,6 +22,7 @@ import matplotlib.pyplot as plt
 from General.data_function_maker import get_function_from_dataframe, extract_from_list_classes, get_function_set
 from Corrections.Lift_interference import df_velocity_filter_tailoff
 from General.cm_cg_corrected import get_cm_cg_cor_all_elevator
+from Corrections.Corrections_main import corrections_combined
 
 
 def get_correct_data_based_on_elevator(elevator_defl: int, tunnel_prop_combi):
@@ -101,17 +102,20 @@ if __name__ == "__main__":
     # Get the data
     bal_sorted_min15 = pd.read_csv('../Sort_data/bal_sorted1.csv')
     bal_sorted_min15 = pd.concat([bal_sorted_min15, pd.DataFrame({'delta_e': [-15]*len(bal_sorted_min15)})], axis=1)
+    data_corrected_min15 = corrections_combined(bal_sorted_min15)
 
     bal_sorted_0 = pd.read_csv('../Sort_data/bal_sorted2.csv')
     bal_sorted_0 = pd.concat([bal_sorted_0, pd.DataFrame({'delta_e': [0]*len(bal_sorted_0)})], axis=1)
+    data_corrected_0 = corrections_combined(bal_sorted_0)
 
     bal_sorted_15 = pd.read_csv('../Sort_data/bal_sorted3.csv')
     bal_sorted_15 = pd.concat([bal_sorted_15, pd.DataFrame({'delta_e': [15]*len(bal_sorted_15)})], axis=1)
+    data_corrected_15 = corrections_combined(bal_sorted_15)
 
     # Get the tail-off data
     data_tailoff_40 = df_velocity_filter_tailoff(40)
-    rounded_AoA_40 = data_tailoff_40['AoA'].round()
-    data_tailoff_40.insert(1, 'rounded_AoA', rounded_AoA_40)
+    # rounded_AoA_40 = data_tailoff_40['AoA'].round()
+    # data_tailoff_40.insert(1, 'rounded_AoA', rounded_AoA_40)
 
     data_tailoff_20 = df_velocity_filter_tailoff(20)
     rounded_AoA_20 = data_tailoff_20['AoA'].round()
@@ -119,7 +123,7 @@ if __name__ == "__main__":
 
     # Determine the corrected CM for all tunnel velocities
     tail_off_data = [data_tailoff_20, data_tailoff_20, data_tailoff_40]
-    CM_cg_cor = get_cm_cg_cor_all_elevator(tail_off_data, [bal_sorted_min15, bal_sorted_0, bal_sorted_15], l_ac_w, l_ac_ht, l_cg, MAC_w)
+    CM_cg_cor = get_cm_cg_cor_all_elevator(tail_off_data, [data_corrected_min15, data_corrected_0, data_corrected_15], l_ac_w, l_ac_ht, l_cg, MAC_w)
 
     # Find the trim points
     find_trim_points_per_aoa(CM_cg_cor, 1)

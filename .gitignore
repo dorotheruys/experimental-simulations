@@ -179,4 +179,7 @@ cython_debug/
 /Noisedata_from_matlab/MIC_0.mat
 /Noisedata_from_matlab/MIC_neg15_2.mat
 /Noisedata_from_matlab/MIC_plus15.mat
+/Corrections/data_cor_min15.csv
+/Corrections/data_cor_0.csv
+/Corrections/data_cor_15.csv
 
