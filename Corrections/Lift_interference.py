@@ -18,6 +18,8 @@ def df_velocity_filter_tailoff(V_target: int):
     if V_target == 40:
         filtered_df = average_40_tailoff(filtered_df)
     filtered_df = generate_cl_alpha(filtered_df)
+    filtered_df.rename(columns={'CM25c': 'CMpitch25c'}, inplace=True)
+    filtered_df = generate_cm025_alpha(filtered_df)
     return filtered_df
 
 
@@ -43,6 +45,11 @@ def generate_cl_alpha(df):
     df["CLa"] = df["CLa"] * 180 / np.pi  # Convert from deg^-1 to rad^-1 for CLa
     return df
 
+def generate_cm025_alpha(df):
+    df['CM25ca'] = df["CMpitch25c"].diff() / df["AoA"].diff()
+    df.loc[0, 'CM25ca'] = df['CM25ca'].iloc[1]  # Set value of first CMa to value of second CLa to prevent NaN
+    df["CM25ca"] = df["CM25ca"] * 180 / np.pi  # Convert from deg^-1 to rad^-1 for CMa
+    return df
 
 def df_velocity_filter(df, V_target: int):
     # There were two similar rows with the same angle of attack in 0_corrected. Took the average of them
@@ -95,6 +102,7 @@ def lift_interference(df):
     tau2_tail = 0.7                 #l/B=0.3
 
     df_tailon = generate_cl_alpha(df)
+    df_tailon_m = generate_cm025_alpha(df)
     #dCM_dalphatail = 5.73 * 3.22 * 0.165  # CLalpha of airfoil (found online) * arm
 
     df_correction_factors = pd.DataFrame(columns=['dAoA', 'dCD', 'dCM25c'])
@@ -106,26 +114,26 @@ def lift_interference(df):
         df_tailoff = df_velocity_filter_tailoff(V)
         df_tailoff = df_tailoff[df_tailoff["AoA"] == aoa_uncor]
 
+        #Tail off data
         CLw = df_tailoff["CL"].values[0]
         CLa = df_tailoff["CLa"].values[0]
+        CMa = df_tailoff["CM25ca"].values[0]
         d_alpha_tail = delta * S_over_C * CLw * (1 + tau2_tail)
 
-        df_tailon_filtered = df_tailon[(df_tailon['rounded_AoA'] == aoa_uncor) & (df_tailon['rounded_J']==J) & (df_tailon['rounded_v']== V)]   #
+        #Tail contributions
+        df_tailon_m_filtered = df_tailon_m[(df_tailon['rounded_AoA'] == aoa_uncor) & (df_tailon_m['rounded_J'] == J) & (df_tailon_m['rounded_v'] == V)]  #
+        CMa_tailon = df_tailon_m_filtered['CM25ca'].values[0]
 
-        CLa_tailon = df_tailon_filtered['CLa'].values[0]
-
-        CLa_tail = CLa_tailon-CLa           #Calculate effects of tail
-
-        dCM_dalphatail = CLa_tail * 3.22 * 0.165    #Multiply CLa_tail with distance from htail to main wing for moment coefficient
+        #Isolate tail slope
+        CMa_tail = CMa_tailon - CMa
 
         d_aoa_uw = delta * S_over_C * CLw
         d_aoa_sc = tau2_wing * d_aoa_uw
         d_aoa = d_aoa_uw + d_aoa_sc
         d_Cd_w = delta * S_over_C * CLw ** 2
         d_CM25c_uw = 1 / 8 * d_aoa_sc * CLa
-        d_CM25c_t = dCM_dalphatail * d_alpha_tail
+        d_CM25c_t = CMa_tail * d_alpha_tail
         d_CM25c = d_CM25c_uw + d_CM25c_t
-
         # Create a temporary DataFrame to hold the current row
         df_temp = pd.DataFrame([[d_aoa, d_Cd_w, d_CM25c]], columns=['dAoA', 'dCD', 'dCM25c'])
 
