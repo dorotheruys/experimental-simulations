@@ -18,7 +18,6 @@ def df_velocity_filter_tailoff(V_target: int):
     if V_target == 40:
         filtered_df = average_40_tailoff(filtered_df)
     filtered_df = generate_cl_alpha(filtered_df)
-    print(filtered_df)
     return filtered_df
 
 
@@ -113,7 +112,7 @@ def lift_interference(df):
 
         df_tailon_filtered = df_tailon[(df_tailon['rounded_AoA'] == aoa_uncor) & (df_tailon['rounded_J']==J) & (df_tailon['rounded_v']== V)]   #
 
-        CLa_tailon = df_tailon_filtered['CLa'].values
+        CLa_tailon = df_tailon_filtered['CLa'].values[0]
 
         CLa_tail = CLa_tailon-CLa           #Calculate effects of tail
 

@@ -168,16 +168,15 @@ def Thrust_estimation(J, V, AoA):
 
 
 # J = [1.6,1.8,3.5]
+# n = [123.02, 109.36, 56.24]
 # CT = []
 # coef_lst = []
 # for j in J:
-#     CT.append(Thrust_estimation(j,40,7)[0])
-#     coef_lst.append(Thrust_estimation(j,40,7)[1])
-# coefficients = np.polyfit(coef_lst, J, deg=2)
-# fitted_curve = np.poly1d(coefficients)
-# J_array = np.linspace(-0.0045,0.13,100)
-# plt.plot(J_array,fitted_curve(J_array))
-# plt.scatter(coef_lst, J)
+#     CT.append(Thrust_estimation(j,40,7))
+# # coefficients = np.polyfit(coef_lst, J, deg=2)
+# # fitted_curve = np.poly1d(coefficients)
+# # J_array = np.linspace(-0.0045,0.13,100)
+# plt.plot(J,CT)
 # plt.xlabel('Advance ratio')
-# plt.ylabel('Drag coefficient from BAL_forces.m')
+# plt.ylabel('Thrust coefficient')
 # plt.show()
