@@ -5,9 +5,9 @@ from General.Pathfinder import get_file_path
 
 
 def df_velocity_filter_tailoff(V_target: int):
-    if V_target == 10:
-        # Reset V_target to 20
-        V_target = 20
+    # if V_target == 10:
+    #     # Reset V_target to 20
+    #     V_target = 20
     tailoff_path = get_file_path("TailOffData.xlsx", 'Corrections')
     df = pd.read_excel(tailoff_path, sheet_name="AoS = 0 deg")
     df = df.drop("AoS", axis=1)
@@ -18,6 +18,7 @@ def df_velocity_filter_tailoff(V_target: int):
     if V_target == 40:
         filtered_df = average_40_tailoff(filtered_df)
     filtered_df = generate_cl_alpha(filtered_df)
+    print(filtered_df)
     return filtered_df
 
 
@@ -91,14 +92,16 @@ def lift_interference(df):
     # Sref = 0.0736284708406532
     # C_tunnel = 2.07
     S_over_C = 0.03556930958485662  # Based on stuff above
-    tau2_wing = 0.15
-    tau2_tail = 0.75
+    tau2_wing = 0.1                 #l/B=0.045
+    tau2_tail = 0.7                 #l/B=0.3
 
-    dCM_dalphatail = 5.73 * 3.22 * 0.165  # CLalpha of airfoil (found online) * arm
+    df_tailon = generate_cl_alpha(df)
+    #dCM_dalphatail = 5.73 * 3.22 * 0.165  # CLalpha of airfoil (found online) * arm
 
     df_correction_factors = pd.DataFrame(columns=['dAoA', 'dCD', 'dCM25c'])
     for index, row in df.iterrows():
         V = row["rounded_v"]
+        J = row['rounded_J']
         aoa_uncor = row["rounded_AoA"]
 
         df_tailoff = df_velocity_filter_tailoff(V)
@@ -106,8 +109,15 @@ def lift_interference(df):
 
         CLw = df_tailoff["CL"].values[0]
         CLa = df_tailoff["CLa"].values[0]
-
         d_alpha_tail = delta * S_over_C * CLw * (1 + tau2_tail)
+
+        df_tailon_filtered = df_tailon[(df_tailon['rounded_AoA'] == aoa_uncor) & (df_tailon['rounded_J']==J) & (df_tailon['rounded_v']== V)]   #
+
+        CLa_tailon = df_tailon_filtered['CLa'].values
+
+        CLa_tail = CLa_tailon-CLa           #Calculate effects of tail
+
+        dCM_dalphatail = CLa_tail * 3.22 * 0.165    #Multiply CLa_tail with distance from htail to main wing for moment coefficient
 
         d_aoa_uw = delta * S_over_C * CLw
         d_aoa_sc = tau2_wing * d_aoa_uw

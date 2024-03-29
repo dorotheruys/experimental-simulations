@@ -77,7 +77,6 @@ def Full_blockage(df):
         qunc = row['q']
         CDunc = row['Drag coefficient']
         CMunc = row['CMpitch25c_strut_cor']
-        print(CDunc,e_total)
         #Corrections
         V = Vunc*(1+e_total)
         q = qunc*(1+e_total)**2

@@ -15,7 +15,8 @@ def corrections_combined(df):
     df_with_bcor = Full_blockage(df_with_strut)
 
     lift_interference_cor = lift_interference(df_with_bcor)
-    print(lift_interference_cor)
+    #1
+    # print(lift_interference_cor)
 
 
 def main():
