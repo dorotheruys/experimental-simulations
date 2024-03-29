@@ -21,6 +21,7 @@ class FunctionData:
         self.y_variable: str = y_variable
         self.poly_coeff: np.poly1d = poly_coeff
         self.data_points: pd.DataFrame = data_points
+        self.trim_points = None
 
 
 def plot_function_data(plot_data: list, xlabel: str, ylabel: str, x_axis_range: np.array):

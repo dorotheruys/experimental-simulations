@@ -67,37 +67,27 @@ def get_aoa_from_cl(elevator_defl: int, cl_des: float, tunnel_speed: int, propel
     return intersections_array
 
 
-# if __name__ == "__main__":
+def find_trim_points_per_aoa(data, order):
 
-# Get the data
-bal_sorted_min15 = pd.read_csv('../Sort_data/bal_sorted1.csv')
-bal_sorted_min15 = pd.concat([bal_sorted_min15, pd.DataFrame({'delta_e': [-15]*len(bal_sorted_min15)})], axis=1)
+    for aoa in [-5, 7, 12, 14]:
+        relevant_set = get_function_set(data, {'AoA': aoa}, None)
+        functionclass_lst = get_function_from_dataframe(relevant_set, order, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 50), None, None)
+        root_lst = []
+        for item in functionclass_lst:
+            roots_x = np.polynomial.polynomial.polyroots(item.poly_coeff)
+            roots_y = [item.poly_coeff(root) for root in roots_x]
+            test = range(len(roots_x))
+            root_lst.append([[roots_x[i], roots_y[i]] for i in range(len(roots_x))])
+            # item.trim_point = roots
+    return
 
-bal_sorted_0 = pd.read_csv('../Sort_data/bal_sorted2.csv')
-bal_sorted_0 = pd.concat([bal_sorted_0, pd.DataFrame({'delta_e': [0]*len(bal_sorted_0)})], axis=1)
 
-bal_sorted_15 = pd.read_csv('../Sort_data/bal_sorted3.csv')
-bal_sorted_15 = pd.concat([bal_sorted_15, pd.DataFrame({'delta_e': [15]*len(bal_sorted_15)})], axis=1)
-
-# Get the tail-off data
-data_tailoff_40 = df_velocity_filter_tailoff(40)
-rounded_AoA_40 = data_tailoff_40['AoA'].round()
-data_tailoff_40.insert(1, 'rounded_AoA', rounded_AoA_40)
-
-data_tailoff_20 = df_velocity_filter_tailoff(20)
-rounded_AoA_20 = data_tailoff_20['AoA'].round()
-data_tailoff_20.insert(1, 'rounded_AoA', rounded_AoA_20)
-
+# Initialize
 prop_tunnel_combis = [[{'rounded_v': 40}, {'rounded_J': 1.6}],
                         [{'rounded_v': 40}, {'rounded_J': 1.8}],
                         [{'rounded_v': 40}, {'rounded_J': 3.5}],
                         [{'rounded_v': 20}, {'rounded_J': 1.6}],
                         [{'rounded_v': 10}, {'rounded_J': 1.6}]]
-
-# Calculate the reference model using the reference aircraft ATR-72
-ref_tunnel_vel = 10.                        # [m/s]
-MTOW_ref_ac = (22800. - 0.5 * 5000) * 9.80665              # [N]
-cruice_vel_ref_ac = 510 * 10**3 / 3600      # [m/s]
 
 # chord-wise location assumptions
 MAC_w = 0.165       # [m]
@@ -106,13 +96,37 @@ l_ac_w = (0.33 - 0.25) * MAC_w
 l_ac_ht = 3.22 * MAC_w + (0.33 - 0.25) * MAC_HT
 l_cg = (0.35 - 0.25) * MAC_w
 
-# Loop through the different tunnel velocities
-tail_off_data = [data_tailoff_20, data_tailoff_20, data_tailoff_40]
-CM_cg_cor = get_cm_cg_cor_all_elevator(tail_off_data, [bal_sorted_min15, bal_sorted_0, bal_sorted_15], l_ac_w, l_ac_ht, l_cg, MAC_w)
 
-# Get CM vs delta_e for AoA = 7
-CM_cg_cor_relevant = get_function_set(CM_cg_cor, {'AoA': 7}, None)
-CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
+if __name__ == "__main__":
+    # Get the data
+    bal_sorted_min15 = pd.read_csv('../Sort_data/bal_sorted1.csv')
+    bal_sorted_min15 = pd.concat([bal_sorted_min15, pd.DataFrame({'delta_e': [-15]*len(bal_sorted_min15)})], axis=1)
 
-plt.plot([-20, 20], [0, 0], color='0')
-plt.show()
+    bal_sorted_0 = pd.read_csv('../Sort_data/bal_sorted2.csv')
+    bal_sorted_0 = pd.concat([bal_sorted_0, pd.DataFrame({'delta_e': [0]*len(bal_sorted_0)})], axis=1)
+
+    bal_sorted_15 = pd.read_csv('../Sort_data/bal_sorted3.csv')
+    bal_sorted_15 = pd.concat([bal_sorted_15, pd.DataFrame({'delta_e': [15]*len(bal_sorted_15)})], axis=1)
+
+    # Get the tail-off data
+    data_tailoff_40 = df_velocity_filter_tailoff(40)
+    rounded_AoA_40 = data_tailoff_40['AoA'].round()
+    data_tailoff_40.insert(1, 'rounded_AoA', rounded_AoA_40)
+
+    data_tailoff_20 = df_velocity_filter_tailoff(20)
+    rounded_AoA_20 = data_tailoff_20['AoA'].round()
+    data_tailoff_20.insert(1, 'rounded_AoA', rounded_AoA_20)
+
+    # Determine the corrected CM for all tunnel velocities
+    tail_off_data = [data_tailoff_20, data_tailoff_20, data_tailoff_40]
+    CM_cg_cor = get_cm_cg_cor_all_elevator(tail_off_data, [bal_sorted_min15, bal_sorted_0, bal_sorted_15], l_ac_w, l_ac_ht, l_cg, MAC_w)
+
+    # Find the trim points
+    find_trim_points_per_aoa(CM_cg_cor, 1)
+
+    # Plot CM vs delta_e for AoA = 7
+    CM_cg_cor_relevant = get_function_set(CM_cg_cor, {'AoA': 7}, None)
+    CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
+
+    plt.plot([-20, 20], [0, 0], color='0')
+    plt.show()
