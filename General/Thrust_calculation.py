@@ -1,5 +1,5 @@
 import pandas as pd
-from General.Data_sorting import *
+from General.Data_sorting import specific_file
 from General.data_function_maker import *
 from Corrections.Support_tare_correction import *
 import numpy as np
@@ -81,7 +81,13 @@ def Windmilling_dragcoefficients(V, df):
     # plt.plot(J_array,fitted_curve(J_array))
     # plt.scatter(J, CD_nowindmill)
     # plt.show()
+    print(df)
     return windmilling_df
+
+# df = specific_file()
+#
+# Windmilling_dragcoefficients(40, df)
+
 
 # Vlst = [40,20,10]
 # for V in Vlst:
@@ -94,14 +100,7 @@ def Windmilling_dragcoefficients(V, df):
 def drag_interpolation(V, df):
     #Interpolate windmilling drag coefficient for all angles of attack
     windmilling_df = Windmilling_dragcoefficients(V, df)
-
-    #Get strut drag to subtract
-    df_strut = get_strut_data()
-    df_strut_aoa = pd.DataFrame()  # Initialize as an empty DataFrame
-    for aoa in windmilling_df["rounded_AoA"]:
-        df_strut_aoa = pd.concat([df_strut_aoa, df_strut[df_strut["AoA"] == aoa]], ignore_index=True)
-    df_strut_aoa.reset_index(drop=True, inplace=True)
-    windmilling_drag = windmilling_df['CD_windmilling'].values-df_strut_aoa['CD'].values
+    windmilling_drag = windmilling_df['CD_windmilling'].values
     windmilling_aoa = windmilling_df['rounded_AoA'].values
     coefficients = np.polyfit(windmilling_aoa, windmilling_drag, deg=4)
     fitted_curve = np.poly1d(coefficients)

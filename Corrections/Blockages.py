@@ -31,7 +31,7 @@ def Wakeblockage(J,V,CL,df):
     mac_vtail = 0.17
     b_vtail = 0.258
 
-    S_ref = np.pi * D_fuselage ** 2 / 4 + t_c_wing * mac_wing * b_wing + np.pi * D_prop ** 2 / 4 + t_c_vtail * mac_vtail * b_vtail
+    S_ref = np.pi * D_fuselage ** 2 / 4 + t_c_wing * mac_wing * b_wing + np.pi * 2 * D_prop ** 2 / 4 + t_c_vtail * mac_vtail * b_vtail
     C_tunnel = 1.8*1.25-0.3**2/2*4
     e_wbt = S_ref / (4 * C_tunnel) * CD0
     e_wbs = 5 * S_ref / (4 * C_tunnel) * (CD_unc-CD0-CDi)
@@ -51,7 +51,7 @@ def slipstream(J,V,AoA, df):
     rho = filtered_df['rho'].mean()
     thrust = thrust_coefficient1 * rho * n ** 2 * Dprop ** 4
     thrust_coefficient2 = thrust/(rho*V**2*Sp)
-    e_ss = - thrust_coefficient2/(2*np.sqrt(1+2*thrust_coefficient2))*Sp/C
+    e_ss = - thrust_coefficient2/(2*np.sqrt(1+2*thrust_coefficient2))*2*Sp/C
     return e_ss
 
 def Full_blockage(df):
