@@ -149,6 +149,23 @@ def Thrust_estimation(J, V, AoA, df):
     # plt.plot(aoa,lst_coef, label='thrust coefficient')
     return thrust_coefficient
 
+def main():
+    df = specific_file()
+    J_lst = [1.6, 1.8, 3.5]
+    CT = []
+    for J in J_lst:
+        CT.append(Thrust_estimation(J,40,7, df)/J**2)
+    CT = np.insert(CT, 2, 0)
+    J_lst = [1.6, 1.8, 2.413, 3.5]
+    plt.plot(J_lst, CT, label='V=40 m/s, AoA=7, de=0')
+    plt.grid()
+    plt.legend()
+    plt.xlabel('J')
+    plt.ylabel('Uncorrected Tc')
+    plt.show()
+
+if __name__ == "__main__":
+    main()
 
 # J = [1.6,1.8,3.5]
 # n = [123.02, 109.36, 56.24]

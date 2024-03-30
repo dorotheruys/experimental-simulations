@@ -70,4 +70,5 @@ def CD_CT(df):
         # Append the temporary DataFrame to the main DataFrame
         df_drag_thrust_coefficient = pd.concat([df_drag_thrust_coefficient, df_temp], ignore_index=True)
     df_drag_thrust_coefficient = pd.concat([df, df_drag_thrust_coefficient], axis=1)
+    df_drag_thrust_coefficient['CL'] = df_drag_thrust_coefficient['CL'] - df_drag_thrust_coefficient['Thrust coefficient'] * np.sin(df_drag_thrust_coefficient['rounded_AoA']*np.pi/180)
     return df_drag_thrust_coefficient
