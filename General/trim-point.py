@@ -80,7 +80,7 @@ def find_trim_points_per_aoa(data, aoa, order):
         # else:
         #     test = [roots_x[0], roots_y[0]]
 
-        CM_function.trim_points = roots_x
+        CM_function.trim_point = roots_x
 
     return functionclass_CM_lst
 
@@ -114,9 +114,9 @@ if __name__ == "__main__":
     # bal_sorted_15 = pd.concat([bal_sorted_15, pd.DataFrame({'delta_e': [15]*len(bal_sorted_15)})], axis=1)
     # data_corrected_15 = corrections_combined(bal_sorted_15)
 
-    data_corrected_min15 = pd.read_csv('../Corrections/data_cor_min15.csv')
-    data_corrected_0 = pd.read_csv('../Corrections/data_cor_0.csv')
-    data_corrected_15 = pd.read_csv('../Corrections/data_cor_15.csv')
+    data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15.csv')
+    data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0.csv')
+    data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15.csv')
 
     # Get the tail-off data
     data_tailoff_40 = df_velocity_filter_tailoff(40)
@@ -141,7 +141,6 @@ if __name__ == "__main__":
     plt.plot([-20, 20], [0, 0], color='0')
 
     for CMfunction in CM_function_AOA7_lst:
-        test = CMfunction.trim_points
-        plt.scatter(CMfunction.trim_points[0], CMfunction.trim_points[1], color='0')
+        plt.scatter(CMfunction.trim_point[0], 0, color='0')
 
     plt.show()
