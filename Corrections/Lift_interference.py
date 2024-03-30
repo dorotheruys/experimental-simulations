@@ -123,6 +123,7 @@ def lift_interference(df):
         #Tail contributions
         df_tailon_m_filtered = df_tailon_m[(df_tailon['rounded_AoA'] == aoa_uncor) & (df_tailon_m['rounded_J'] == J) & (df_tailon_m['rounded_v'] == V)]  #
         CMa_tailon = df_tailon_m_filtered['CM25ca'].values[0]
+        CLa_tailon = df_tailon_m_filtered['CLa'].values[0]
 
         #Isolate tail slope
         CMa_tail = CMa_tailon - CMa
@@ -131,7 +132,7 @@ def lift_interference(df):
         d_aoa_sc = tau2_wing * d_aoa_uw
         d_aoa = d_aoa_uw + d_aoa_sc
         d_Cd_w = delta * S_over_C * CLw ** 2
-        d_CM25c_uw = 1 / 8 * d_aoa_sc * CLa
+        d_CM25c_uw = 1 / 8 * d_aoa_sc * CLa_tailon
         d_CM25c_t = CMa_tail * d_alpha_tail
         d_CM25c = d_CM25c_uw + d_CM25c_t
         # Create a temporary DataFrame to hold the current row
