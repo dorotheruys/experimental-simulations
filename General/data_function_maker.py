@@ -5,9 +5,11 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from Plotting.plotter import PlotData
 
 # colors = ['b', 'g', 'c', 'r', 'k', 'm', 'tab:orange', 'grey']
-colors = ["#00A6B6", "#A50034", "#EC6842", "#009B77", "#FFB81C", "#6F1D77", "#EF60A3", "#000000"]
+colors = ["#00A6B6", "#A50034", "#EF60A3", "#6CC24A", "#FFB81C", "#6F1D77", "#EC6842", "#000000"]
+#           cyan,   raspberry,    pink,   light green, yellow,     purple,     orange,   black
 
 
 class FunctionData:
@@ -23,6 +25,7 @@ class FunctionData:
         self.poly_coeff: np.poly1d = poly_coeff
         self.data_points: pd.DataFrame = data_points
         self.trim_point = None
+        self.trim_aoa = None
 
 
 def plot_function_data(plot_data: list, xlabel: str, ylabel: str, x_axis_range: np.array):
@@ -58,12 +61,11 @@ def get_function_set(data, var1, var2):
     """
 
     name1 = list(var1.keys())[0]
-    layer1 = data[(data[name1] <= var1[name1] + 0.1) & (data[name1] >= var1[name1] - 0.1)]
+    layer1 = data[(data[name1] <= var1[name1] + 0.45) & (data[name1] >= var1[name1] - 0.45)]
 
     if var2 is not None:
-        name2 = list(var2.keys())[0]
-        group2 = layer1.groupby(name2)    # eg: 'rounded_J'
-        layer2 = group2.get_group(var2[name2])
+        name2 = list(var2.keys())[0]    # eg: 'rounded_J'
+        layer2 = layer1[(layer1[name2] <= var2[name2] + 0.1) & (layer1[name2] >= var2[name2] - 0.1)]
         return layer2.sort_values(by='AoA')
     else:
         return layer1.sort_values(by='AoA')
@@ -95,7 +97,7 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
         # print(f"Residual values for {order} order fit: {polyfit[1]}")
 
         # Create label with V and J
-        var1 = round(np.mean(dat['rounded_v']))
+        var1 = round(np.mean(dat['V cor']), 3)
         var2 = round(np.mean(dat['rounded_J']), 2)
 
         # Save the poly coefficients to a class with corresponding var1 and var2
@@ -106,7 +108,8 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
 
     # Plot
     if xlabel is not None and ylabel is not None:
-        plot_function_data(f_lst, xlabel, ylabel, x_axis_range)
+        # plot_function_data(f_lst, xlabel, ylabel, x_axis_range)
+        PlotData(x_var_name, y_var_name, x_axis_range, f_lst)
     else:
         # print("The data has not been plotted. Please fill in the correct fields if wanted.")
         print(" ")
