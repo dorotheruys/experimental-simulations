@@ -4,8 +4,8 @@ import numpy as np
 pd.set_option('display.max_rows', None)
 pd.set_option('display.max_columns', None)
 
-def specific_file():
-    filename = int(input('Enter elevator deflection (1, 2 or 3): '))
+def specific_old_file():
+    filename = int(input('Enter elevator deflection for old data (1, 2 or 3): '))
 
     if filename==1:
         df = pd.read_csv('../Sort_data/bal_sorted1.csv')
@@ -13,6 +13,18 @@ def specific_file():
         df = pd.read_csv('../Sort_data/bal_sorted2.csv')
     elif filename == 3:
         df = pd.read_csv('../Sort_data/bal_sorted3.csv')
+    else:
+        print('WRONG FILE SPECIFIED')
+    return df, filename
+
+def specific_cor_file():
+    filename = int(input('Enter elevator deflection for corrected data (1, 2 or 3): '))
+    if filename==1:
+        df = pd.read_csv('../Sort_data/cor_data_min15.csv')
+    elif filename==2:
+        df = pd.read_csv('../Sort_data/cor_data_0.csv')
+    elif filename == 3:
+        df = pd.read_csv('../Sort_data/cor_data_15.csv')
     else:
         print('WRONG FILE SPECIFIED')
     return df

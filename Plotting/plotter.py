@@ -103,7 +103,6 @@ class PlotData:
             print('Please provide x and y list of values.')
         return
 
-
 if __name__ == "__main__":
     n = 40
     x_range = np.linspace(-10, 20, 100)
