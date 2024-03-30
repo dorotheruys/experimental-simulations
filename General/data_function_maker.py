@@ -14,7 +14,8 @@ class FunctionData:
     """
     Class to save the polyfit coefficients with the corresponding data
     """
-    def __init__(self, tunnel_speed: float, propeller_speed: float, x_variable: str, y_variable: str, poly_coeff: np.poly1d, data_points: pd.DataFrame):
+    def __init__(self, name: str, tunnel_speed: float, propeller_speed: float, x_variable: str, y_variable: str, poly_coeff: np.poly1d, data_points: pd.DataFrame):
+        self.name: str = name
         self.tunnel_speed: float = tunnel_speed
         self.propeller_speed: float = propeller_speed
         self.x_variable: str = x_variable
@@ -98,7 +99,8 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
         var2 = round(np.mean(dat['rounded_J']), 2)
 
         # Save the poly coefficients to a class with corresponding var1 and var2
-        correspondingClass = FunctionData(var1, var2, x_var_name, y_var_name, curve_fit, dat)
+        name = f'{y_var_name}vs{x_var_name}_V{var1}_J{var2}'
+        correspondingClass = FunctionData(name, var1, var2, x_var_name, y_var_name, curve_fit, dat)
         dict_f[f"V_{var1}_J_{var2}"] = correspondingClass
         f_lst.append(correspondingClass)
 
