@@ -114,10 +114,10 @@ if __name__ == "__main__":
     # get_slope_cm_vs_aoa(cm_data_points)
 
     # Get plot for AoA vs CL, for each V & J combination
-    get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CL_total cor', tunnel_prop_combi, np.linspace(-6, 20, 100), f'$\\alpha$ [deg]', f'$C_L$ [-]')
+    get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CL_total cor', tunnel_prop_combi, np.linspace(-10, 20, 100), f'$\\alpha$ [deg]', f'$C_L$ [-]')
 
     # Get plot for AoA vs CM, for each V & J combination
-    get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CM_0.25c_total', tunnel_prop_combi, np.linspace(-6, 20, 100), f'$\\alpha$ [deg]', f'$C_M$ [-]')
+    get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CM_0.25c_total', tunnel_prop_combi, np.linspace(-10, 20, 100), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
     # Get plot for CD vs CL, for each V & J combination
     get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'CL_total cor', 'CD cor', tunnel_prop_combi, np.linspace(-1, 1.7, 100), f'$C_L$ [-]', f'$C_D$ [-]')

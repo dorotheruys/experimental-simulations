@@ -67,20 +67,55 @@ def get_aoa_from_cl(elevator_defl: int, cl_des: float, tunnel_speed: int, propel
     return intersections_array
 
 
-def find_trim_points_per_aoa(data, aoa, order):
-    relevant_set = get_function_set(data, {'AoA': aoa}, None)
-    functionclass_CM_lst = get_function_from_dataframe(relevant_set, order, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 200), None, None)
+def find_trim_points_per_aoa(aoa_data, aoa, order):
+    # relevant_set = get_function_set(data, {'AoA': aoa}, None)
+    functionclass_CM_lst = get_function_from_dataframe(aoa_data, order, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 200), None, None)
 
     for CM_function in functionclass_CM_lst:
         roots_x = np.roots(CM_function.poly_coeff.coefficients)
-        CM_function.trim_point = roots_x
+        if len(roots_x) == 1:
+            CM_function.trim_point = roots_x[0]
+            CM_function.trim_aoa = aoa_data['AoA cor'].mean()
+        else:
+            print("Multiple roots. Adjust code.")
     return functionclass_CM_lst
 
 
-# def trim_points_all_aoa():
-#
-#     for aoa in [-5, 7]
-#     return
+def trim_points_all_aoa(CM_data):
+    """
+
+    :param CM_data: data for all CMs
+    :return: a list containing for 4 AoA each 5 functions for the 5 different combinations of V and J
+    """
+    CM_data_lst = []
+    for aoa in [-5, 7, 12, 14]:
+        # Find the trim point for 1 AoA
+        CM_data_relevant = get_function_set(CM_data, {'AoA': aoa}, None)
+        CM_function_AOA_lst = find_trim_points_per_aoa(CM_data_relevant, aoa, 1)
+
+        CM_data_lst.append(CM_function_AOA_lst)
+
+    return CM_data_lst
+
+
+def plot_trim_vs_aoa(CM_data_function_lst):
+    x_lst = []
+    y_lst = []
+    V_lst = []
+    J_lst = []
+    combi_lst = []
+    for functionlst in CM_data_function_lst:
+        for function in functionlst:
+            x_lst.append(function.trim_aoa)
+            y_lst.append(function.trim_point)
+            V_lst.append(function.tunnel_speed)
+            J_lst.append(function.propeller_speed)
+            combi_lst.append([{'V cor': function.tunnel_speed}, {'rounded_J': function.propeller_speed}])
+
+    data = [{'AoA': x, 'delta_e trim': y, 'V cor': v, 'rounded_J': j} for x, y, v, j in zip(x_lst, y_lst, V_lst, J_lst)]
+    df_trim_vs_aoa = pd.DataFrame(data=data)
+    get_function_from_dataframe(df_trim_vs_aoa, 2, 'AoA', 'delta_e trim', prop_tunnel_combis, np.linspace(-6, 20, 100), f'$\\alpha$ [deg]', f'$\\delta_e$ trim')
+    return
 
 
 # Initialize
@@ -113,13 +148,16 @@ if __name__ == "__main__":
     CM_cg_cor = get_cm_cg_cor_all_elevator(tail_off_data, [data_corrected_min15, data_corrected_0, data_corrected_15], l_ac_w, l_ac_ht, l_cg, MAC_w)
 
     # Find the trim point for 1 AoA
-    CM_cg_cor_relevant = get_function_set(CM_cg_cor, {'AoA': 7}, None)
-    CM_function_AOA7_lst = find_trim_points_per_aoa(CM_cg_cor_relevant, 7, 1)
+    CM_cg_cor_relevant = get_function_set(CM_cg_cor, {'AoA': 14}, None)
+    # CM_function_AOA7_lst = find_trim_points_per_aoa(CM_cg_cor_relevant, 7, 1)
+
+    CM_function_lst = trim_points_all_aoa(CM_cg_cor)
+    plot_trim_vs_aoa(CM_function_lst)
 
     # Plot
     CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
-    plt.plot([-20, 20], [0, 0], color='0')
-    for CMfunction in CM_function_AOA7_lst:
-        plt.scatter(CMfunction.trim_point[0], 0, color='0')
+    # plt.plot([-20, 20], [0, 0], color='0')
+    # for CMfunction in CM_function_AOA7_lst:
+    #     plt.scatter(CMfunction.trim_point[0], 0, color='0')
 
     plt.show()
