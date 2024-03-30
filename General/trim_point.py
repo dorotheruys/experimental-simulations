@@ -77,12 +77,18 @@ def find_trim_points_per_aoa(data, aoa, order):
     return functionclass_CM_lst
 
 
+# def trim_points_all_aoa():
+#
+#     for aoa in [-5, 7]
+#     return
+
+
 # Initialize
-prop_tunnel_combis = [[{'rounded_v': 40}, {'rounded_J': 1.6}],
-                        [{'rounded_v': 40}, {'rounded_J': 1.8}],
-                        [{'rounded_v': 40}, {'rounded_J': 3.5}],
-                        [{'rounded_v': 20}, {'rounded_J': 1.6}],
-                        [{'rounded_v': 10}, {'rounded_J': 1.6}]]
+prop_tunnel_combis = [[{'V cor': 40}, {'rounded_J': 1.6}],
+                     [{'V cor': 40}, {'rounded_J': 1.8}],
+                     [{'V cor': 40}, {'rounded_J': 3.5}],
+                     [{'V cor': 20}, {'rounded_J': 1.6}],
+                     [{'V cor': 10}, {'rounded_J': 1.6}]]
 
 # chord-wise location assumptions
 MAC_w = 0.165       # [m]

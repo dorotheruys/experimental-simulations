@@ -7,7 +7,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 # colors = ['b', 'g', 'c', 'r', 'k', 'm', 'tab:orange', 'grey']
-colors = ["#00A6B6", "#A50034", "#EC6842", "#009B77", "#FFB81C", "#6F1D77", "#EF60A3", "#000000"]
+colors = ["#00A6B6", "#A50034", "#EF60A3", "#6CC24A", "#FFB81C", "#6F1D77", "#EC6842", "#000000"]
+#           cyan,   raspberry,    pink,   light green, yellow,     purple,     orange,   black
 
 
 class FunctionData:
@@ -58,12 +59,11 @@ def get_function_set(data, var1, var2):
     """
 
     name1 = list(var1.keys())[0]
-    layer1 = data[(data[name1] <= var1[name1] + 0.1) & (data[name1] >= var1[name1] - 0.1)]
+    layer1 = data[(data[name1] <= var1[name1] + 0.45) & (data[name1] >= var1[name1] - 0.45)]
 
     if var2 is not None:
-        name2 = list(var2.keys())[0]
-        group2 = layer1.groupby(name2)    # eg: 'rounded_J'
-        layer2 = group2.get_group(var2[name2])
+        name2 = list(var2.keys())[0]    # eg: 'rounded_J'
+        layer2 = layer1[(layer1[name2] <= var2[name2] + 0.1) & (layer1[name2] >= var2[name2] - 0.1)]
         return layer2.sort_values(by='AoA')
     else:
         return layer1.sort_values(by='AoA')
