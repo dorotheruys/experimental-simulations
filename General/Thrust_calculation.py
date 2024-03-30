@@ -81,7 +81,6 @@ def Windmilling_dragcoefficients(V, df):
     # plt.plot(J_array,fitted_curve(J_array))
     # plt.scatter(J, CD_nowindmill)
     # plt.show()
-    print(df)
     return windmilling_df
 
 # df = specific_file()
