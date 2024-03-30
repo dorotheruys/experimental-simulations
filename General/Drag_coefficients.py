@@ -5,7 +5,7 @@ def drag_coefficients(J,V,CL_unc,df):
     tunnel_velocity = df['rounded_v'] == V
     filtered_df = df.loc[(prop_setting) & (tunnel_velocity)].copy()     #Filter the dataframe to find rows with set J and V
     tunnel_prop_combi = [[{'rounded_v': V}, {'rounded_J': J}]]
-    CL_alpha_function = get_function_from_dataframe(df, 2, 'AoA', 'CL_strut_cor', tunnel_prop_combi,np.linspace(-6, 20, 26),None,None)
+    CL_alpha_function = get_function_from_dataframe(df, 2, 'AoA', 'CL', tunnel_prop_combi,np.linspace(-6, 20, 26),None,None)
     CL_array = CL_alpha_function[0].poly_coeff(np.arange(-5,14.1,1))
     #CL_array = filtered_df['CL'].values                                 #Find relevant lift coefficients
     CD_curve = drag_interpolation(V, df)                                     #Interpolation for drag curve
