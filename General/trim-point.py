@@ -144,5 +144,4 @@ if __name__ == "__main__":
         test = CMfunction.trim_points
         plt.scatter(CMfunction.trim_points[0], CMfunction.trim_points[1], color='0')
 
-
     plt.show()
