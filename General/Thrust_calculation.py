@@ -1,5 +1,5 @@
 import pandas as pd
-from General.Data_sorting import specific_file
+from General.Data_sorting import specific_old_file
 from General.data_function_maker import *
 from Corrections.Support_tare_correction import *
 import numpy as np
@@ -150,7 +150,7 @@ def Thrust_estimation(J, V, AoA, df):
     return thrust_coefficient
 
 def main():
-    df = specific_file()
+    df = specific_old_file()
     J_lst = [1.6, 1.8, 3.5]
     CT = []
     for J in J_lst:

@@ -18,7 +18,7 @@ def aoa_CL(V,J):
 
     range = [min(aoa_old)-max(aoa_old)*0.1, max(aoa_old)+max(aoa_old)*0.1]
 
-    PlotData('AoA', 'CL', range, [aoa_old, CL_old, aoa_cor, CL_cor], 'lists')
+    PlotData('AoA', 'CL', CL_old, [aoa_old, CL_old, aoa_cor, CL_cor], 'lists')
     return
 
 def aoa_CD(V,J):
@@ -56,7 +56,7 @@ def CL_CD(V,J):
 
     range = [min(CD_old) - max(CD_old) * 0.1, max(CD_old) + max(CD_old) * 0.1]
 
-    PlotData('CD', 'CL', range, [CD_old, CL_old, CD_cor, CL_cor], 'lists')
+    PlotData('CD', 'CL', CD_old, [CD_old, CL_old, CD_cor, CL_cor], 'lists')
     return
 
 def aoa_CM(V,J):
