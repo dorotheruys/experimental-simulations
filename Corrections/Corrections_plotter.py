@@ -18,7 +18,7 @@ def aoa_CL(V,J):
 
     range = [min(aoa_old)-max(aoa_old)*0.1, max(aoa_old)+max(aoa_old)*0.1]
 
-    PlotData('AoA', 'CL', CL_old, [aoa_old, CL_old, aoa_cor, CL_cor], 'lists')
+    PlotData('AoA', 'CL', aoa_old, [CL_old, CL_cor], 'lists', ['Uncorrected', 'Corrected'])
     return
 
 def aoa_CD(V,J):
@@ -37,10 +37,10 @@ def aoa_CD(V,J):
 
     range = [min(aoa_old) - max(aoa_old) * 0.1, max(aoa_old) + max(aoa_old) * 0.1]
 
-    PlotData('AoA', 'CD', range, [aoa_old, CD_old, aoa_cor, CD_cor], 'lists')
+    PlotData('AoA', 'CD', aoa_old, [CD_old, CD_cor], 'lists', ['Uncorrected', 'Corrected'])
     return
 
-def CL_CD(V,J):
+def CD_CL(V,J):
     df_cor = specific_cor_file()
 
     df_old = df_cor.loc[(df_cor['rounded_v'] == V) & (df_cor['rounded_J'] == J)]
@@ -56,7 +56,7 @@ def CL_CD(V,J):
 
     range = [min(CD_old) - max(CD_old) * 0.1, max(CD_old) + max(CD_old) * 0.1]
 
-    PlotData('CD', 'CL', CD_old, [CD_old, CL_old, CD_cor, CL_cor], 'lists')
+    PlotData('CD', 'CL', CD_old, [CL_old, CL_cor], 'lists', ['Uncorrected', 'Corrected'])
     return
 
 def aoa_CM(V,J):
@@ -75,10 +75,10 @@ def aoa_CM(V,J):
 
     range = [min(aoa_old)-max(aoa_old)*0.1, max(aoa_old)+max(aoa_old)*0.1]
 
-    PlotData('AoA', 'CM', range, [aoa_old, CM_old, aoa_cor, CM_cor], 'lists')
+    PlotData('AoA', 'CM', aoa_old, [CM_old, CM_cor], 'lists', ['Uncorrected', 'Corrected'])
 
     return
 J = [1.6, 1.8, 3.5]
 for j in J:
-    CL_CD(40, j)
+    CD_CL(40, j)
 plt.show()
