@@ -111,12 +111,12 @@ class PlotData:
         if len(self.data_to_plot) == 1:
             ax.plot(self.x_range, self.data_to_plot, color=self.colors[0])
 
-        elif len(self.data_to_plot) > 1:
-            for i in range(0, len(self.data_to_plot), 1):
+        elif len(self.data_to_plot) > 2:
+            for j, i in enumerate(range(0, len(self.data_to_plot), 2)):
                 if self.list_labels is not None:
-                    ax.plot(self.x_range, self.data_to_plot[i], color=self.colors[i], label=self.list_labels[i])
+                    ax.plot(self.data_to_plot[i], self.data_to_plot[i + 1], color=self.colors[j], label=self.list_labels[j])
                 else:
-                    ax.plot(self.x_range, self.data_to_plot[i], color=self.colors[i])
+                    ax.plot(self.data_to_plot[i], self.data_to_plot[i + 1], color=self.colors[j])
         else:
             print('Please provide x and y list of values.')
 
@@ -134,6 +134,8 @@ class PlotData:
         elif len(self.data) > 1:
             for i in range(0, len(self.data_to_plot), 1):
                 polyfit = np.poly1d(np.polyfit(self.x_range, self.data[i], order))
+
+                self.data_to_plot.append(self.x_range)
                 self.data_to_plot.append(polyfit(self.x_range))
 
         self.plot_lists(ax)
@@ -150,6 +152,6 @@ if __name__ == "__main__":
     function2 = np.poly1d([-0.5, 5])
     ylst2 = function2(x_axis_range)
 
-    plot = PlotData('AoA', 'CL', x_axis_range, [ylst1, ylst2], 'lists', ['labeltest', 'test2'])
+    plot = PlotData('AoA', 'CL', x_axis_range, [x_axis_range, ylst1, x_axis_range, ylst2], 'lists', ['labeltest', 'test2'])
 
     plt.show()

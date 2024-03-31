@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from General.data_function_maker import get_function_from_dataframe, get_function_set
 from Corrections.Lift_interference import df_velocity_filter_tailoff
-from General.trim_point import get_cm_cg_cor_all_elevator
+from General.trim_point import get_cm_cg_cor_all_elevator, trim_points_all_aoa
 
 
 # def get_aoa_combis(aoa):
@@ -56,6 +56,27 @@ from General.trim_point import get_cm_cg_cor_all_elevator
 #
 #     return dcm_ddeltae_plotting_lst
 
+def get_CL_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
+    data_sliced_V40_J18 = get_function_set(data, {'V cor': tunnel_speed}, {'rounded_J': propeller_speed})
+
+    # A list of CL vs delta_e function for each AoA: -5, 7, 12, 14 for 1 V-J combi
+    CL_vs_delta_e_functions = get_function_from_dataframe(data_sliced_V40_J18, 1, 'delta_e', 'CL_total cor', aoa_combis, np.linspace(-20, 20, 200), 'delta_e', 'CL')
+
+    # A list of CM vs delta_e functions for each AoA: -5, 7, 12, 14 for 1 V-J combi
+    function_lst = trim_points_all_aoa(data_sliced_V40_J18, [[{'V cor': tunnel_speed}, {'rounded_J': propeller_speed}]])
+
+    AoA_trim_lst = []
+    CL_trim_lst = []
+    for i, function in enumerate(function_lst):
+        delta_e_trim = function[0].trim_point
+
+        CL_delta_e_function = CL_vs_delta_e_functions[i]
+        CL_trim_AoA = CL_delta_e_function.poly_coeff(delta_e_trim)
+
+        AoA_trim_lst.append(function[0].trim_aoa)
+        CL_trim_lst.append(CL_trim_AoA)
+    return
+
 
 tunnel_prop_combi = [[{'V cor': 40}, {'rounded_J': 1.6}],
                      [{'V cor': 40}, {'rounded_J': 1.8}],
@@ -74,6 +95,8 @@ MAC_HT = 0.149      # [m]
 l_ac_w = (0.33 - 0.25) * MAC_w
 l_ac_ht = 3.22 * MAC_w + (0.33 - 0.25) * MAC_HT
 l_cg = (0.35 - 0.25) * MAC_w
+
+# Assumed approach AoA
 
 # Slice the zero deflection array such that the new dataframe contains the same data points
 rows = [0, 12, 17, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 42, 47, 49]
@@ -103,9 +126,12 @@ if __name__ == "__main__":
     CM_cg_cor_0_sliced = pd.concat(CM_cg_cor_0_sliced_lst, axis=0)
 
 
-    data_sliced_V40_J18 = get_function_set(CM_cg_cor, {'V cor': 40}, {'rounded_J': 1.8})
-    get_function_from_dataframe(data_sliced_V40_J18, 1, 'delta_e', 'CL_total cor', used_aoa, np.linspace(-20, 20, 200), 'delta_e', 'CL')
+    # data_sliced_V40_J18 = get_function_set(CM_cg_cor, {'V cor': 40}, {'rounded_J': 1.8})
+    # get_function_from_dataframe(data_sliced_V40_J18, 1, 'delta_e', 'CL_total cor', used_aoa, np.linspace(-20, 20, 200), 'delta_e', 'CL')
+    # get_function_from_dataframe(data_sliced_V40_J18, 2, 'AoA cor', 'CL_total cor', [[{'V cor': 40}, {'rounded_J': 1.8}]], np.linspace(-10, 20, 100), 'AoA', 'CL')
 
+    # CM_function_lst = trim_points_all_aoa(data_sliced_V40_J18, [[{'V cor': 40}, {'rounded_J': 1.8}]])
+    get_CL_for_trim(CM_cg_cor, 40, 1.8, used_aoa)
 
     # Get plot for AoA vs CL, for each V & J combination
     get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CL_total cor', tunnel_prop_combi, np.linspace(-10, 20, 100), f'$\\alpha$ [deg]', f'$C_L$ [-]')
