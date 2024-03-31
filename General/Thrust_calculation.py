@@ -126,8 +126,8 @@ def Thrust_estimation(J, V, AoA, df):
     windmilling_drag = curve(AoA)
 
     # Interpolate CX data for all angles of attack
-    tunnel_prop_combi = [[{'rounded_v': V}, {'rounded_J': J}]]
-    CX_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD', tunnel_prop_combi, np.linspace(-6, 20, 26),
+    tunnel_prop_combis = [[{'rounded_v': V}, {'rounded_J': J}]]
+    CX_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD', tunnel_prop_combis, np.linspace(-6, 20, 26),
                                                     None, None)
     CX_array = CX_alpha_function[0].poly_coeff(np.arange(-5, 14.1, 1))
     #Find tangential coefficient for desired angle of attack in range -5.......14

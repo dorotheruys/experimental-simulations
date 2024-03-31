@@ -130,7 +130,7 @@ MAC_w = 0.165       # [m]
 MAC_HT = 0.149      # [m]
 l_ac_w = (0.33 - 0.25) * MAC_w
 l_ac_ht = 3.22 * MAC_w + (0.33 - 0.25) * MAC_HT
-l_cg = (0.35 - 0.25) * MAC_w
+l_cg = (0.33 - 0.25) * MAC_w
 
 
 if __name__ == "__main__":

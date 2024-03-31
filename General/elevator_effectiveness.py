@@ -63,10 +63,10 @@ tunnel_prop_combi = [[{'V cor': 40}, {'rounded_J': 1.6}],
                      [{'V cor': 20}, {'rounded_J': 1.6}],
                      [{'V cor': 10}, {'rounded_J': 1.6}]]
 
-used_aoa = [{'AoA cor': -5},
-            {'AoA cor': 7},
-            {'AoA cor': 12},
-            {'AoA cor': 14}]
+used_aoa = [[{'AoA cor': -5}, None],
+            [{'AoA cor': 7}, None],
+            [{'AoA cor': 12}, None],
+            [{'AoA cor': 14}, None]]
 
 # chord-wise location assumptions
 MAC_w = 0.165       # [m]
@@ -98,20 +98,14 @@ if __name__ == "__main__":
 
     CM_cg_cor_0_sliced_lst = []
     for item in used_aoa:
-        CM_cg_cor_0_slice = get_function_set(CM_cg_cor_0, item, None)
+        CM_cg_cor_0_slice = get_function_set(CM_cg_cor_0, item[0], None)
         CM_cg_cor_0_sliced_lst.append(CM_cg_cor_0_slice)
     CM_cg_cor_0_sliced = pd.concat(CM_cg_cor_0_sliced_lst, axis=0)
 
-    # bal_sorted_0_sliced1 = bal_sorted_0.iloc[rows]
-    # bal_sorted_0_sliced = pd.concat([bal_sorted_0_sliced1, bal_sorted_0[50:]])
-    #
-    # # Get the datapoints at which the CM were made
-    # cm_data_points = bal_sorted_15.loc[:, ['AoA', 'rounded_AoA', 'V', 'rounded_v', 'J_M1', 'rounded_J']]
-    # # Get CM vs delta_e curve
-    # get_cm_vs_elevator(cm_data_points, True)
 
-    # Get dCM/d delta_e vs AoA curve
-    # get_slope_cm_vs_aoa(cm_data_points)
+    data_sliced_V40_J18 = get_function_set(CM_cg_cor, {'V cor': 40}, {'rounded_J': 1.8})
+    get_function_from_dataframe(data_sliced_V40_J18, 1, 'delta_e', 'CL_total cor', used_aoa, np.linspace(-20, 20, 200), 'delta_e', 'CL')
+
 
     # Get plot for AoA vs CL, for each V & J combination
     get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CL_total cor', tunnel_prop_combi, np.linspace(-10, 20, 100), f'$\\alpha$ [deg]', f'$C_L$ [-]')
