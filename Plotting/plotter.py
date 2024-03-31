@@ -3,14 +3,15 @@ import numpy as np
 
 
 class PlotData:
-    def __init__(self, x_name: str, y_name: str, x_range: np.array, data: [list, np.array], data_type: str):
+    def __init__(self, x_name: str, y_name: str, x_range: np.array, data: [list, np.array], data_type: str, labels_lst: [list, np.array]):
         """
-
-        :param x_name:
-        :param y_name:
-        :param x_range: list or array of x-values. Note that that this is one range for all different lists/arrays of y-values
+        A class that generates a plot with a general plotting style.
+        :param x_name: Name of the x variable. If inputting a dataframe, make sure that the column name is filled in.
+        :param y_name:Name of the y variable. If inputting a dataframe, make sure that the column name is filled in.
+        :param x_range: list or array of x-values. Note that this is one range for all different lists/arrays of y-values
         :param data: list/array of y-values or list/array of list/arrays of y-values OR list of FunctionClasses
         :param data_type: Fill in the type of input data: Classes, lists, arrays or curvefit
+        :param labels_lst: a list of the labels to be used in the plot. Note that for a dataframe the labels are generated automatically. Fill in None in that case.
         """
         self.colors = ["#00A6B6", "#A50034", "#EF60A3", "#6CC24A", "#FFB81C", "#6F1D77", "#EC6842", "#000000"]
         #               cyan,   raspberry,    pink,   light green, yellow,     purple,     orange,   black
@@ -24,7 +25,7 @@ class PlotData:
         self.data = data
         self.data_type = data_type
         self.data_to_plot = []
-        self.list_labels = None
+        self.list_labels = labels_lst
 
         ax = self.initiate_plot()
         if 'class' in self.data_type:
@@ -118,6 +119,9 @@ class PlotData:
                     ax.plot(self.x_range, self.data_to_plot[i], color=self.colors[i])
         else:
             print('Please provide x and y list of values.')
+
+        if self.legend:
+            ax.legend()
         return
 
     def curve_fit(self, ax):
@@ -134,15 +138,18 @@ class PlotData:
 
         self.plot_lists(ax)
 
+        if self.legend:
+            ax.legend()
+
 
 if __name__ == "__main__":
     n = 40
-    x_range = np.linspace(-10, 20, 100)
+    x_axis_range = np.linspace(-10, 20, 100)
     function1 = np.poly1d([0.5, 5])
-    ylst1 = function1(x_range)
+    ylst1 = function1(x_axis_range)
     function2 = np.poly1d([-0.5, 5])
-    ylst2 = function2(x_range)
+    ylst2 = function2(x_axis_range)
 
-    PlotData('AoA', 'CL', x_range, [x_range, ylst1, x_range, ylst2], 'lists')
+    plot = PlotData('AoA', 'CL', x_axis_range, [ylst1, ylst2], 'lists', ['labeltest', 'test2'])
 
     plt.show()
