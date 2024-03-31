@@ -102,7 +102,7 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
         # print(f"Residual values for {order} order fit: {polyfit[1]}")
 
         # Create label with V and J
-        var1 = round(np.mean(dat['V cor']), 3)
+        var1 = round(np.mean(dat['rounded_v']), 3)
         var2 = round(np.mean(dat['rounded_J']), 2)
 
         # Save the poly coefficients to a class with corresponding var1 and var2

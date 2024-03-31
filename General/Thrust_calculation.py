@@ -1,5 +1,5 @@
 import pandas as pd
-from General.Data_sorting import specific_file
+from General.Data_sorting import specific_old_file
 from General.data_function_maker import *
 from Corrections.Support_tare_correction import *
 import numpy as np
@@ -126,8 +126,8 @@ def Thrust_estimation(J, V, AoA, df):
     windmilling_drag = curve(AoA)
 
     # Interpolate CX data for all angles of attack
-    tunnel_prop_combi = [[{'rounded_v': V}, {'rounded_J': J}]]
-    CX_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD', tunnel_prop_combi, np.linspace(-6, 20, 26),
+    tunnel_prop_combis = [[{'rounded_v': V}, {'rounded_J': J}]]
+    CX_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD', tunnel_prop_combis, np.linspace(-6, 20, 26),
                                                     None, None)
     CX_array = CX_alpha_function[0].poly_coeff(np.arange(-5, 14.1, 1))
     #Find tangential coefficient for desired angle of attack in range -5.......14
@@ -150,7 +150,7 @@ def Thrust_estimation(J, V, AoA, df):
     return thrust_coefficient
 
 def main():
-    df = specific_file()
+    df = specific_old_file()
     J_lst = [1.6, 1.8, 3.5]
     CT = []
     for J in J_lst:
