@@ -25,9 +25,9 @@ def Windmilling_dragcoefficients(V, df):
     first_advance_regime = df.loc[(first_advance_ratio) & (tunnel_velocity) & (General_AoA_values)]
     upper_linear_regime = df.loc[(upper_advance_ratio) & (tunnel_velocity) & (General_AoA_values)]
     lower_linear_regime = df.loc[(lower_advance_ratio) & (tunnel_velocity) & (General_AoA_values)]
-    first_resulting_CD = first_advance_regime['CD']
-    upper_resulting_CD = upper_linear_regime['CD']
-    lower_resulting_CD = lower_linear_regime['CD']
+    first_resulting_CD = first_advance_regime['CD_strut_cor']
+    upper_resulting_CD = upper_linear_regime['CD_strut_cor']
+    lower_resulting_CD = lower_linear_regime['CD_strut_cor']
 
     #Find slope and windmilling drag between J=1.8 and J=3.5 for V=40
     lst_CD_windmilling = []
@@ -51,7 +51,7 @@ def Windmilling_dragcoefficients(V, df):
         lst_CD = []
         # Only points available are at J=1.6
         slow = df.loc[(df['rounded_J'] == 1.6) & (df['rounded_v'] == V) & (General_AoA_values)]
-        slow_CD = slow['CD']
+        slow_CD = slow['CD_strut_cor']
         for i in range(len(aoa_lst)):
             #Baseline from 40 m/s at J=1.6
             baseline = first_resulting_CD.iloc[i]
@@ -127,7 +127,7 @@ def Thrust_estimation(J, V, AoA, df):
 
     # Interpolate CX data for all angles of attack
     tunnel_prop_combis = [[{'rounded_v': V}, {'rounded_J': J}]]
-    CX_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD', tunnel_prop_combis, np.linspace(-6, 20, 26),
+    CX_alpha_function = get_function_from_dataframe(df, 10, 'AoA', 'CD_strut_cor', tunnel_prop_combis, np.linspace(-6, 20, 26),
                                                     None, None)
     CX_array = CX_alpha_function[0].poly_coeff(np.arange(-5, 14.1, 1))
     #Find tangential coefficient for desired angle of attack in range -5.......14

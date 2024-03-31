@@ -63,7 +63,7 @@ def Full_blockage(df):
         #Wake blockage
         J = row['rounded_J']
         Vunc = row["rounded_v"]
-        CLunc = row['CL']
+        CLunc = row['CL_thrust_cor']
         e_wbt = Wakeblockage(J, Vunc, CLunc, df)
 
         #Slipstream blockage
@@ -76,7 +76,7 @@ def Full_blockage(df):
         #Other variables
         qunc = row['q']
         CDunc = row['Drag coefficient']
-        CMunc = row['CMpitch25c']
+        CMunc = row['CMpitch25c_strut_cor']
         #Corrections
         V = Vunc*(1+e_total)
         q = qunc*(1+e_total)**2

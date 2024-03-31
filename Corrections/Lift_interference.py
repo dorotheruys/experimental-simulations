@@ -8,7 +8,7 @@ def df_velocity_filter_tailoff(V_target: int):
     # if V_target == 10:
     #     # Reset V_target to 20
     #     V_target = 20
-    tailoff_path = get_file_path("../Sort_data/TailOffData.xlsx", 'Corrections')
+    tailoff_path = get_file_path("TailOffData.xlsx", 'Corrections')
     df = pd.read_excel(tailoff_path, sheet_name="AoS = 0 deg")
     df = df.drop("AoS", axis=1)
     margin = 0.5  # [m/s]
@@ -45,8 +45,21 @@ def generate_cl_alpha(df):
     df["CLa"] = df["CLa"] * 180 / np.pi  # Convert from deg^-1 to rad^-1 for CLa
     return df
 
+def generate_cl_alpha_cor(df):
+    df['CLa'] = df["CL cor"].diff() / df["AoA"].diff()
+    df.loc[0, 'CLa'] = df['CLa'].iloc[1]  # Set value of first CLa to value of second CLa to prevent NaN
+    df["CLa"] = df["CLa"] * 180 / np.pi  # Convert from deg^-1 to rad^-1 for CLa
+    return df
+
 def generate_cm025_alpha(df):
     df['CM25ca'] = df["CMpitch25c"].diff() / df["AoA"].diff()
+    df.loc[0, 'CM25ca'] = df['CM25ca'].iloc[1]  # Set value of first CMa to value of second CLa to prevent NaN
+    df["CM25ca"] = df["CM25ca"] * 180 / np.pi  # Convert from deg^-1 to rad^-1 for CMa
+    return df
+
+def generate_cm025_alpha_cor(df):
+    print(df)
+    df['CM25ca'] = df["CMbcor"].diff() / df["AoA"].diff()
     df.loc[0, 'CM25ca'] = df['CM25ca'].iloc[1]  # Set value of first CMa to value of second CLa to prevent NaN
     df["CM25ca"] = df["CM25ca"] * 180 / np.pi  # Convert from deg^-1 to rad^-1 for CMa
     return df
@@ -101,7 +114,7 @@ def lift_interference(df):
     tau2_wing = 0.1                 #l/B=0.045
     tau2_tail = 0.7                 #l/B=0.3
 
-    df_tailon = generate_cl_alpha(df)
+    df_tailon = generate_cl_alpha_cor(df)
     df_tailon_m = generate_cm025_alpha(df)
     #dCM_dalphatail = 5.73 * 3.22 * 0.165  # CLalpha of airfoil (found online) * arm
 
