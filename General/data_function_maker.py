@@ -61,7 +61,8 @@ def get_function_set(data, var1, var2):
     """
 
     name1 = list(var1.keys())[0]
-    layer1 = data[(data[name1] <= var1[name1] + 0.45) & (data[name1] >= var1[name1] - 0.45)]
+    # tolerance = max(data[name1] - var1[name1])
+    layer1 = data[(data[name1] <= var1[name1] + 0.7) & (data[name1] >= var1[name1] - 0.7)]
 
     if var2 is not None:
         name2 = list(var2.keys())[0]    # eg: 'rounded_J'
@@ -89,9 +90,13 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
     f_lst = []
 
     for i in range(len(inp_lst)):
+        test1 = inp_lst[i][0]
+        test2 = inp_lst[i][1]
         dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
 
         # Use a polynomial data fit with prescribed order
+        testx = dat[x_var_name]
+        testy = dat[y_var_name]
         polyfit = np.polyfit(dat[x_var_name], dat[y_var_name], order, full=True)
         curve_fit = np.poly1d(polyfit[0])
         # print(f"Residual values for {order} order fit: {polyfit[1]}")
@@ -109,7 +114,7 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
     # Plot
     if xlabel is not None and ylabel is not None:
         # plot_function_data(f_lst, xlabel, ylabel, x_axis_range)
-        PlotData(x_var_name, y_var_name, x_axis_range, f_lst)
+        PlotData(x_var_name, y_var_name, x_axis_range, f_lst, 'class', None)
     else:
         # print("The data has not been plotted. Please fill in the correct fields if wanted.")
         print(" ")
