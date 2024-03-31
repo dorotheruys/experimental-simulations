@@ -16,9 +16,15 @@ def aoa_CL(V,J):
     aoa_cor = df_cor['AoA cor'].values
     CL_cor = df_cor['CL cor'].values
 
-    range = [min(aoa_old)-max(aoa_old)*0.1, max(aoa_old)+max(aoa_old)*0.1]
+    x_range_array = aoa_old
 
-    PlotData('AoA', 'CL', aoa_old, [CL_old, CL_cor], 'lists', ['Uncorrected', 'Corrected'])
+    adjustment = 0.1 * max(x_range_array)
+
+    # Adjust the range
+    range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in
+                                               x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
+
+    PlotData('AoA', 'CL', aoa_old, [aoa_old, CL_old, aoa_cor, CL_cor], 'lists', ['Uncorrected', 'Corrected'])
     return
 
 def aoa_CD(V,J):
@@ -35,28 +41,15 @@ def aoa_CD(V,J):
     aoa_cor = df_cor['AoA cor'].values
     CD_cor = df_cor['CD cor'].values
 
-    range = [min(aoa_old) - max(aoa_old) * 0.1, max(aoa_old) + max(aoa_old) * 0.1]
+    x_range_array = aoa_old
 
-    PlotData('AoA', 'CD', aoa_old, [CD_old, CD_cor], 'lists', ['Uncorrected', 'Corrected'])
-    return
+    adjustment = 0.1 * max(x_range_array)
 
-def CD_CL(V,J):
-    df_cor = specific_cor_file()
+    # Adjust the range
+    range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in
+                                               x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
 
-    df_old = df_cor.loc[(df_cor['rounded_v'] == V) & (df_cor['rounded_J'] == J)]
-    CL_old = df_old['CL'].values
-    CD_old = df_old['Drag coefficient'].values
-
-    V_low = V - 1
-    V_high = V + 1
-
-    df_cor = df_cor .loc[(df_cor['V cor'] >= V_low) & (df_cor['V cor'] <= V_high) & (df_cor['rounded_J'] == J)]
-    CL_cor = df_cor['CL cor'].values
-    CD_cor = df_cor['CD cor'].values
-
-    range = [min(CD_old) - max(CD_old) * 0.1, max(CD_old) + max(CD_old) * 0.1]
-
-    PlotData('CD', 'CL', CD_old, [CL_old, CL_cor], 'lists', ['Uncorrected', 'Corrected'])
+    PlotData('AoA', 'CD', aoa_old, [aoa_old, CD_old, aoa_cor, CD_cor], 'lists', ['Uncorrected', 'Corrected'])
     return
 
 def aoa_CM(V,J):
@@ -73,11 +66,42 @@ def aoa_CM(V,J):
     aoa_cor = df_cor['AoA cor'].values
     CM_cor = df_cor['CM cor'].values
 
-    range = [min(aoa_old)-max(aoa_old)*0.1, max(aoa_old)+max(aoa_old)*0.1]
+    x_range_array = aoa_old
 
-    PlotData('AoA', 'CM', aoa_old, [CM_old, CM_cor], 'lists', ['Uncorrected', 'Corrected'])
+    adjustment = 0.1 * max(x_range_array)
+
+    # Adjust the range
+    range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in
+                                               x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
+
+    PlotData('AoA', 'CM', range, [aoa_old, CM_old, aoa_cor, CM_cor], 'lists', ['Uncorrected', 'Corrected'])
 
     return
+
+def CD_CL(V,J):
+    df_cor = specific_cor_file()
+
+    df_old = df_cor.loc[(df_cor['rounded_v'] == V) & (df_cor['rounded_J'] == J)]
+    CL_old = df_old['CL'].values
+    CD_old = df_old['Drag coefficient'].values
+
+    V_low = V - 1
+    V_high = V + 1
+
+    df_cor = df_cor .loc[(df_cor['V cor'] >= V_low) & (df_cor['V cor'] <= V_high) & (df_cor['rounded_J'] == J)]
+    CL_cor = df_cor['CL cor'].values
+    CD_cor = df_cor['CD cor'].values
+
+    x_range_array = CD_old
+
+    adjustment = 0.1 * max(x_range_array)
+
+    # Adjust the range
+    range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
+
+    PlotData('CD', 'CL', range, [CD_old, CL_old, CD_cor, CL_cor], 'lists', ['Uncorrected', 'Corrected'])
+    return
+
 J = [1.6, 1.8, 3.5]
 for j in J:
     CD_CL(40, j)
