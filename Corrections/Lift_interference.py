@@ -8,7 +8,7 @@ def df_velocity_filter_tailoff(V_target: int):
     # if V_target == 10:
     #     # Reset V_target to 20
     #     V_target = 20
-    tailoff_path = get_file_path("TailOffData.xlsx", 'Corrections')
+    tailoff_path = get_file_path("../Sort_data/TailOffData.xlsx", 'Corrections')
     df = pd.read_excel(tailoff_path, sheet_name="AoS = 0 deg")
     df = df.drop("AoS", axis=1)
     margin = 0.5  # [m/s]
