@@ -3,7 +3,15 @@ import numpy as np
 
 
 class PlotData:
-    def __init__(self, x_name: str, y_name: str, x_range: np.array, plot_data: [list, np.array], data_type: str):
+    def __init__(self, x_name: str, y_name: str, x_range: np.array, data: [list, np.array], data_type: str):
+        """
+
+        :param x_name:
+        :param y_name:
+        :param x_range: list or array of x-values. Note that that this is one range for all different lists/arrays of y-values
+        :param data: list/array of y-values or list/array of list/arrays of y-values OR list of FunctionClasses
+        :param data_type: Fill in the type of input data: Classes, lists, arrays or curvefit
+        """
         self.colors = ["#00A6B6", "#A50034", "#EF60A3", "#6CC24A", "#FFB81C", "#6F1D77", "#EC6842", "#000000"]
         #               cyan,   raspberry,    pink,   light green, yellow,     purple,     orange,   black
         self.grid = True
@@ -13,14 +21,20 @@ class PlotData:
         self.x_name: str = x_name
         self.y_name: str = y_name
         self.x_range = x_range
-        self.plot_data = plot_data
+        self.data = data
         self.data_type = data_type
+        self.data_to_plot = []
+        self.list_labels = None
 
         ax = self.initiate_plot()
         if 'class' in self.data_type:
+            self.data_to_plot = self.data
             self.plot_data_class_lst(ax)
-        elif 'list' in self.data_type:
+        elif 'list' or 'array' in self.data_type:
+            self.data_to_plot = self.data
             self.plot_lists(ax)
+        elif 'curvefit' in self.data_type:
+            self.curve_fit(ax)
 
     def get_axislabel(self, name):
         if 'AoA' in name:
@@ -81,7 +95,8 @@ class PlotData:
         return ax
 
     def plot_data_class_lst(self, ax):
-        for i, function in enumerate(self.plot_data):
+
+        for i, function in enumerate(self.data_to_plot):
             function_label = f'V = {function.tunnel_speed} m/s, J = {function.propeller_speed}'
             ax.plot(self.x_range, function.poly_coeff(self.x_range), '-.', color=self.colors[i], label=function_label)
             ax.scatter(function.data_points[function.x_variable], function.data_points[function.y_variable], color=self.colors[i])
@@ -91,17 +106,33 @@ class PlotData:
         return
 
     def plot_lists(self, ax):
-        if len(self.plot_data) == 2:
-            ax.plot(self.plot_data[0], self.plot_data[1])
 
-        elif len(self.plot_data) > 2:
-            counter = 0
-            for i in range(0, len(self.plot_data), 2):
-                ax.plot(self.plot_data[i], self.plot_data[i + 1], color=self.colors[counter])
-                counter += 1
+        if len(self.data_to_plot) == 1:
+            ax.plot(self.x_range, self.data_to_plot, color=self.colors[0])
+
+        elif len(self.data_to_plot) > 1:
+            for i in range(0, len(self.data_to_plot), 1):
+                if self.list_labels is not None:
+                    ax.plot(self.x_range, self.data_to_plot[i], color=self.colors[i], label=self.list_labels[i])
+                else:
+                    ax.plot(self.x_range, self.data_to_plot[i], color=self.colors[i])
         else:
             print('Please provide x and y list of values.')
         return
+
+    def curve_fit(self, ax):
+        order = int(input('Please provide order of fit'))
+
+        if len(self.data) == 1:
+            polyfit = np.poly1d(np.polyfit(self.x_range, self.data, order))
+            self.data_to_plot = polyfit(self.x_range)
+
+        elif len(self.data) > 1:
+            for i in range(0, len(self.data_to_plot), 1):
+                polyfit = np.poly1d(np.polyfit(self.x_range, self.data[i], order))
+                self.data_to_plot.append(polyfit(self.x_range))
+
+        self.plot_lists(ax)
 
 
 if __name__ == "__main__":
