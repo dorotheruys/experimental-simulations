@@ -56,22 +56,28 @@ from General.trim_point import get_cm_cg_cor_all_elevator, trim_points_all_aoa
 #
 #     return dcm_ddeltae_plotting_lst
 
-def get_CL_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
+def get_CLCD_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
     data_sliced_V40_J18 = get_function_set(data, {'V cor': tunnel_speed}, {'rounded_J': propeller_speed})
 
     # A list of CL vs delta_e function for each AoA: -5, 7, 12, 14 for 1 V-J combi
     CL_vs_delta_e_functions = get_function_from_dataframe(data_sliced_V40_J18, 1, 'delta_e', 'CL_total cor', aoa_combis, np.linspace(-20, 20, 200), 'delta_e', 'CL')
+    CD_vs_delta_e_functions = get_function_from_dataframe(data_sliced_V40_J18, 1, 'delta_e', 'CD cor', aoa_combis, np.linspace(-20, 20, 200), 'delta_e', 'CD')
 
     # A list of CM vs delta_e functions for each AoA: -5, 7, 12, 14 for 1 V-J combi
     function_lst = trim_points_all_aoa(data_sliced_V40_J18, [[{'V cor': tunnel_speed}, {'rounded_J': propeller_speed}]])
 
+    # Find the CL trim for each AoA: -5, 7, 12, 14
     AoA_trim_lst = []
     CL_trim_lst = []
+    CD_trim_lst = []
     for i, function in enumerate(function_lst):
         delta_e_trim = function[0].trim_point
 
         CL_delta_e_function = CL_vs_delta_e_functions[i]
         CL_trim_AoA = CL_delta_e_function.poly_coeff(delta_e_trim)
+
+        CD_delta_e_function = CD_vs_delta_e_functions[i]
+        CD_trim_AoA = CD_delta_e_function.poly_coeff(delta_e_trim)
 
         AoA_trim_lst.append(function[0].trim_aoa)
         CL_trim_lst.append(CL_trim_AoA)
@@ -131,7 +137,7 @@ if __name__ == "__main__":
     # get_function_from_dataframe(data_sliced_V40_J18, 2, 'AoA cor', 'CL_total cor', [[{'V cor': 40}, {'rounded_J': 1.8}]], np.linspace(-10, 20, 100), 'AoA', 'CL')
 
     # CM_function_lst = trim_points_all_aoa(data_sliced_V40_J18, [[{'V cor': 40}, {'rounded_J': 1.8}]])
-    get_CL_for_trim(CM_cg_cor, 40, 1.8, used_aoa)
+    get_CLCD_for_trim(CM_cg_cor, 40, 1.8, used_aoa)
 
     # Get plot for AoA vs CL, for each V & J combination
     get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CL_total cor', tunnel_prop_combi, np.linspace(-10, 20, 100), f'$\\alpha$ [deg]', f'$C_L$ [-]')
