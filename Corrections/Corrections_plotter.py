@@ -24,10 +24,9 @@ def aoa_CL(V,J):
     adjustment = 0.1 * max(x_range_array)
 
     # Adjust the range
-    range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in
-                                               x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
+    range = np.linspace(x_range_array[0] - adjustment, x_range_array[-1] + adjustment, 100)
 
-    PlotData('AoA', 'CL', aoa_old, [aoa_old, CL_old, aoa_cor, CL_cor], 'lists', ['Uncorrected', 'Corrected'])
+    PlotData('AoA', 'CL', range, [aoa_old, CL_old, aoa_cor, CL_cor], 'curvefit', ['Uncorrected', 'Corrected'])
     return
 
 def aoa_CD(V,J):
@@ -49,10 +48,9 @@ def aoa_CD(V,J):
     adjustment = 0.1 * max(x_range_array)
 
     # Adjust the range
-    range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in
-                                               x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
+    range = np.linspace(x_range_array[0] - adjustment, x_range_array[-1] + adjustment, 100)
 
-    PlotData('AoA', 'CD', aoa_old, [aoa_old, CD_old, aoa_cor, CD_cor], 'lists', ['Uncorrected', 'Corrected'])
+    PlotData('AoA', 'CD', range, [aoa_old, CD_old, aoa_cor, CD_cor], 'curvefit', ['Uncorrected', 'Corrected'])
     return
 
 def aoa_CM(V,J):
@@ -74,10 +72,9 @@ def aoa_CM(V,J):
     adjustment = 0.1 * max(x_range_array)
 
     # Adjust the range
-    range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in
-                                               x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
+    range = np.linspace(x_range_array[0] - adjustment, x_range_array[-1] + adjustment, 100)
 
-    PlotData('AoA', 'CM', range, [aoa_old, CM_old, aoa_cor, CM_cor], 'lists', ['Uncorrected', 'Corrected'])
+    PlotData('AoA', 'CM', range, [aoa_old, CM_old, aoa_cor, CM_cor], 'curvefit', ['Uncorrected', 'Corrected'])
 
     return
 
@@ -141,10 +138,10 @@ def J_CT(V,AoA):
     PlotData('J', 'CT', range, [J_old, CT_old, J_cor, CT_cor], 'lists', ['Uncorrected', 'Corrected'])
     return
 
-# J = [1.6]
-# for j in J:
-#     CD_CL(40, j)
+J = [1.6, 1.8, 3.5]
+for j in J:
+    aoa_CM(40, j)
 # aoa = [7]
 # for angle in aoa:
 #     J_CT(40, angle)
-# plt.show()
+plt.show()
