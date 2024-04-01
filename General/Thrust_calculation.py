@@ -112,7 +112,7 @@ def drag_interpolation(V, df):
     # plt.show()
     return fitted_curve
 
-def Thrust_estimation(J, V, AoA, df):
+def Thrust_estimation(J, V, AoA, df, cor):
     # Old stuff
     # tunnel_velocity = df['rounded_v'] == V
     # prop_setting = df['rounded_J'] == J
@@ -121,9 +121,17 @@ def Thrust_estimation(J, V, AoA, df):
     # tancoef = filtered_df['CD'].values
     # short_aoa = filtered_df['rounded_AoA'].values
 
-    # Find willing drag coefficients
-    curve = drag_interpolation(V, df)
-    windmilling_drag = curve(AoA)
+    if cor==False:
+        # Find windmilling drag coefficients for uncorrected data
+        curve = drag_interpolation(V, df)
+        windmilling_drag = curve(AoA)
+    elif cor==True:
+        # Find windmilling drag coefficients for corrected data
+        prop_setting = df['rounded_J'] == J
+        tunnel_velocity = df['rounded_v'] == V
+        aoa = df['rounded_AoA'] == AoA
+        windmilling_df = df.loc[(prop_setting) & (tunnel_velocity) & (aoa)]
+        windmilling_drag = windmilling_df['CD cor'].values
 
     # Interpolate CX data for all angles of attack
     tunnel_prop_combis = [[{'rounded_v': V}, {'rounded_J': J}]]
@@ -148,6 +156,27 @@ def Thrust_estimation(J, V, AoA, df):
     #     lst_coef.append(tancoef)
     # plt.plot(aoa,lst_coef, label='thrust coefficient')
     return thrust_coefficient
+
+def CT_corrected(df):
+    cor = True
+    df_thrust_correction = pd.DataFrame(columns=['CT cor'])
+    for index, row in df.iterrows():
+        J = row['rounded_J']
+        V = row["rounded_v"]
+        AoA = row['rounded_AoA']
+
+        CT = Thrust_estimation(J, V, AoA, df, cor)
+
+        # Create a temporary DataFrame to hold the current row
+        df_temp = pd.DataFrame([CT], columns=['CT cor'])
+
+        # Drop empty or all-NA columns from df_temp
+        df_thrust_correction = df_thrust_correction.dropna(axis=1, how='all')
+
+        # Append the temporary DataFrame to the main DataFrame
+        df_thrust_correction = pd.concat([df_thrust_correction, df_temp], ignore_index=True)
+    df_thrust_correction = pd.concat([df, df_thrust_correction], axis=1)
+    return df_thrust_correction
 
 def main():
     df = specific_old_file()

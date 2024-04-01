@@ -50,6 +50,7 @@ def drag_coefficients(J,V,CL_unc,df):
     return CD0, CDi, CDs, CD_unc
 
 def CD_CT(df):
+    cor = False
     df_drag_thrust_coefficient = pd.DataFrame(columns=['Drag coefficient', 'Thrust coefficient'])
     for index, row in df.iterrows():
         Vunc = row["rounded_v"]
@@ -57,7 +58,7 @@ def CD_CT(df):
         curve = drag_interpolation(Vunc, df)
         AoA = row['rounded_AoA']
         CDunc = curve(AoA)
-        CT = Thrust_estimation(J,Vunc,AoA, df)
+        CT = Thrust_estimation(J,Vunc,AoA, df, cor)
 
         add_columns = [CDunc, CT]
 

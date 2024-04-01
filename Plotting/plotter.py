@@ -45,7 +45,7 @@ class PlotData:
         elif 'CM' in name:
             axislabel = f'$C_M$ [-]'
         elif 'CD' in name:
-            axislabel = f'$C_M$ [-]'
+            axislabel = f'$C_D$ [-]'
         elif 'delta_e' in name:
             axislabel = f'$\\delta_e$ [deg]'
         elif 'CT' in name:

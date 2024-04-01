@@ -39,8 +39,8 @@ def Wakeblockage(J,V,CL,df):
     e_wbt = e_wbt + e_wbs
     return e_wbt
 
-def slipstream(J,V,AoA, df):
-    thrust_coefficient1 = Thrust_estimation(J,V,AoA, df)
+def slipstream(J,V,AoA, df, cor):
+    thrust_coefficient1 = Thrust_estimation(J,V,AoA, df, cor)
     Dprop = 0.2032
     Sp = np.pi / 4 * Dprop ** 2
     C = 1.8*1.25-0.3**2/2*4
@@ -55,6 +55,7 @@ def slipstream(J,V,AoA, df):
     return e_ss
 
 def Full_blockage(df):
+    cor = False
     df_blockage_corrections = pd.DataFrame(columns=['V cor', 'q cor', 'CDbcor', 'CMbcor', 'CL cor'])
     for index, row in df.iterrows():
         #Solid blockage
@@ -68,7 +69,7 @@ def Full_blockage(df):
 
         #Slipstream blockage
         AoA = row['rounded_AoA']
-        e_ss = slipstream(J, Vunc, AoA, df)
+        e_ss = slipstream(J, Vunc, AoA, df, cor)
 
         #Total blockage
         e_total = e_sb+e_wbt+e_ss
