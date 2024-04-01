@@ -33,7 +33,7 @@ class PlotData:
             self.plot_data_class_lst(ax)
         elif 'list' or 'array' in self.data_type:
             self.data_to_plot = self.data
-            self.plot_lists(ax)
+            self.plot_lists(ax, self.data_to_plot, ['line'])
         elif 'curvefit' in self.data_type:
             self.curve_fit(ax)
 
@@ -45,7 +45,7 @@ class PlotData:
         elif 'CM' in name:
             axislabel = f'$C_M$ [-]'
         elif 'CD' in name:
-            axislabel = f'$C_M$ [-]'
+            axislabel = f'$C_D$ [-]'
         elif 'delta_e' in name:
             axislabel = f'$\\delta_e$ [deg]'
         elif 'CT' in name:
@@ -106,17 +106,22 @@ class PlotData:
             ax.legend()
         return
 
-    def plot_lists(self, ax):
+    def plot_lists(self, ax, plotting_data, type_lst):
 
-        if len(self.data_to_plot) == 1:
-            ax.plot(self.x_range, self.data_to_plot, color=self.colors[0])
+        if len(plotting_data) == 1:
+            ax.plot(self.x_range, plotting_data, color=self.colors[0])
 
-        elif len(self.data_to_plot) > 2:
-            for j, i in enumerate(range(0, len(self.data_to_plot), 2)):
-                if self.list_labels is not None:
-                    ax.plot(self.data_to_plot[i], self.data_to_plot[i + 1], color=self.colors[j], label=self.list_labels[j])
-                else:
-                    ax.plot(self.data_to_plot[i], self.data_to_plot[i + 1], color=self.colors[j])
+        elif len(plotting_data) > 2:
+            for j, i in enumerate(range(0, len(plotting_data), 2)):
+                for one_type in type_lst:
+                    if 'line' in one_type:
+                        if self.list_labels is not None:
+                            ax.plot(plotting_data[i], plotting_data[i + 1], color=self.colors[j], label=self.list_labels[j])
+                        else:
+                            ax.plot(plotting_data[i], plotting_data[i + 1], color=self.colors[j])
+                    elif 'scatter' in one_type:
+                        ax.scatter(plotting_data[i], plotting_data[i + 1], color=self.colors[j])
+
         else:
             print('Please provide x and y list of values.')
 
@@ -126,19 +131,31 @@ class PlotData:
 
     def curve_fit(self, ax):
         order = int(input('Please provide order of fit'))
+        type_lst = []
 
-        if len(self.data) == 1:
-            polyfit = np.poly1d(np.polyfit(self.x_range, self.data, order))
-            self.data_to_plot = polyfit(self.x_range)
+        if len(self.data) == 2:
+            polyfit = np.poly1d(np.polyfit(self.data[0], self.data[1], order))
+            self.data_to_plot.append(self.data[0])
+            self.data_to_plot.append(self.data[1])
+            type_lst.append('scatter')
 
-        elif len(self.data) > 1:
-            for i in range(0, len(self.data_to_plot), 1):
-                polyfit = np.poly1d(np.polyfit(self.x_range, self.data[i], order))
+            self.data_to_plot.append(self.x_range)
+            self.data_to_plot.append(polyfit(self.x_range))
+            type_lst.append(['line'])
+
+        elif len(self.data) > 2:
+            for j, i in enumerate(range(0, len(self.data_to_plot), 2)):
+                polyfit = np.poly1d(np.polyfit(self.data[i], self.data[i + 1], order))
+
+                self.data_to_plot.append(self.data[i])
+                self.data_to_plot.append(self.data[i + 1])
+                type_lst.append('scatter')
 
                 self.data_to_plot.append(self.x_range)
                 self.data_to_plot.append(polyfit(self.x_range))
+                type_lst.append(['line'])
 
-        self.plot_lists(ax)
+        self.plot_lists(ax, self.data_to_plot, type_lst)
 
         if self.legend:
             ax.legend()
