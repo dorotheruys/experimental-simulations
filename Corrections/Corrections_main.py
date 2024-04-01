@@ -16,10 +16,10 @@ def corrections_combined(df):
     df_with_bcor = Full_blockage(df_dragthrust_coefficients)
 
     lift_interference_cor = lift_interference(df_with_bcor)
-    #print(lift_interference_cor)
+
     thrust_cor = CT_corrected(lift_interference_cor)
 
-    return lift_interference_cor
+    return thrust_cor
 
 
 def main():
