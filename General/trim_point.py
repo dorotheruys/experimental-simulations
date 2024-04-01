@@ -132,7 +132,7 @@ MAC_w = 0.165       # [m]
 MAC_HT = 0.149      # [m]
 l_ac_w = (0.33 - 0.25) * MAC_w
 l_ac_ht = 3.22 * MAC_w + (0.33 - 0.25) * MAC_HT
-l_cg = (0.33 - 0.25) * MAC_w
+l_cg = (0.5 - 0.25)
 
 
 if __name__ == "__main__":
@@ -150,7 +150,7 @@ if __name__ == "__main__":
     CM_cg_cor = get_cm_cg_cor_all_elevator(tail_off_data, [data_corrected_min15, data_corrected_0, data_corrected_15], l_ac_w, l_ac_ht, l_cg, MAC_w)
 
     # Find the trim point for 1 AoA
-    CM_cg_cor_relevant = get_function_set(CM_cg_cor, {'AoA': 14}, None)
+    CM_cg_cor_relevant = get_function_set(CM_cg_cor, {'AoA': 7}, None)
     # CM_function_AOA7_lst = find_trim_points_per_aoa(CM_cg_cor_relevant, 7, 1)
 
     CM_function_lst = trim_points_all_aoa(CM_cg_cor, prop_tunnel_combis)
@@ -158,6 +158,7 @@ if __name__ == "__main__":
 
     # Plot
     CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
+
     # plt.plot([-20, 20], [0, 0], color='0')
     # for CMfunction in CM_function_AOA7_lst:
     #     plt.scatter(CMfunction.trim_point[0], 0, color='0')

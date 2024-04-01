@@ -51,6 +51,32 @@ def get_cm_cg_corrected(df_data: pd.DataFrame, df_data_tailoff: list, arm_ac_win
 
     return df_data_complete.sort_index()
 
+def get_cm_cg_corrected2(df_data: pd.DataFrame, df_data_tailoff: list, arm_ac_wing: float, arm_ac_ht: float, arm_cg: float, mac_wing: float):
+    """
+    A function to get the pitch model coefficient for all tunnel velocity due to lift and virtually added weight
+    :param df_data: Wind tunnel data
+    :param df_data_tailoff: tail-off data for all tunnel speeds
+    :param arm_ac_wing: chord-wise location aerodynamic centre main wing
+    :param arm_ac_ht: chord-wise location aerodynamic centre horizontal tailplane
+    :param arm_cg: chord-wise location centre of gravity
+    :param mac_wing: reference model weight
+    :return:
+    """
+    df_data_lst = []
+    for i, tunnel_speed in enumerate([10., 20., 40.]):
+        velocity_relevant_data = get_function_set(df_data, {'V': tunnel_speed}, None)
+        df_data_decoupled_lift = get_decoupled_lift(velocity_relevant_data, df_data_tailoff[i], tunnel_speed)
+        df_data_lst.append(df_data_decoupled_lift)
+    df_data_complete = pd.concat(df_data_lst, axis=0)
+
+    # df_data_complete['CM_due_to_lift'] = -(arm_ac_wing / mac_wing) * df_data_complete['CL_wing'] - (arm_ac_ht / mac_wing) * df_data_complete['CL_tail']
+    df_data_complete['CM_0.25c_total'] = arm_cg * df_data_complete['CL_wing'] - (3.22 - arm_cg) * df_data_complete['CL_tail']
+    # df_data_complete['CM_0.25c_total'] = arm_cg * df_data_complete['CL_wing'] + df_data_complete['CM cor'] * (3.22 - arm_cg) / 3.22
+
+    # df_data_complete['CM_due_to_lift'] + (arm_cg / mac_wing) * df_data_complete['CL_total cor'])
+
+    return df_data_complete.sort_index()
+
 
 def get_cm_cg_cor_all_elevator(tailoff_data: list, bal_data: list, arm_ac_w: float, arm_ac_ht: float, arm_cg: float, ref_chord: float):
     """
@@ -63,8 +89,8 @@ def get_cm_cg_cor_all_elevator(tailoff_data: list, bal_data: list, arm_ac_w: flo
     :param ref_chord: reference chord length to non-dimensionalise the moment (eg: MAC of the wing)
     :return: a dataframe consisting of new columns CL_wing, CL_tail, CM due to lift, total CM (the cg corrected one)
     """
-    CM_ref_15 = get_cm_cg_corrected(bal_data[2], tailoff_data, arm_ac_w, arm_ac_ht, arm_cg, ref_chord)
-    CM_ref_min15 = get_cm_cg_corrected(bal_data[0], tailoff_data, arm_ac_w, arm_ac_ht, arm_cg, ref_chord)
-    CM_ref_0 = get_cm_cg_corrected(bal_data[1], tailoff_data, arm_ac_w, arm_ac_ht, arm_cg, ref_chord)
+    CM_ref_15 = get_cm_cg_corrected2(bal_data[2], tailoff_data, arm_ac_w, arm_ac_ht, arm_cg, ref_chord)
+    CM_ref_min15 = get_cm_cg_corrected2(bal_data[0], tailoff_data, arm_ac_w, arm_ac_ht, arm_cg, ref_chord)
+    CM_ref_0 = get_cm_cg_corrected2(bal_data[1], tailoff_data, arm_ac_w, arm_ac_ht, arm_cg, ref_chord)
 
     return pd.concat([CM_ref_min15, CM_ref_0, CM_ref_15], axis=0)
