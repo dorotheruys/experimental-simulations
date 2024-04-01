@@ -8,7 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from General.data_function_maker import get_function_from_dataframe, get_function_set
 from Corrections.Lift_interference import df_velocity_filter_tailoff
-from General.trim_point import get_cm_cg_cor_all_elevator, trim_points_all_aoa
+from General.trim_point import get_cm_cg_cor_all_elevator, trim_points_all_aoa, l_cg, l_ac_w, l_ac_ht, MAC_w
 
 
 # def get_aoa_combis(aoa):
@@ -57,17 +57,18 @@ from General.trim_point import get_cm_cg_cor_all_elevator, trim_points_all_aoa
 #     return dcm_ddeltae_plotting_lst
 
 def get_CLCD_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
-    data_sliced_V40_J18 = get_function_set(data, {'V cor': tunnel_speed}, {'rounded_J': propeller_speed})
+    data_sliced_VJ = get_function_set(data, {'V cor': tunnel_speed}, {'rounded_J': propeller_speed})
 
-    # A list of CL vs delta_e function for each AoA: -5, 7, 12, 14 for 1 V-J combi
-    CL_vs_delta_e_functions = get_function_from_dataframe(data_sliced_V40_J18, 1, 'delta_e', 'CL_total cor', aoa_combis, np.linspace(-20, 20, 200), 'delta_e', 'CL')
-    CD_vs_delta_e_functions = get_function_from_dataframe(data_sliced_V40_J18, 1, 'delta_e', 'CD cor', aoa_combis, np.linspace(-20, 20, 200), 'delta_e', 'CD')
+    # A list of CL vs delta_e function for each AoA: -5, 7, 12, 14 for 1 V-J combi (lists containing 4 functions)
+    CL_vs_delta_e_functions = get_function_from_dataframe(data_sliced_VJ, 1, 'delta_e', 'CL_total cor', aoa_combis, np.linspace(-20, 20, 200), None, None)
+    CD_vs_delta_e_functions = get_function_from_dataframe(data_sliced_VJ, 1, 'delta_e', 'CD cor', aoa_combis, np.linspace(-20, 20, 200), None, None)
 
     # A list of CM vs delta_e functions for each AoA: -5, 7, 12, 14 for 1 V-J combi
-    function_lst = trim_points_all_aoa(data_sliced_V40_J18, [[{'V cor': tunnel_speed}, {'rounded_J': propeller_speed}]])
+    function_lst = trim_points_all_aoa(data_sliced_VJ, [[{'V cor': tunnel_speed}, {'rounded_J': propeller_speed}]])
 
-    # Find the CL trim for each AoA: -5, 7, 12, 14
+    # Find the CL, CD trim for each AoA: -5, 7, 12, 14
     AoA_trim_lst = []
+    delta_e_trim_lst = []
     CL_trim_lst = []
     CD_trim_lst = []
     for i, function in enumerate(function_lst):
@@ -80,8 +81,12 @@ def get_CLCD_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
         CD_trim_AoA = CD_delta_e_function.poly_coeff(delta_e_trim)
 
         AoA_trim_lst.append(function[0].trim_aoa)
+        delta_e_trim_lst.append(function[0].trim_point)
         CL_trim_lst.append(CL_trim_AoA)
-    return
+        CD_trim_lst.append(CD_trim_AoA)
+
+    df_aoa_cl_cd = pd.DataFrame(data=({'AoA': AoA_trim_lst, 'delta_e trim': delta_e_trim_lst, 'rounded_v': [tunnel_speed for i in range(len(AoA_trim_lst))], 'V cor': [tunnel_speed for i in range(len(AoA_trim_lst))], 'rounded_J': [propeller_speed for i in range(len(AoA_trim_lst))], 'CL_total trim': CL_trim_lst, 'CD trim': CD_trim_lst}))
+    return df_aoa_cl_cd
 
 
 tunnel_prop_combi = [[{'V cor': 40}, {'rounded_J': 1.6}],
@@ -95,14 +100,6 @@ used_aoa = [[{'AoA cor': -5}, None],
             [{'AoA cor': 12}, None],
             [{'AoA cor': 14}, None]]
 
-# chord-wise location assumptions
-MAC_w = 0.165       # [m]
-MAC_HT = 0.149      # [m]
-l_ac_w = (0.33 - 0.25) * MAC_w
-l_ac_ht = 3.22 * MAC_w + (0.33 - 0.25) * MAC_HT
-l_cg = (0.35 - 0.25) * MAC_w
-
-# Assumed approach AoA
 
 # Slice the zero deflection array such that the new dataframe contains the same data points
 rows = [0, 12, 17, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 42, 47, 49]
@@ -137,7 +134,19 @@ if __name__ == "__main__":
     # get_function_from_dataframe(data_sliced_V40_J18, 2, 'AoA cor', 'CL_total cor', [[{'V cor': 40}, {'rounded_J': 1.8}]], np.linspace(-10, 20, 100), 'AoA', 'CL')
 
     # CM_function_lst = trim_points_all_aoa(data_sliced_V40_J18, [[{'V cor': 40}, {'rounded_J': 1.8}]])
-    get_CLCD_for_trim(CM_cg_cor, 40, 1.8, used_aoa)
+    # test = get_function_set(CM_cg_cor, {'delta_e': 15}, None)
+
+    trim_VJs_lst = []
+    for combi in tunnel_prop_combi:
+        tunnel_speed_val = combi[0]['V cor']
+        propeller_speed_val = combi[1]['rounded_J']
+
+        df_trim_VJ = get_CLCD_for_trim(CM_cg_cor, tunnel_speed_val, propeller_speed_val, used_aoa)
+        trim_VJs_lst.append(df_trim_VJ)
+
+    df_trim_CL_CD = pd.concat(trim_VJs_lst, axis=0)
+    get_function_from_dataframe(df_trim_CL_CD, 2, 'AoA', 'CL_total trim', tunnel_prop_combi, np.linspace(-10, 20, 100), 'AoA', 'CL')
+    plt.show()
 
     # Get plot for AoA vs CL, for each V & J combination
     get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CL_total cor', tunnel_prop_combi, np.linspace(-10, 20, 100), f'$\\alpha$ [deg]', f'$C_L$ [-]')

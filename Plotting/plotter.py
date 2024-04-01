@@ -79,6 +79,7 @@ class PlotData:
         return ticks
 
     def initiate_plot(self):
+        plt.rcParams.update({'font.size': 25})
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.set_xlabel(self.get_axislabel(self.x_name))
         ax.set_ylabel(self.get_axislabel(self.y_name))
@@ -99,6 +100,8 @@ class PlotData:
 
         for i, function in enumerate(self.data_to_plot):
             function_label = f'V = {function.tunnel_speed} m/s, J = {function.propeller_speed}'
+            test = function.poly_coeff(self.x_range)
+            test2 = self.colors[i]
             ax.plot(self.x_range, function.poly_coeff(self.x_range), '-.', color=self.colors[i], label=function_label)
             ax.scatter(function.data_points[function.x_variable], function.data_points[function.y_variable], color=self.colors[i])
 
