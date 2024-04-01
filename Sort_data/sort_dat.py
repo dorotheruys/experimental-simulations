@@ -29,7 +29,7 @@ names_p = ['run', 'hr', 'min', 'sec', 'AoA', 'AoS', 'dPb', 'pBar', 'temp', 'rpmW
 
 # %%
 # load data with matlab engine
-file = 'Sort_data/BAL.mat'
+file = 'Sort_data/BAL_05neg15.mat'
 file_p = 'Sort_data/PRS_dat.mat'
 
 eng = matlab.engine.start_matlab()
