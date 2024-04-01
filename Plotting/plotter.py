@@ -31,9 +31,9 @@ class PlotData:
         if 'class' in self.data_type:
             self.data_to_plot = self.data
             self.plot_data_class_lst(ax)
-        elif 'list' or 'array' in self.data_type:
+        elif 'list' in self.data_type or 'array' in self.data_type:
             self.data_to_plot = self.data
-            self.plot_lists(ax, self.data_to_plot, ['line'])
+            self.plot_lists(ax, self.data_to_plot, ['line'], self.list_labels)
         elif 'curvefit' in self.data_type:
             self.curve_fit(ax)
 
@@ -106,21 +106,34 @@ class PlotData:
             ax.legend()
         return
 
-    def plot_lists(self, ax, plotting_data, type_lst):
-
+    def plot_lists(self, ax, plotting_data, type_lst, labels_lst):
         if len(plotting_data) == 1:
             ax.plot(self.x_range, plotting_data, color=self.colors[0])
 
         elif len(plotting_data) > 2:
-            for j, i in enumerate(range(0, len(plotting_data), 2)):
-                for one_type in type_lst:
+            i = 0
+            counter = 0
+            if 'line' in type_lst and 'scatter' in type_lst:
+                # for j, i in enumerate(range(0, len(plotting_data), 4)):
+                for j, one_type in enumerate(type_lst):
                     if 'line' in one_type:
                         if self.list_labels is not None:
-                            ax.plot(plotting_data[i], plotting_data[i + 1], color=self.colors[j], label=self.list_labels[j])
+                            ax.plot(plotting_data[i], plotting_data[i + 1], '-.', color=self.colors[counter], label=labels_lst[j])
+                            i += 4
+                            counter += 1
                         else:
-                            ax.plot(plotting_data[i], plotting_data[i + 1], color=self.colors[j])
+                            ax.plot(plotting_data[i], plotting_data[i + 1], '-.', color=self.colors[j])
                     elif 'scatter' in one_type:
-                        ax.scatter(plotting_data[i], plotting_data[i + 1], color=self.colors[j])
+                        ax.scatter(plotting_data[i - 2], plotting_data[i - 1], color=self.colors[counter - 1])
+
+            elif 'scatter' not in type_lst:
+                for j, i in enumerate(range(0, len(plotting_data), 2)):
+                    for one_type in type_lst:
+                        if 'line' in one_type:
+                            if self.list_labels is not None:
+                                ax.plot(plotting_data[i], plotting_data[i + 1], color=self.colors[j], label=labels_lst[j])
+                            else:
+                                ax.plot(plotting_data[i], plotting_data[i + 1], color=self.colors[j])
 
         else:
             print('Please provide x and y list of values.')
@@ -130,32 +143,42 @@ class PlotData:
         return
 
     def curve_fit(self, ax):
-        order = int(input('Please provide order of fit'))
+        order = int(input('Please provide order of fit: '))
         type_lst = []
+        label_lst = []
 
         if len(self.data) == 2:
             polyfit = np.poly1d(np.polyfit(self.data[0], self.data[1], order))
-            self.data_to_plot.append(self.data[0])
-            self.data_to_plot.append(self.data[1])
-            type_lst.append('scatter')
 
+            # Append the polyfit line
             self.data_to_plot.append(self.x_range)
             self.data_to_plot.append(polyfit(self.x_range))
             type_lst.append(['line'])
+            label_lst.append(self.list_labels[0])
+
+            # Append the points
+            self.data_to_plot.append(self.data[0])
+            self.data_to_plot.append(self.data[1])
+            type_lst.append('scatter')
+            label_lst.append(self.list_labels[0])
 
         elif len(self.data) > 2:
-            for j, i in enumerate(range(0, len(self.data_to_plot), 2)):
+            for j, i in enumerate(range(0, len(self.data), 2)):
                 polyfit = np.poly1d(np.polyfit(self.data[i], self.data[i + 1], order))
 
+                # Append the line
+                self.data_to_plot.append(self.x_range)
+                self.data_to_plot.append(polyfit(self.x_range))
+                type_lst.append('line')
+                label_lst.append(self.list_labels[j])
+
+                # Append the points
                 self.data_to_plot.append(self.data[i])
                 self.data_to_plot.append(self.data[i + 1])
                 type_lst.append('scatter')
+                label_lst.append(self.list_labels[j])
 
-                self.data_to_plot.append(self.x_range)
-                self.data_to_plot.append(polyfit(self.x_range))
-                type_lst.append(['line'])
-
-        self.plot_lists(ax, self.data_to_plot, type_lst)
+        self.plot_lists(ax, self.data_to_plot, type_lst, label_lst)
 
         if self.legend:
             ax.legend()

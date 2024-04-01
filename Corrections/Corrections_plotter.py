@@ -1,3 +1,5 @@
+import numpy as np
+
 from Plotting.plotter import PlotData
 from General.Data_sorting import specific_old_file, specific_cor_file
 import matplotlib.pyplot as plt
@@ -97,9 +99,10 @@ def CD_CL(V,J):
     adjustment = 0.1 * max(x_range_array)
 
     # Adjust the range
-    range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
+    # range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
+    range = np.linspace(x_range_array[0] - adjustment, x_range_array[-1] + adjustment, 100)
 
-    PlotData('CD', 'CL', range, [CD_old, CL_old, CD_cor, CL_cor], 'lists', ['Uncorrected', 'Corrected'])
+    PlotData('CD', 'CL', range, [CD_old, CL_old, CD_cor, CL_cor], 'curvefit', ['Uncorrected', 'Corrected'])
     return
 
 J = [1.6, 1.8, 3.5]
