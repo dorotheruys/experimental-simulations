@@ -29,8 +29,6 @@ def specific_cor_file():
         print('WRONG FILE SPECIFIED')
     return df
 
-
-
 # tunnel_velocity = df['rounded_v'] == 40
 # aoa_setting = df['rounded_AoA'] == 7
 # df = df.loc[(tunnel_velocity) & (aoa_setting)].copy()
