@@ -38,13 +38,7 @@ for j = 1:length(inp_DPN)
             grid on
             legend
             xlim([0 13]);
-            if i==7;
-                
-                ylim([0.5e-3 2.5e-3]);
-            else
-                ylim([0 3]);
-            end
-        
+            ylim([0 15]);
             xlabel('Frequency f/RPS [-]');
             ylabel('PSD [-]');
             title(['Mic ',num2str(i)]);

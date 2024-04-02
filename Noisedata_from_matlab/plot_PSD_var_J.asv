@@ -12,7 +12,7 @@ if delta == 0
     elseif V==20
         inp_DPN = [83,95];
     elseif V==10
-        inp_DPN = [96];%[85,96];
+        inp_DPN = [85,96];
     end
 
 elseif delta == -15
@@ -54,17 +54,17 @@ for j = 1:length(inp_DPN)
             subplot(2,2,plot_number), box on, hold on;
             lab=['J = ',num2str(round(opp_dat.opp{1}.J_M1(run),2))];
 
-            %plot(mic_dat.MIC{1}.f{run}/opp_dat.opp{1}.RPS_M1(run),mic_dat.MIC{1}.PXX{run}(:,i),colors(j),'DisplayName',lab);
-            plot(mic_dat.MIC{1}.f{run},mic_dat.MIC{1}.PXX{run}(:,i),colors(j),'DisplayName',lab);
+            plot(mic_dat.MIC{1}.f{run}/opp_dat.opp{1}.RPS_M1(run),mic_dat.MIC{1}.PXX{run}(:,i),colors(j),'DisplayName',lab);
+            %plot(mic_dat.MIC{1}.f{run}/BPF,mic_dat.MIC{1}.PXX{run}(:,i),colors(j),'DisplayName',lab);
             %plot(mic_dat.MIC{1}.f{run}/opp_dat.opp{1}.RPS_M1(run),mic_dat.MIC{1}.PXX{run}(:,7),'DisplayName','Inflow mic');
             grid on
             legend
-            %xlim([0 13]);
+            xlim([0 13]);
             if i==7;
                 
                 ylim([0.5e-3 2.5e-3]);
             else
-                %ylim([0 3]);
+                ylim([0 3]);
             end
             xlabel('Frequency f/RPS [-]');
             ylabel('PSD [-]');

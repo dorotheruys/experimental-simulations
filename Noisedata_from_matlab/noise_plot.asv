@@ -33,17 +33,17 @@ run_number = 17;
 %plot_PSD_var_J(MIC_0,opp_0,0,20)
 %plot_PSD_var_J(MIC_0,opp_0,0,40)
 
-%plot_SPL_var_J(MIC_0,opp_0,0,10)
-%plot_SPL_var_J(MIC_0,opp_0,0,20)
+plot_SPL_var_J(MIC_0,opp_0,0,10)
+plot_SPL_var_J(MIC_0,opp_0,0,20)
 plot_SPL_var_J(MIC_0,opp_0,0,40) 
 
-% plot_SPL_var_J(MIC_15,opp_15,15,10)
-% plot_SPL_var_J(MIC_15,opp_15,15,20)
-% plot_SPL_var_J(MIC_15,opp_15,15,40) 
-% 
-% plot_SPL_var_J(MIC_neg15,opp_neg15,-15,10)
-% plot_SPL_var_J(MIC_neg15,opp_neg15,-15,20)
-% plot_SPL_var_J(MIC_neg15,opp_neg15,-15,40) 
+plot_SPL_var_J(MIC_15,opp_15,15,10)
+plot_SPL_var_J(MIC_15,opp_15,15,20)
+plot_SPL_var_J(MIC_15,opp_15,15,40) 
+
+plot_SPL_var_J(MIC_neg15,opp_neg15,-15,10)
+plot_SPL_var_J(MIC_neg15,opp_neg15,-15,20)
+plot_SPL_var_J(MIC_neg15,opp_neg15,-15,40) 
 
 
 

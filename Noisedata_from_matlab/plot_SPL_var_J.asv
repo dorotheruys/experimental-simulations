@@ -37,7 +37,7 @@ elseif delta == 15
 end
 colors=['r','b','g','m'];
 
-fig=figure('Name','Spectra');
+figure('Name','Spectra')
 
 for j = 1:length(inp_DPN)
     for i=1:7
@@ -55,20 +55,23 @@ for j = 1:length(inp_DPN)
             subplot(2,2,plot_number), box on, hold on;
           
             lab=['J = ',num2str(round(opp_dat.opp{1}.J_M1(run),2))];
-        
             plot(mic_dat.MIC{1}.f{run}/opp_dat.opp{1}.RPS_M1(run),mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
+            %semilogx(mic_dat.MIC{1}.f{run},mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
+            
             %plot(mic_dat.MIC{1}.f{run},mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
             axis tight
+            %xscale log
+            %plot(mic_dat.MIC{1}.f{run},mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
             grid on
             legend
             xlim([0 14]);
             if i==7
-                ylim([40 70]);
+                %ylim([40 70]);
             else
-                ylim([65 115]);
+                %ylim([65 115]);
             end
             %xlabel('Frequency f/RPS[-]');
-            xlabel('Frequency f/RPS [-]');
+            xlabel('Frequency f/RPS [Hz]');
             ylabel('SPL [-]');
             title(['Mic ',num2str(i)]);
             %ylim([0 120]);
@@ -76,5 +79,5 @@ for j = 1:length(inp_DPN)
         end
     end
 end
-fontsize(fig, 22, "points")
+
 end
