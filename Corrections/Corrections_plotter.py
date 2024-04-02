@@ -179,8 +179,8 @@ def J_CT_plot(filename):
         range, old, cor = J_CT(40, angle, filename)
         old_lst.append(old)
         cor_lst.append(cor)
-    PlotData('J', 'CT', range, [old_lst[0][0], old_lst[0][1], cor_lst[0][0], cor_lst[0][1], old_lst[1][0], old_lst[1][1],  cor_lst[1][0], cor_lst[1][1]], 'lists', [ 'Uncorrected J=1.8', 'Corrected J=1.8', 'Uncorrected J=3.5',  'Corrected J=3.5'])
+    PlotData('J', 'CT', range, [old_lst[0][0], old_lst[0][1], cor_lst[0][0], cor_lst[0][1], old_lst[1][0], old_lst[1][1],  cor_lst[1][0], cor_lst[1][1]], 'lists', [ 'Uncorrected AoA=7', 'Corrected AoA=7', 'Uncorrected AoA=12',  'Corrected AoA=12'])
     plt.show()
     return
 
-J_CT_plot(2)
+aoa_CL_plot(2)
