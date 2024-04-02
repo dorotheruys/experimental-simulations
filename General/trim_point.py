@@ -123,9 +123,7 @@ def plot_trim_vs_aoa(CM_data_function_lst):
 # Initialize
 prop_tunnel_combis = [[{'V cor': 40}, {'rounded_J': 1.6}],
                      [{'V cor': 40}, {'rounded_J': 1.8}],
-                     [{'V cor': 40}, {'rounded_J': 3.5}],
-                     [{'V cor': 20}, {'rounded_J': 1.6}],
-                     [{'V cor': 10}, {'rounded_J': 1.6}]]
+                     [{'V cor': 40}, {'rounded_J': 3.5}]]
 
 # chord-wise location assumptions
 MAC_w = 0.165       # [m]
@@ -174,7 +172,7 @@ if __name__ == "__main__":
     plot_trim_vs_aoa(CM_function_lst)
 
     # Plot
-    CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
+    # CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
 
     # plt.plot([-20, 20], [0, 0], color='0')
     # for CMfunction in CM_function_AOA7_lst:

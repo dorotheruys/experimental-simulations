@@ -89,8 +89,8 @@ class PlotData:
         return ticks
 
     def initiate_plot(self):
-        plt.rcParams.update({'font.size': 15})
-        fig, ax = plt.subplots(figsize=(10, 6))
+        plt.rcParams.update({'font.size': 20})
+        fig, ax = plt.subplots(figsize=(8, 6))
         ax.set_xlabel(self.get_axislabel(self.x_name))
         ax.set_ylabel(self.get_axislabel(self.y_name))
 
