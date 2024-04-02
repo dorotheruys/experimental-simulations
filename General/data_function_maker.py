@@ -90,16 +90,11 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
     f_lst = []
 
     for i in range(len(inp_lst)):
-        test1 = inp_lst[i][0]
-        test2 = inp_lst[i][1]
         dat = get_function_set(dataframe, inp_lst[i][0], inp_lst[i][1])
 
         # Use a polynomial data fit with prescribed order
-        testx = dat[x_var_name]
-        testy = dat[y_var_name]
         polyfit = np.polyfit(dat[x_var_name], dat[y_var_name], order, full=True)
         curve_fit = np.poly1d(polyfit[0])
-        # print(f"Residual values for {order} order fit: {polyfit[1]}")
 
         # Create label with V and J
         var1 = round(np.mean(dat['rounded_v']), 3)
