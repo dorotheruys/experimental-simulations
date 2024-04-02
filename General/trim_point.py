@@ -116,7 +116,7 @@ def plot_trim_vs_aoa(CM_data_function_lst):
 
     data = [{'AoA': x, 'delta_e trim': y, 'rounded_v': v_r, 'V cor': v, 'rounded_J': j} for x, y, v_r, v, j in zip(x_lst, y_lst, V_r_lst, V_lst, J_lst)]
     df_trim_vs_aoa = pd.DataFrame(data=data)
-    get_function_from_dataframe(df_trim_vs_aoa, 2, 'AoA', 'delta_e trim', prop_tunnel_combis, np.linspace(-6, 20, 100), f'$\\alpha$ [deg]', f'$\\delta_e$ trim')
+    get_function_from_dataframe(df_trim_vs_aoa, 2, 'AoA', 'delta_e trim', prop_tunnel_combis, np.linspace(-6, 18, 100), f'$\\alpha$ [deg]', f'$\\delta_e$ trim')
     return
 
 

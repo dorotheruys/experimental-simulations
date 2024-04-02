@@ -69,7 +69,7 @@ class PlotData:
 
     def generate_xticks(self, min_val, max_val):
         range_val = max_val - min_val
-        num_ticks = 11
+        num_ticks = 7
 
         # Define the candidate spacings
         spacings = [5, 2.5, 1, 0.5, 0.25]

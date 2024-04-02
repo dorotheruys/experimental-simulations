@@ -82,7 +82,7 @@ if __name__ == "__main__":
     # get_function_from_dataframe(CM_cg_cor_min15, 1, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
     # Plot CM vs AoA for delta = 0
-    # get_function_from_dataframe(CM_cg_cor_0_sliced, 1, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
+    # get_function_from_dataframe(CM_cg_cor_0_sliced, 1, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 18, 100), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
     # Plot CM vs AoA for delta = 15
     # get_function_from_dataframe(CM_cg_cor_15, 1, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
