@@ -54,6 +54,8 @@ class PlotData:
             axislabel = f'J [-]'
         elif 'LD' in name:
             axislabel = f'$C_L$/$C_D$ [-]'
+        elif 'dCm_dDelta_e' in name:
+            axislabel = f'$\\partial C_M/ \\partial \\delta_e$ [-]'
         else:
             axislabel = ''
             print(f'{name} is not in the database. The following options exist: AoA, CL, CD, CM, CT, delta_e. If you want additional ones, ask Dorothé.')

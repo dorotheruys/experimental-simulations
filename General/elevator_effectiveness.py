@@ -40,21 +40,27 @@ from Plotting.plotter import PlotData
 #     return cm_deltae_plotting_lst
 
 
-def get_slope_cm_vs_aoa(df_cm_data, cm_datapoints):
-    # Make an array with all Cm coefficients and polyfit to line to return the slopes aka Cm delta
-    CM_array = np.array(df_cm_data['CMpitch'])
+def get_slope_cm_vs_aoa(df_cm_data_min15, df_cm_data_0, df_cm_data_15):
+    # Make an array with all Cm coefficients
+    CM_array = np.array([df_cm_data_min15['CM_total'], df_cm_data_0['CM_total'], df_cm_data_15['CM_total']])
     delta_e_array = [-15, 0, 15]    # deg
+
+    # Polyfit to line to return the slopes aka Cm delta
     coeff_CM_deltae = np.polyfit(np.transpose(delta_e_array), CM_array, 1)
 
     # Make a dataframe consisting the slopes, AoA, V and K
-    df_cm_data['dCM/ddelta_e'] = pd.DataFrame(data=({'CM_de': coeff_CM[0]}))
+    dCM_ddelta_e_arr = coeff_CM_deltae[0]
 
-    dcm_dataframe = pd.concat([cm_datapoints, cm_slope], axis=1)
+    # Get the corresponding AoA
+    AoA_arr = np.array(df_cm_data_min15['AoA'].to_list())
 
-    # Get plot for AoA versus dCM/d delta_e, for each V & J combination
-    dcm_ddeltae_plotting_lst = get_function_from_dataframe(dcm_dataframe, 2, 'AoA', 'CM_de', tunnel_prop_combi, np.linspace(-6, 20, 26), f'$\\alpha$ [deg]', r'$\frac{\partial C_M}{\partial \delta_e}$ [-]')
+    # Get the corresponding J
+    J_arr = np.array(df_cm_data_min15['rounded_J'].to_list())
 
-    return dcm_ddeltae_plotting_lst
+    # Get the corresponding V
+    V_arr = np.array(df_cm_data_min15['V cor'].to_list())
+
+    return pd.DataFrame(data=({'AoA': AoA_arr, 'AoA cor': AoA_arr, 'V cor': V_arr, 'rounded_J': J_arr, 'dCm_dDelta_e': dCM_ddelta_e_arr}))
 
 def get_CLCD_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
     data_sliced_VJ = get_function_set(data, {'V cor': tunnel_speed}, {'rounded_J': propeller_speed})
@@ -91,6 +97,23 @@ def get_CLCD_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
 
     df_aoa_cl_cd = pd.DataFrame(data=({'AoA': AoA_trim_lst, 'delta_e trim': delta_e_trim_lst, 'rounded_v': [tunnel_speed for i in range(len(AoA_trim_lst))], 'V cor': [tunnel_speed for i in range(len(AoA_trim_lst))], 'rounded_J': [propeller_speed for i in range(len(AoA_trim_lst))], 'CL_total trim': CL_trim_lst, 'CD trim': CD_trim_lst, 'Coeff LD trim': CLCD_trim_lst}))
     return df_aoa_cl_cd
+
+def get_data_for_J(full_data, combi_lst, xname, yname):
+    xy_datapoints = []
+    labels_lst = []
+    for combi in combi_lst:
+        relevant_data = get_function_set(full_data, combi[0], combi[1])
+        xpoints = relevant_data[xname].tolist()
+        ypoints = relevant_data[yname].tolist()
+
+        AoA_rounded = round(np.mean(relevant_data['AoA']))
+        label = f'$\\alpha$ = {AoA_rounded} deg'
+
+        xy_datapoints.append(xpoints)
+        xy_datapoints.append(ypoints)
+        labels_lst.append(label)
+
+    return xy_datapoints, labels_lst
 
 
 tunnel_prop_combi = [[{'V cor': 40}, {'rounded_J': 1.6}],
@@ -129,11 +152,11 @@ if __name__ == "__main__":
     CM_cg_cor_0 = get_function_set(CM_cg_cor, {'delta_e': 0}, None)
     CM_cg_cor_15 = get_function_set(CM_cg_cor, {'delta_e': 15}, None)
 
-    # CM_cg_cor_0_sliced_lst = []
-    # for item in used_aoa:
-    #     CM_cg_cor_0_slice = get_function_set(CM_cg_cor_0, item[0], None)
-    #     CM_cg_cor_0_sliced_lst.append(CM_cg_cor_0_slice)
-    # CM_cg_cor_0_sliced = pd.concat(CM_cg_cor_0_sliced_lst, axis=0)
+    CM_cg_cor_0_sliced_lst = []
+    for item in used_aoa:
+        CM_cg_cor_0_slice = get_function_set(CM_cg_cor_0, item[0], None)
+        CM_cg_cor_0_sliced_lst.append(CM_cg_cor_0_slice)
+    CM_cg_cor_0_sliced = pd.concat(CM_cg_cor_0_sliced_lst, axis=0)
 
 
     # data_sliced_V40_J18 = get_function_set(CM_cg_cor, {'V cor': 40}, {'rounded_J': 1.8})
@@ -154,29 +177,23 @@ if __name__ == "__main__":
 
     df_trim_CL_CD = pd.concat(trim_VJs_lst, axis=0)
 
-    # 1. CL trim vs AoA
+    # 1. Plot CL trim vs AoA
     # get_function_from_dataframe(df_trim_CL_CD, 2, 'AoA', 'CL_total trim', tunnel_prop_combi, np.linspace(-10, 20, 100), 'AoA', 'CL')
 
-    # 2. CD trim vs CL trim
+    # 2. Plot CD trim vs CL trim
     # get_function_from_dataframe(df_trim_CL_CD, 8, 'CL_total trim', 'CD trim', tunnel40_prop_combi, np.linspace(-1, 2, 100), 'AoA', 'CD')
 
-    # 3. CL/CD trim vs J
-
-    CLCD_datapoints = []
-    CLCD_labels_lst = []
-    for aoaVcombi in used_aoa_V:
-        relevant_data = get_function_set(df_trim_CL_CD, aoaVcombi[0], aoaVcombi[1])
-        xpoints = relevant_data['rounded_J'].tolist()
-        ypoints = relevant_data['Coeff LD trim'].tolist()
-
-        AoA_rounded = round(np.mean(relevant_data['AoA']))
-        label = f'$\\alpha$ = {AoA_rounded} deg'
-
-        CLCD_datapoints.append(xpoints)
-        CLCD_datapoints.append(ypoints)
-        CLCD_labels_lst.append(label)
-
+    # 3. Plot CL/CD trim vs J
+    # CLCD_datapoints, CLCD_labels_lst = get_data_for_J(df_trim_CL_CD, used_aoa_V, 'rounded_J', 'Coeff LD trim')
     # PlotData('rounded_J', 'Coeff LD trim', np.linspace(0, 4, 100), CLCD_datapoints, 'curvefit', CLCD_labels_lst)
+
+    # 4. Plot dCM/dDelta_e vs J
+    df_dCM_ddelta_e = get_slope_cm_vs_aoa(CM_cg_cor_min15, CM_cg_cor_0_sliced, CM_cg_cor_15)
+    dCMdDelta_e_data_lst, dCMdDelta_e_label_lst = get_data_for_J(df_dCM_ddelta_e, used_aoa_V, 'rounded_J', 'dCm_dDelta_e')
+    PlotData('rounded_J', 'dCm_dDelta_e', np.linspace(1.5, 4, 100), dCMdDelta_e_data_lst, 'curvefit', dCMdDelta_e_label_lst)
+
+
+
 
     # Get plot for AoA vs CL, for each V & J combination
     # get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CL_total cor', tunnel_prop_combi, np.linspace(-10, 20, 100), f'$\\alpha$ [deg]', f'$C_L$ [-]')
