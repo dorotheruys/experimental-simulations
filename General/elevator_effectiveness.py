@@ -32,7 +32,12 @@ from Plotting.plotter import PlotData
 #     return cm_deltae_plotting_lst
 
 
-def get_slope_cm_vs_aoa(df_cm_data_min15, df_cm_data_0, df_cm_data_15):
+def get_slope_cm_delta(df_cm_data_min15, df_cm_data_0, df_cm_data_15):
+    # sort to make sure the columns have the same order
+    df_cm_data_min15 = df_cm_data_min15.sort_values(by=['rounded_v', 'rounded_J'])
+    df_cm_data_0 = df_cm_data_0.sort_values(by=['rounded_v', 'rounded_J'])
+    df_cm_data_15 = df_cm_data_15.sort_values(by=['rounded_v', 'rounded_J'])
+
     # Make an array with all Cm coefficients
     CM_array = np.array([df_cm_data_min15['CM_total'], df_cm_data_0['CM_total'], df_cm_data_15['CM_total']])
     delta_e_array = [-15, 0, 15]    # deg
@@ -92,7 +97,7 @@ def get_clcd_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
     return df_aoa_cl_cd
 
 
-def get_data_for_j(full_data, combi_lst, xname, yname):
+def get_data_for_j(full_data, combi_lst, xname, yname, legendname):
     xy_datapoints = []
     labels_lst = []
     for c in combi_lst:
@@ -100,8 +105,12 @@ def get_data_for_j(full_data, combi_lst, xname, yname):
         xpoints = relevant_data[xname].tolist()
         ypoints = relevant_data[yname].tolist()
 
-        AoA_rounded = round(np.mean(relevant_data['AoA']))
-        label = f'$\\alpha$ = {AoA_rounded} deg'
+        if 'AoA' in legendname:
+            AoA_rounded = round(np.mean(relevant_data['AoA']))
+            label = f'$\\alpha$ = {AoA_rounded} deg'
+        elif 'delta' in legendname:
+            delta_e_rounded = round(np.mean(relevant_data['delta_e']))
+            label = f'$\\delta_e$ = {delta_e_rounded} deg'
 
         xy_datapoints.append(xpoints)
         xy_datapoints.append(ypoints)
@@ -162,6 +171,7 @@ if __name__ == "__main__":
 
         df_trim_VJ = get_clcd_for_trim(CM_cg_cor, tunnel_speed_val, propeller_speed_val, used_aoa)
         trim_VJs_lst.append(df_trim_VJ)
+
     df_trim_CL_CD = pd.concat(trim_VJs_lst, axis=0)
 
     # 1. Plot CL trim vs AoA
@@ -174,9 +184,13 @@ if __name__ == "__main__":
     # CLCD_datapoints, CLCD_labels_lst = get_data_for_j(df_trim_CL_CD, used_aoa_V, 'rounded_J', 'Coeff LD trim')
     # PlotData('rounded_J', 'Coeff LD trim', np.linspace(0, 4, 100), CLCD_datapoints, 'curvefit', CLCD_labels_lst)
 
-    # 4. Plot dCM/dDelta_e vs J
-    # df_dCM_ddelta_e = get_slope_cm_vs_aoa(CM_cg_cor_min15, CM_cg_cor_0_sliced, CM_cg_cor_15)
-    # dCMdDelta_e_data_lst, dCMdDelta_e_label_lst = get_data_for_j(df_dCM_ddelta_e, used_aoa_V, 'rounded_J', 'dCm_dDelta_e')
+    # 4. Plot CM vs delta_e for AoA = 7
+    df_CM_AoA7 = get_function_set(CM_cg_cor, {'AoA cor': 7}, None)
+    get_function_from_dataframe(df_CM_AoA7, 1, 'delta_e', 'CM_total', tunnel40_prop_combi, np.linspace(-20, 20, 100), 'deltae', 'CM')
+
+    # 5. Plot dCM/dDelta_e vs J
+    # df_dCM_ddelta_e = get_slope_cm_delta(CM_cg_cor_min15, CM_cg_cor_0_sliced, CM_cg_cor_15)
+    # dCMdDelta_e_data_lst, dCMdDelta_e_label_lst = get_data_for_j(df_dCM_ddelta_e, used_aoa_V, 'rounded_J', 'dCm_dDelta_e', 'AoA')
     # PlotData('rounded_J', 'dCm_dDelta_e', np.linspace(1.5, 4, 100), dCMdDelta_e_data_lst, 'curvefit', dCMdDelta_e_label_lst)
 
     plt.show()
