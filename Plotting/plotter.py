@@ -108,8 +108,7 @@ class PlotData:
 
         for i, function in enumerate(self.data_to_plot):
             function_label = f'V = {function.tunnel_speed} m/s, J = {function.propeller_speed}'
-            test = function.poly_coeff(self.x_range)
-            test2 = self.colors[i]
+
             ax.plot(self.x_range, function.poly_coeff(self.x_range), '-.', color=self.colors[i], label=function_label)
             ax.scatter(function.data_points[function.x_variable], function.data_points[function.y_variable], color=self.colors[i])
 
@@ -196,13 +195,13 @@ class PlotData:
                 type_lst.append('scatter')
                 label_lst.append(self.list_labels[j])
 
-        self.plot_lists(ax, self.data_to_plot, type_lst, label_lst)
+        self.plot_lists(fig, ax, self.data_to_plot, type_lst, label_lst, savename)
 
         if self.legend:
             ax.legend()
 
-        fig.tight_layout()
-        plt.savefig(f"../Figures/{savename}.svg")
+        # fig.tight_layout()
+        # plt.savefig(f"../Figures/{savename}.svg")
 
 
 if __name__ == "__main__":
