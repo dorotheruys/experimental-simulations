@@ -137,13 +137,13 @@ l_cg = (0.5 - 0.25)
 
 if __name__ == "__main__":
     # Get the data
-    # data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15.csv')
-    # data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0.csv')
-    # data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15.csv')
-
-    data_corrected_min15 = pd.read_csv('../Sort_data/cor_05data_min15.csv')
+    data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15.csv')
     data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0.csv')
-    data_corrected_15 = pd.read_csv('../Sort_data/cor_05data_15.csv')
+    data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15.csv')
+
+    data05_corrected_min15 = pd.read_csv('../Sort_data/cor_05data_min15.csv')
+    data05_corrected_0 = pd.read_csv('../Sort_data/cor_05data_0.csv')
+    data05_corrected_15 = pd.read_csv('../Sort_data/cor_05data_15.csv')
 
     # Get the tail-off data
     data_tailoff_40 = df_velocity_filter_tailoff(40)
@@ -163,6 +163,8 @@ if __name__ == "__main__":
     # Plot
     CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
 
+    test = pd.concat([data05_corrected_min15, data05_corrected_0, data05_corrected_15], axis=0)
+    get_function_from_dataframe(test, 2, 'delta_e', 'CM cor', prop_tunnel_combis, np.linspace(-20, 20, 100), 'deltae', 'CM')
     # plt.plot([-20, 20], [0, 0], color='0')
     # for CMfunction in CM_function_AOA7_lst:
     #     plt.scatter(CMfunction.trim_point[0], 0, color='0')
