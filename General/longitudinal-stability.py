@@ -43,6 +43,7 @@ def get_slope_cm_aoa(df_cm_data):
 
     return pd.DataFrame(data=({'delta_e': delta_e_arr, 'AoA': AoA_full_arr, 'AoA cor': AoA_full_arr, 'V cor': V_arr, 'rounded_J': J_arr, 'dCm_dAoA': dCM_dAlpha_arr}))
 
+
 tunnel_prop_combi = [[{'V cor': 40}, {'rounded_J': 1.6}],
                      [{'V cor': 40}, {'rounded_J': 1.8}],
                      [{'V cor': 40}, {'rounded_J': 3.5}]]
