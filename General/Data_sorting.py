@@ -17,8 +17,8 @@ def specific_old_file():
         print('WRONG FILE SPECIFIED')
     return df, filename
 
-def specific_cor_file():
-    filename = int(input('Enter elevator deflection for corrected data (1, 2 or 3): '))
+def specific_cor_file(filename):
+    #filename = int(input('Enter elevator deflection for corrected data (1, 2 or 3): '))
     if filename==1:
         df = pd.read_csv('../Sort_data/cor_data_min15.csv')
     elif filename==2:
