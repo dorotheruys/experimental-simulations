@@ -13,8 +13,8 @@ from General.elevator_effectiveness import get_data_for_j
 from Plotting.plotter import PlotData
 
 tunnel_prop_combi_Re = [[{'V cor': 40}, {'rounded_J': 1.6}],
-                     [{'V cor': 20}, {'rounded_J': 1.6}],
-                     [{'V cor': 10}, {'rounded_J': 1.6}]]
+                     [{'V cor': 20}, {'rounded_J': 1.6}]]#,
+                     # [{'V cor': 10}, {'rounded_J': 1.6}]]
 
 used_aoa = [[{'AoA cor': -5}, None],
             [{'AoA cor': 7}, None],
