@@ -183,4 +183,4 @@ def J_CT_plot(filename):
     plt.show()
     return
 
-aoa_CL_plot(2)
+J_CT_plot(2)
