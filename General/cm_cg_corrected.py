@@ -70,8 +70,8 @@ def get_cm_cg_corrected2(df_data: pd.DataFrame, df_data_tailoff: list, arm_ac_wi
     df_data_complete = pd.concat(df_data_lst, axis=0)
 
     # df_data_complete['CM_due_to_lift'] = -(arm_ac_wing / mac_wing) * df_data_complete['CL_wing'] - (arm_ac_ht / mac_wing) * df_data_complete['CL_tail']
-    df_data_complete['CM_0.25c_total'] = arm_cg * df_data_complete['CL_wing'] - (3.22 - arm_cg) * df_data_complete['CL_tail']
-    # df_data_complete['CM_0.25c_total'] = arm_cg * df_data_complete['CL_wing'] + df_data_complete['CM cor'] * (3.22 - arm_cg) / 3.22
+    # df_data_complete['CM_0.25c_total'] = arm_cg * df_data_complete['CL_wing'] - (3.22 - arm_cg) * df_data_complete['CL_tail']
+    df_data_complete['CM_0.25c_total'] = arm_cg * df_data_complete['CL_wing'] + df_data_complete['CM cor'] * (3.22 - arm_cg) / 3.22
 
     # df_data_complete['CM_due_to_lift'] + (arm_cg / mac_wing) * df_data_complete['CL_total cor'])
 

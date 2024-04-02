@@ -137,9 +137,13 @@ l_cg = (0.5 - 0.25)
 
 if __name__ == "__main__":
     # Get the data
-    data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15.csv')
+    # data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15.csv')
+    # data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0.csv')
+    # data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15.csv')
+
+    data_corrected_min15 = pd.read_csv('../Sort_data/cor_05data_min15.csv')
     data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0.csv')
-    data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15.csv')
+    data_corrected_15 = pd.read_csv('../Sort_data/cor_05data_15.csv')
 
     # Get the tail-off data
     data_tailoff_40 = df_velocity_filter_tailoff(40)
