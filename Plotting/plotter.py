@@ -27,15 +27,15 @@ class PlotData:
         self.data_to_plot = []
         self.list_labels = labels_lst
 
-        ax = self.initiate_plot()
+        fig, ax, savename = self.initiate_plot()
         if 'class' in self.data_type:
             self.data_to_plot = self.data
-            self.plot_data_class_lst(ax)
+            self.plot_data_class_lst(fig, ax, savename)
         elif 'list' in self.data_type or 'array' in self.data_type:
             self.data_to_plot = self.data
-            self.plot_lists(ax, self.data_to_plot, ['line'], self.list_labels)
+            self.plot_lists(fig, ax, self.data_to_plot, ['line'], self.list_labels, savename)
         elif 'curvefit' in self.data_type:
-            self.curve_fit(ax)
+            self.curve_fit(fig, ax, savename)
 
     def get_axislabel(self, name):
         if 'AoA' in name:
@@ -52,9 +52,15 @@ class PlotData:
             axislabel = f'$C_T$ [-]'
         elif 'J' in name:
             axislabel = f'J [-]'
+        elif 'L/D' in name:
+            axislabel = f'$C_L$/$C_D$ [-]'
         else:
             axislabel = ''
             print('This label is not in the database. The following options exist: AoA, CL, CD, CM, CT, delta_e. If you want additional ones, ask Dorothé')
+
+        if 'trim' in name:
+            axislabel = f'{axislabel} (trim)'
+
         return axislabel
 
     def generate_xticks(self, min_val, max_val):
@@ -79,10 +85,12 @@ class PlotData:
         return ticks
 
     def initiate_plot(self):
-        # plt.rcParams.update({'font.size': 25})
+        plt.rcParams.update({'font.size': 15})
         fig, ax = plt.subplots(figsize=(10, 6))
         ax.set_xlabel(self.get_axislabel(self.x_name))
         ax.set_ylabel(self.get_axislabel(self.y_name))
+
+        savename = f'{self.x_name}_vs_{self.y_name}-{self.data_type}'
 
         if all(item is None for item in self.xlim):
             self.xlim[0] = self.x_range[0]
@@ -94,9 +102,9 @@ class PlotData:
         if self.grid:
             ax.grid()
 
-        return ax
+        return fig, ax, savename
 
-    def plot_data_class_lst(self, ax):
+    def plot_data_class_lst(self, fig, ax, savename):
 
         for i, function in enumerate(self.data_to_plot):
             function_label = f'V = {function.tunnel_speed} m/s, J = {function.propeller_speed}'
@@ -107,9 +115,13 @@ class PlotData:
 
         if self.legend:
             ax.legend()
+
+        fig.tight_layout()
+        plt.savefig(f"../Figures/{savename}.svg")
+
         return
 
-    def plot_lists(self, ax, plotting_data, type_lst, labels_lst):
+    def plot_lists(self, fig, ax, plotting_data, type_lst, labels_lst, savename):
         if len(plotting_data) == 1:
             ax.plot(self.x_range, plotting_data, color=self.colors[0])
 
@@ -143,9 +155,12 @@ class PlotData:
 
         if self.legend:
             ax.legend()
+
+        fig.tight_layout()
+        plt.savefig(f"../Figures/{savename}.svg")
         return
 
-    def curve_fit(self, ax):
+    def curve_fit(self, fig, ax, savename):
         order = int(input('Please provide order of fit: '))
         type_lst = []
         label_lst = []
@@ -185,6 +200,9 @@ class PlotData:
 
         if self.legend:
             ax.legend()
+
+        fig.tight_layout()
+        plt.savefig(f"../Figures/{savename}.svg")
 
 
 if __name__ == "__main__":

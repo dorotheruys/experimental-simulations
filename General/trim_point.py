@@ -69,7 +69,7 @@ def get_aoa_from_cl(elevator_defl: int, cl_des: float, tunnel_speed: int, propel
 
 def find_trim_points_per_aoa(aoa_data, aoa, order, combis):
     # relevant_set = get_function_set(data, {'AoA': aoa}, None)
-    functionclass_CM_lst = get_function_from_dataframe(aoa_data, order, 'delta_e', 'CM_0.25c_total', combis, np.linspace(-20, 20, 200), None, None)
+    functionclass_CM_lst = get_function_from_dataframe(aoa_data, order, 'delta_e', 'CM_total', combis, np.linspace(-20, 20, 200), None, None)
 
     for CM_function in functionclass_CM_lst:
         roots_x = np.roots(CM_function.poly_coeff.coefficients)
@@ -131,27 +131,40 @@ prop_tunnel_combis = [[{'V cor': 40}, {'rounded_J': 1.6}],
 MAC_w = 0.165       # [m]
 MAC_HT = 0.149      # [m]
 l_ac_w = (0.33 - 0.25) * MAC_w
-l_ac_ht = 3.22 * MAC_w + (0.33 - 0.25) * MAC_HT
+l_ac_ac = 3.22
 l_cg = (0.5 - 0.25)
+
+# Get the data
+
+# Old data
+data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15.csv')
+data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0.csv')
+data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15.csv')
+
+# data_corrected_min15 = pd.read_csv('../Sort_data/cor_05data_min15.csv')
+# data_corrected_0 = pd.read_csv('../Sort_data/cor_05data_0.csv')
+# data_corrected_15 = pd.read_csv('../Sort_data/cor_05data_15.csv')
 
 
 if __name__ == "__main__":
-    # Get the data
-    data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15.csv')
-    data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0.csv')
-    data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15.csv')
+    # # Plot CM vs delta_e per AoA
+    # df_data_complete = pd.concat([data_corrected_min15, data_corrected_0, data_corrected_15], axis=0)
+    #
+    # for one_aoa in [7]:
+    #     # plt.title(f'$\\alpha$ = {aoa} deg')
+    #     data_relevant = get_function_set(df_data_complete, {'AoA': one_aoa}, None)
+    #     get_function_from_dataframe(data_relevant, 1, 'delta_e', 'CM cor', prop_tunnel_combis, np.linspace(-20, 20, 100), 'deltae', 'CM')
+    #
+    # get_function_from_dataframe(data_corrected_0, 2, 'AoA cor', 'CM cor', prop_tunnel_combis, np.linspace(-10, 20, 100), 'AoA', 'CM')
 
-    data05_corrected_min15 = pd.read_csv('../Sort_data/cor_05data_min15.csv')
-    data05_corrected_0 = pd.read_csv('../Sort_data/cor_05data_0.csv')
-    data05_corrected_15 = pd.read_csv('../Sort_data/cor_05data_15.csv')
-
-    # Get the tail-off data
+    ### Other approach stuff
+    # # Get the tail-off data
     data_tailoff_40 = df_velocity_filter_tailoff(40)
     data_tailoff_20 = df_velocity_filter_tailoff(20)
     tail_off_data = [data_tailoff_20, data_tailoff_20, data_tailoff_40]
 
     # Determine the corrected CM for all tunnel velocities
-    CM_cg_cor = get_cm_cg_cor_all_elevator(tail_off_data, [data_corrected_min15, data_corrected_0, data_corrected_15], l_ac_w, l_ac_ht, l_cg, MAC_w)
+    CM_cg_cor = get_cm_cg_cor_all_elevator(tail_off_data, [data_corrected_min15, data_corrected_0, data_corrected_15], l_ac_ac, l_cg)
 
     # Find the trim point for 1 AoA
     CM_cg_cor_relevant = get_function_set(CM_cg_cor, {'AoA': 7}, None)
@@ -161,10 +174,8 @@ if __name__ == "__main__":
     plot_trim_vs_aoa(CM_function_lst)
 
     # Plot
-    CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_0.25c_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
+    CM_cg_cor_function_lst = get_function_from_dataframe(CM_cg_cor_relevant, 1, 'delta_e', 'CM_total', prop_tunnel_combis, np.linspace(-20, 20, 50), f'$\\delta_e$ [deg]', f'$C_M$ [-]')
 
-    test = pd.concat([data05_corrected_min15, data05_corrected_0, data05_corrected_15], axis=0)
-    get_function_from_dataframe(test, 2, 'delta_e', 'CM cor', prop_tunnel_combis, np.linspace(-20, 20, 100), 'deltae', 'CM')
     # plt.plot([-20, 20], [0, 0], color='0')
     # for CMfunction in CM_function_AOA7_lst:
     #     plt.scatter(CMfunction.trim_point[0], 0, color='0')
