@@ -89,7 +89,7 @@ def get_CLCD_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
         CD_trim_lst.append(CD_trim_AoA)
         CLCD_trim_lst.append(CLCD_trim_AoA)
 
-    df_aoa_cl_cd = pd.DataFrame(data=({'AoA': AoA_trim_lst, 'delta_e trim': delta_e_trim_lst, 'rounded_v': [tunnel_speed for i in range(len(AoA_trim_lst))], 'V cor': [tunnel_speed for i in range(len(AoA_trim_lst))], 'rounded_J': [propeller_speed for i in range(len(AoA_trim_lst))], 'CL_total trim': CL_trim_lst, 'CD trim': CD_trim_lst, 'Coeff L/D trim': CLCD_trim_lst}))
+    df_aoa_cl_cd = pd.DataFrame(data=({'AoA': AoA_trim_lst, 'delta_e trim': delta_e_trim_lst, 'rounded_v': [tunnel_speed for i in range(len(AoA_trim_lst))], 'V cor': [tunnel_speed for i in range(len(AoA_trim_lst))], 'rounded_J': [propeller_speed for i in range(len(AoA_trim_lst))], 'CL_total trim': CL_trim_lst, 'CD trim': CD_trim_lst, 'Coeff LD trim': CLCD_trim_lst}))
     return df_aoa_cl_cd
 
 
@@ -155,23 +155,28 @@ if __name__ == "__main__":
     df_trim_CL_CD = pd.concat(trim_VJs_lst, axis=0)
 
     # 1. CL trim vs AoA
-    get_function_from_dataframe(df_trim_CL_CD, 2, 'AoA', 'CL_total trim', tunnel_prop_combi, np.linspace(-10, 20, 100), 'AoA', 'CL')
+    # get_function_from_dataframe(df_trim_CL_CD, 2, 'AoA', 'CL_total trim', tunnel_prop_combi, np.linspace(-10, 20, 100), 'AoA', 'CL')
 
     # 2. CD trim vs CL trim
-    get_function_from_dataframe(df_trim_CL_CD, 2, 'CL_total trim', 'CD trim', tunnel40_prop_combi, np.linspace(-1, 2, 100), 'AoA', 'CD')
+    # get_function_from_dataframe(df_trim_CL_CD, 8, 'CL_total trim', 'CD trim', tunnel40_prop_combi, np.linspace(-1, 2, 100), 'AoA', 'CD')
 
     # 3. CL/CD trim vs J
-    # get_function_from_dataframe(df_trim_CL_CD, 2, 'rounded_J', 'Coeff L/D trim', used_aoa_V, np.linspace(0, 4, 100), 'J', 'CL/CD')
 
+    CLCD_datapoints = []
+    CLCD_labels_lst = []
+    for aoaVcombi in used_aoa_V:
+        relevant_data = get_function_set(df_trim_CL_CD, aoaVcombi[0], aoaVcombi[1])
+        xpoints = relevant_data['rounded_J'].tolist()
+        ypoints = relevant_data['Coeff LD trim'].tolist()
 
+        AoA_rounded = round(np.mean(relevant_data['AoA']))
+        label = f'$\\alpha$ = {AoA_rounded} deg'
 
+        CLCD_datapoints.append(xpoints)
+        CLCD_datapoints.append(ypoints)
+        CLCD_labels_lst.append(label)
 
-
-    # CLCD_datapoints = []
-    # for aoaVcombi in used_aoa_V:
-    #     relevant_data = get_function_set(df_trim_CL_CD, aoaVcombi[0], aoaVcombi[1])
-    #     test=1
-    # PlotData('rounded_J', 'Coeff L/D trim', np.linspace(0, 4, 100), CLCD_datapoints, 'curvefit', CLCD_labels_lst)
+    # PlotData('rounded_J', 'Coeff LD trim', np.linspace(0, 4, 100), CLCD_datapoints, 'curvefit', CLCD_labels_lst)
 
     # Get plot for AoA vs CL, for each V & J combination
     # get_function_from_dataframe(CM_cg_cor_0_sliced, 2, 'AoA cor', 'CL_total cor', tunnel_prop_combi, np.linspace(-10, 20, 100), f'$\\alpha$ [deg]', f'$C_L$ [-]')
