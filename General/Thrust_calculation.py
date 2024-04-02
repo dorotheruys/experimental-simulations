@@ -1,5 +1,5 @@
 import pandas as pd
-from General.Data_sorting import specific_old_file
+from General.Data_sorting import specific_old_file, specific_cor_file
 from General.data_function_maker import *
 from Corrections.Support_tare_correction import *
 import numpy as np
@@ -179,18 +179,19 @@ def CT_corrected(df):
     return df_thrust_correction
 
 def main():
-    df = specific_old_file()
+    cor = False
+    df = specific_cor_file()
     J_lst = [1.6, 1.8, 3.5]
     CT = []
     for J in J_lst:
-        CT.append(Thrust_estimation(J,40,7, df)/J**2)
+        CT.append(Thrust_estimation(float(J),40,7, df, cor))
     CT = np.insert(CT, 2, 0)
     J_lst = [1.6, 1.8, 2.413, 3.5]
     plt.plot(J_lst, CT, label='V=40 m/s, AoA=7, de=0')
     plt.grid()
     plt.legend()
     plt.xlabel('J')
-    plt.ylabel('Uncorrected Tc')
+    plt.ylabel('Corrected CT')
     plt.show()
 
 if __name__ == "__main__":
