@@ -161,7 +161,11 @@ if __name__ == "__main__":
     get_function_from_dataframe(df_trim_CL_CD, 2, 'CL_total trim', 'CD trim', tunnel40_prop_combi, np.linspace(-1, 2, 100), 'AoA', 'CD')
 
     # 3. CL/CD trim vs J
-    get_function_from_dataframe(df_trim_CL_CD, 2, 'rounded_J', 'Coeff L/D trim', used_aoa_V, np.linspace(0, 4, 100), 'J', 'CL/CD')
+    # get_function_from_dataframe(df_trim_CL_CD, 2, 'rounded_J', 'Coeff L/D trim', used_aoa_V, np.linspace(0, 4, 100), 'J', 'CL/CD')
+
+
+
+
 
     # CLCD_datapoints = []
     # for aoaVcombi in used_aoa_V:
