@@ -38,7 +38,9 @@ class PlotData:
             self.curve_fit(fig, ax, savename)
 
     def get_axislabel(self, name):
-        if 'AoA' in name:
+        if 'dCm_dAoA' in name:
+            axislabel = f'$\\partial C_M/ \\partial \\alpha$ [-]'
+        elif 'AoA' in name:
             axislabel = f'$\\alpha$ [deg]'
         elif 'CL' in name:
             axislabel = f'$C_L$ [-]'
