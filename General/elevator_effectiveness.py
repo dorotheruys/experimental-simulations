@@ -48,16 +48,12 @@ def get_slope_cm_delta(df_cm_data_min15, df_cm_data_0, df_cm_data_15):
     # Make a dataframe consisting the slopes, AoA, V and K
     dCM_ddelta_e_arr = coeff_CM_deltae[0]
 
-    # Get the corresponding AoA
+    # Get the corresponding conditions
     AoA_arr = np.array(df_cm_data_min15['AoA'].to_list())
-
-    # Get the corresponding J
     J_arr = np.array(df_cm_data_min15['rounded_J'].to_list())
-
-    # Get the corresponding V
     V_arr = np.array(df_cm_data_min15['V cor'].to_list())
 
-    return pd.DataFrame(data=({'AoA': AoA_arr, 'AoA cor': AoA_arr, 'V cor': V_arr, 'rounded_J': J_arr, 'dCm_dDelta_e': dCM_ddelta_e_arr}))
+    return pd.DataFrame(data=({'AoA': AoA_arr.round(), 'AoA cor': AoA_arr, 'V cor': V_arr, 'rounded_J': J_arr, 'dCm_dDelta_e': dCM_ddelta_e_arr}))
 
 
 def get_clcd_for_trim(data, tunnel_speed, propeller_speed, aoa_combis):
@@ -121,9 +117,7 @@ def get_data_for_j(full_data, combi_lst, xname, yname, legendname):
 
 tunnel_prop_combi = [[{'V cor': 40}, {'rounded_J': 1.6}],
                      [{'V cor': 40}, {'rounded_J': 1.8}],
-                     [{'V cor': 40}, {'rounded_J': 3.5}],
-                     [{'V cor': 20}, {'rounded_J': 1.6}],
-                     [{'V cor': 10}, {'rounded_J': 1.6}]]
+                     [{'V cor': 40}, {'rounded_J': 3.5}]]
 
 tunnel40_prop_combi = [[{'V cor': 40}, {'rounded_J': 1.6}],
                        [{'V cor': 40}, {'rounded_J': 1.8}],
@@ -137,10 +131,6 @@ used_aoa = [[{'AoA cor': -5}, None],
 used_aoa_V = [[{'V cor': 40}, {'AoA': 7}],
               [{'V cor': 40}, {'AoA': 12}],
               [{'V cor': 40}, {'AoA': 14}]]
-
-
-# Slice the zero deflection array such that the new dataframe contains the same data points
-rows = [0, 12, 17, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 42, 47, 49]
 
 if __name__ == "__main__":
     # Get the tail-off data
@@ -174,23 +164,33 @@ if __name__ == "__main__":
 
     df_trim_CL_CD = pd.concat(trim_VJs_lst, axis=0)
 
+    latex_data = df_trim_CL_CD[['AoA', 'rounded_J', 'delta_e trim', 'CL_total trim', 'CD trim', 'Coeff LD trim']].round(2)
+    latex_table = latex_data.to_latex(index=False, float_format="%.2f")
+    with open(f'../Figures/aer-perf-table.tex', 'w') as f:
+        f.write(latex_table)
+
     # 1. Plot CL trim vs AoA
-    # get_function_from_dataframe(df_trim_CL_CD, 2, 'AoA', 'CL_total trim', tunnel_prop_combi, np.linspace(-6, 18, 100), 'AoA', 'CL')
+    get_function_from_dataframe(df_trim_CL_CD, 2, 'AoA', 'CL_total trim', tunnel_prop_combi, np.linspace(-6, 15, 100), 'AoA', 'CL')
 
     # 2. Plot CD trim vs CL trim
-    # get_function_from_dataframe(df_trim_CL_CD, 8, 'CL_total trim', 'CD trim', tunnel40_prop_combi, np.linspace(-1, 2, 100), 'AoA', 'CD')
+    get_function_from_dataframe(df_trim_CL_CD, 8, 'CL_total trim', 'CD trim', tunnel40_prop_combi, np.linspace(-1, 2, 100), 'AoA', 'CD')
 
     # 3. Plot CL/CD trim vs J
     CLCD_datapoints, CLCD_labels_lst = get_data_for_j(df_trim_CL_CD, used_aoa_V, 'rounded_J', 'Coeff LD trim', 'AoA')
     PlotData('rounded_J', 'Coeff LD trim', np.linspace(0, 4.5, 100), CLCD_datapoints, 'curvefit', CLCD_labels_lst)
 
     # 4. Plot CM vs delta_e for AoA = 7
-    # df_CM_AoA7 = get_function_set(CM_cg_cor, {'AoA cor': 14}, None)
-    # get_function_from_dataframe(df_CM_AoA7, 1, 'delta_e', 'CM_total', tunnel40_prop_combi, np.linspace(-16, 20, 100), 'deltae', 'CM')
+    df_CM_AoA7 = get_function_set(CM_cg_cor, {'AoA cor': 14}, None)
+    get_function_from_dataframe(df_CM_AoA7, 1, 'delta_e', 'CM_total', tunnel40_prop_combi, np.linspace(-16, 20, 100), 'deltae', 'CM')
 
     # 5. Plot dCM/dDelta_e vs J
-    # df_dCM_ddelta_e = get_slope_cm_delta(CM_cg_cor_min15, CM_cg_cor_0_sliced, CM_cg_cor_15)
-    # dCMdDelta_e_data_lst, dCMdDelta_e_label_lst = get_data_for_j(df_dCM_ddelta_e, used_aoa_V, 'rounded_J', 'dCm_dDelta_e', 'AoA')
-    # PlotData('rounded_J', 'dCm_dDelta_e', np.linspace(1.5, 4, 100), dCMdDelta_e_data_lst, 'curvefit', dCMdDelta_e_label_lst)
+    df_dCM_ddelta_e = get_slope_cm_delta(CM_cg_cor_min15, CM_cg_cor_0_sliced, CM_cg_cor_15)
+    dCMdDelta_e_data_lst, dCMdDelta_e_label_lst = get_data_for_j(df_dCM_ddelta_e, used_aoa_V, 'rounded_J', 'dCm_dDelta_e', 'AoA')
+    PlotData('rounded_J', 'dCm_dDelta_e', np.linspace(1.5, 4, 100), dCMdDelta_e_data_lst, 'curvefit', dCMdDelta_e_label_lst)
+
+    latex_data = df_dCM_ddelta_e[['AoA', 'V cor', 'rounded_J', 'dCm_dDelta_e']].round(4)
+    latex_table = latex_data.to_latex(index=False, float_format="%.4f")
+    with open(f'../Figures/el-eff-table.tex', 'w') as f:
+        f.write(latex_table)
 
     plt.show()

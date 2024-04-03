@@ -72,7 +72,7 @@ class PlotData:
         num_ticks = 7
 
         # Define the candidate spacings
-        spacings = [5, 2.5, 1, 0.5, 0.25]
+        spacings = [5, 2.5, 1, 0.5, 0.25, 0.3, 3]
 
         for spacing in spacings:
             # Calculate the number of ticks based on the spacing
@@ -120,7 +120,7 @@ class PlotData:
             ax.legend()
 
         fig.tight_layout()
-        plt.savefig(f"../Figures/{savename}.svg")
+        plt.savefig(f"../Figures/new_{savename}.svg")
 
         return
 
@@ -204,18 +204,3 @@ class PlotData:
         if self.legend:
             ax.legend()
 
-        # fig.tight_layout()
-        # plt.savefig(f"../Figures/{savename}.svg")
-
-
-if __name__ == "__main__":
-    n = 40
-    x_axis_range = np.linspace(-10, 20, 100)
-    function1 = np.poly1d([0.5, 5])
-    ylst1 = function1(x_axis_range)
-    function2 = np.poly1d([-0.5, 5])
-    ylst2 = function2(x_axis_range)
-
-    plot = PlotData('AoA', 'CL', x_axis_range, [x_axis_range, ylst1, x_axis_range, ylst2], 'lists', ['labeltest', 'test2'])
-
-    plt.show()

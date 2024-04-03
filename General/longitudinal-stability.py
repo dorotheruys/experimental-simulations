@@ -9,8 +9,6 @@ import matplotlib.pyplot as plt
 from General.data_function_maker import get_function_set
 from Corrections.Lift_interference import df_velocity_filter_tailoff
 from General.trim_point import get_cm_cg_cor_all_elevator, l_cg, l_ac_ac, data_corrected_min15, data_corrected_0, data_corrected_15, get_function_from_dataframe
-from General.elevator_effectiveness import get_data_for_j
-from Plotting.plotter import PlotData
 
 
 def get_slope_cm_aoa(df_cm_data):
@@ -29,16 +27,10 @@ def get_slope_cm_aoa(df_cm_data):
     # Make a dataframe consisting the slopes, AoA, V and K
     dCM_dAlpha_arr = coeff_CM_aoa[0]
 
-    # Get the corresponding delta_e
+    # Get the corresponding conditions
     delta_e_arr = np.array(df_CM_AoA_min5['delta_e'].to_list())
-
-    # Get the full corresponding AoA
     AoA_full_arr = np.array(df_CM_AoA_min5['AoA cor'].to_list())
-
-    # Get the corresponding J
     J_arr = np.array(df_CM_AoA_min5['rounded_J'].to_list())
-
-    # Get the corresponding V
     V_arr = np.array(df_CM_AoA_min5['V cor'].to_list())
 
     return pd.DataFrame(data=({'delta_e': delta_e_arr, 'AoA': AoA_full_arr, 'AoA cor': AoA_full_arr, 'V cor': V_arr, 'rounded_J': J_arr, 'dCm_dAoA': dCM_dAlpha_arr}))
@@ -82,14 +74,18 @@ if __name__ == "__main__":
     # get_function_from_dataframe(CM_cg_cor_min15, 1, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
     # Plot CM vs AoA for delta = 0
-    # get_function_from_dataframe(CM_cg_cor_0_sliced, 1, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 18, 100), f'$\\alpha$ [deg]', f'$C_M$ [-]')
+    get_function_from_dataframe(CM_cg_cor_0_sliced, 1, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 15, 100), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
     # Plot CM vs AoA for delta = 15
     # get_function_from_dataframe(CM_cg_cor_15, 1, 'AoA', 'CMpitch', tunnel_prop_combi, np.linspace(-6, 20, 50), f'$\\alpha$ [deg]', f'$C_M$ [-]')
 
-    # Plot dCmdAlpha vs J
-    # df_dCM_dAoA = get_slope_cm_aoa(CM_cg_cor)
-    # df_dCM_dAoA_lst, df_dCM_dAoA_labels_lst = get_data_for_j(df_dCM_dAoA, used_deltae_V, 'rounded_J', 'dCm_dAoA', 'delta_e')
-    # PlotData('rounded_J', 'dCm_dAoA', np.linspace(1.5, 4, 100), df_dCM_dAoA_lst, 'curvefit', df_dCM_dAoA_labels_lst)
+    # Get dCmdAlpha
+    df_dCM_dAoA = get_slope_cm_aoa(CM_cg_cor_0_sliced)
+
+    # Save to a table
+    latex_data = df_dCM_dAoA[['V cor', 'rounded_J', 'dCm_dAoA']].round(4)
+    latex_table = latex_data.to_latex(index=False, float_format="%.4f")
+    with open(f'../Figures/long-stab-table.tex', 'w') as f:
+        f.write(latex_table)
 
     plt.show()
