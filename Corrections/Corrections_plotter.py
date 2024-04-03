@@ -22,7 +22,6 @@ def aoa_CL(V,J, filename):
     range = np.linspace(-10, 20, 100)
     old = np.vstack((aoa_old, CL_old)).tolist()
     cor = np.vstack((aoa_cor, CL_cor)).tolist()
-    #PlotData('AoA', 'CL', range, [aoa_old, CL_old, aoa_cor, CL_cor], 'curvefit', ['Uncorrected', 'Corrected'])
     return range, old, cor
 
 def aoa_CL_plot(filename):
@@ -54,7 +53,6 @@ def aoa_CD(V,J, filename):
     range = np.linspace(-10, 20, 100)
     old = np.vstack((aoa_old, CD_old)).tolist()
     cor = np.vstack((aoa_cor, CD_cor)).tolist()
-    #PlotData('AoA', 'CD', range, [aoa_old, CD_old, aoa_cor, CD_cor], 'curvefit', ['Uncorrected', 'Corrected'])
     return range, old, cor
 
 def aoa_CD_plot(filename):
@@ -86,7 +84,6 @@ def aoa_CM(V,J, filename):
     range = np.linspace(-10, 20, 100)
     old = np.vstack((aoa_old, CM_old)).tolist()
     cor = np.vstack((aoa_cor, CM_cor)).tolist()
-    #PlotData('AoA', 'CM', range, [aoa_old, CM_old, aoa_cor, CM_cor], 'curvefit', ['Uncorrected', 'Corrected']
     return range, old, cor
 
 def aoa_CM_plot(filename):
@@ -115,21 +112,9 @@ def CL_CD(V,J, filename):
     CL_cor = df_cor['CL cor'].values
     CD_cor = df_cor['CD cor'].values
 
-    x_range_array = CL_old
-
-    adjustment = 0.05 * max(x_range_array)
-
-    # Adjust the range
-    # range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
-    #range = np.linspace(x_range_array[0] - adjustment, x_range_array[-1] + adjustment, 100)
-    # a, b, c = np.polyfit(CL_old, CD_old, deg=2)
-    #
-    # plot_inverse_second_degree_polynomial(a, b, c, x_range_array)
-    # plt.scatter(CD_old,CL_cor)
     range = np.linspace(-0.5, 1.5, 100)
     old = np.vstack((CL_old, CD_old)).tolist()
     cor = np.vstack((CL_cor, CD_cor)).tolist()
-    #PlotData('CL', 'CD', range, [CL_old, CD_old, CL_cor, CD_cor], 'curvefit', ['Uncorrected', 'Corrected'])
     return range, old, cor
 
 def CL_CD_plot(filename):
@@ -158,17 +143,9 @@ def J_CT(V,AoA, filename):
     J_cor = df_cor['rounded_J'].values
     CT_cor = df_cor['CT cor'].values
 
-    # Adjust the range
-    # range = [x_range_array[0] - adjustment] + [x + adjustment / (len(x_range_array) - 2) for x in x_range_array[1:-1]] + [x_range_array[-1] + adjustment]
-    # range = np.linspace(x_range_array[0] - adjustment, x_range_array[-1] + adjustment, 100)
-    # a, b, c = np.polyfit(CL_old, CD_old, deg=2)
-    #
-    # plot_inverse_second_degree_polynomial(a, b, c, x_range_array)
-    # plt.scatter(CD_old,CL_cor)
     range = np.linspace(1.5, 3.6, 100)
     old = np.vstack((J_old, CT_old)).tolist()
     cor = np.vstack((J_cor, CT_cor)).tolist()
-    #PlotData('J', 'CT', range, [J_old, CT_old, J_cor, CT_cor], 'lists', ['Uncorrected', 'Corrected'])
     return range, old, cor
 
 def J_CT_plot(filename):
@@ -179,7 +156,9 @@ def J_CT_plot(filename):
         range, old, cor = J_CT(40, angle, filename)
         old_lst.append(old)
         cor_lst.append(cor)
-    PlotData('J', 'CT', range, [old_lst[0][0], old_lst[0][1], cor_lst[0][0], cor_lst[0][1], old_lst[1][0], old_lst[1][1],  cor_lst[1][0], cor_lst[1][1]], 'lists', [ 'Uncorrected AoA=7', 'Corrected AoA=7', 'Uncorrected AoA=12',  'Corrected AoA=12'])
+    angles = ['Uncorrected AoA=7', 'Corrected AoA=7.31', 'Uncorrected AoA=12', 'Corrected AoA=12.38']
+    angles_with_degrees = [f"{angle}°" for angle in angles]
+    PlotData('J', 'CT', range, [old_lst[0][0], old_lst[0][1], cor_lst[0][0], cor_lst[0][1], old_lst[1][0], old_lst[1][1],  cor_lst[1][0], cor_lst[1][1]], 'lists', angles_with_degrees)
     plt.show()
     return
 

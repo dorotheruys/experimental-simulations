@@ -54,6 +54,7 @@ def slipstream(J,V,AoA, df, cor):
     e_ss = - thrust_coefficient2/(2*np.sqrt(1+2*thrust_coefficient2))*2*Sp/C
     return e_ss
 
+#Function to calculate epsilon for all blockages
 def Full_blockage(df):
     cor = False
     df_blockage_corrections = pd.DataFrame(columns=['V cor', 'q cor', 'CDbcor', 'CMbcor', 'CL cor'])

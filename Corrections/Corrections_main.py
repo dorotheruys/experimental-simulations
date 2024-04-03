@@ -38,7 +38,6 @@ def main():
     bal_sorted_0 = pd.concat([bal_sorted_0, pd.DataFrame({'delta_e': [0] * len(bal_sorted_0)})], axis=1)
     data_corrected_0 = corrections_combined(bal_sorted_0)
     data_corrected_0.to_csv('cor_data_0_V2.csv')
-    print(data_corrected_0)
 
 
 if __name__ == "__main__":
