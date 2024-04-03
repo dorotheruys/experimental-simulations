@@ -3,8 +3,8 @@ import itertools
 import numpy as np
 import pandas as pd
 
-pd.set_option("display.max_rows", None)
-pd.set_option("display.max_columns", None)
+# pd.set_option("display.max_rows", None)
+# pd.set_option("display.max_columns", None)
 
 # Define times for component changes in seconds
 dt_aoa_per_deg = 2
@@ -17,8 +17,8 @@ dt_recalibrate = 15
 dt_decision_point = 5 * 60
 
 use_randomized_testmatrix = True
-generate_excel_sheet = True  # No need to make this true unless you have a good reason
-extended_matrix = False
+generate_excel_sheet = False  # No need to make this true unless you have a good reason
+extended_matrix = True
 extended_short_version = False
 
 if extended_matrix:
@@ -28,7 +28,7 @@ if extended_matrix:
     else:
         AoA_values = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13]  # [deg]
     Elevator_values = [0]  # [deg]
-    Tunnel_velocity_high_speed = [40]  # [m/s]
+    Tunnel_velocity_high_speed = [40,20]  # [m/s]
     Tunnel_velocity_low_speed = []  # [m/s]
     prop_J_values_high_speed = [1.6]  # [rpm]
     prop_J_values_low_speed = []  # [rpm]
@@ -291,8 +291,6 @@ if __name__ == "__main__":
 
     testmatrix_wind_on.reset_index(drop=True, inplace=True)
 
-    print(testmatrix_wind_on)
-
     if extended_matrix:
         # Add time
         testmatrix_wind_on_with_time, total_time_wind_on = get_testmatrix_with_time(testmatrix_wind_on,
@@ -331,4 +329,4 @@ if __name__ == "__main__":
 
         # Add colum with datapoint number
         combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
-        generate_excel(combined_matrices, filename="Testmatrix_V51.xlsx")
+        generate_excel(combined_matrices, filename="../Test_matrices/Testmatrix_extended_actually_used.xlsx")
