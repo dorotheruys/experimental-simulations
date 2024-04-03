@@ -28,7 +28,7 @@ if extended_matrix:
     else:
         AoA_values = [-4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 8, 9, 10, 11, 13]  # [deg]
     Elevator_values = [0]  # [deg]
-    Tunnel_velocity_high_speed = [40]  # [m/s]
+    Tunnel_velocity_high_speed = [40,20]  # [m/s]
     Tunnel_velocity_low_speed = []  # [m/s]
     prop_J_values_high_speed = [1.6]  # [rpm]
     prop_J_values_low_speed = []  # [rpm]
@@ -274,11 +274,11 @@ if __name__ == "__main__":
 
     testmatrix_wind_on = reorder_blocks(testmatrix_wind_on, Elevator_values, Tunnel_velocity_values)
 
-
     # Splitting into three parts based on 'Elevator' values
-    parts = {}
+    parts = {elevator: [] for elevator in Elevator_values}
     for elevator, group in testmatrix_wind_on.groupby('Elevator'):
-        parts[elevator] = group
+        if elevator in parts:
+            parts[elevator] = group
 
     # Moving NaN rows to the end of each part
     for elevator, part in parts.items():
@@ -286,12 +286,10 @@ if __name__ == "__main__":
         non_nan_rows = part.dropna()
         parts[elevator] = pd.concat([non_nan_rows, nan_rows])
 
-    # Concatenating the parts
-    testmatrix_wind_on = pd.concat(parts.values())
+    # Concatenating the parts in the order of Elevator_values
+    testmatrix_wind_on = pd.concat([parts[elevator] for elevator in Elevator_values])
 
     testmatrix_wind_on.reset_index(drop=True, inplace=True)
-
-    print(testmatrix_wind_on)
 
     if extended_matrix:
         # Add time
@@ -331,4 +329,4 @@ if __name__ == "__main__":
 
         # Add colum with datapoint number
         combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
-        generate_excel(combined_matrices, filename="Testmatrix_V51.xlsx")
+        generate_excel(combined_matrices, filename="../Test_matrices/Testmatrix_as_executed.xlsx")

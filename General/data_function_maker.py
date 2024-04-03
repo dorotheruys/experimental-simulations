@@ -108,11 +108,7 @@ def get_function_from_dataframe(dataframe: pd.DataFrame, order: int, x_var_name:
 
     # Plot
     if xlabel is not None and ylabel is not None:
-        # plot_function_data(f_lst, xlabel, ylabel, x_axis_range)
         PlotData(x_var_name, y_var_name, x_axis_range, f_lst, 'class', None)
-    else:
-        # print("The data has not been plotted. Please fill in the correct fields if wanted.")
-        print(" ")
 
     return f_lst
 

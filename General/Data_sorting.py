@@ -20,11 +20,11 @@ def specific_old_file():
 def specific_cor_file(filename):
     #filename = int(input('Enter elevator deflection for corrected data (1, 2 or 3): '))
     if filename==1:
-        df = pd.read_csv('../Sort_data/cor_data_min15.csv')
+        df = pd.read_csv('../Sort_data/cor_data_min15_V2.csv')
     elif filename==2:
-        df = pd.read_csv('../Sort_data/cor_data_0.csv')
+        df = pd.read_csv('../Sort_data/cor_data_0_V2.csv')
     elif filename == 3:
-        df = pd.read_csv('../Sort_data/cor_data_15.csv')
+        df = pd.read_csv('../Sort_data/cor_data_15_V2.csv')
     else:
         print('WRONG FILE SPECIFIED')
     return df
