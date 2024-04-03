@@ -3,8 +3,8 @@ import itertools
 import numpy as np
 import pandas as pd
 
-# pd.set_option("display.max_rows", None)
-# pd.set_option("display.max_columns", None)
+pd.set_option("display.max_rows", None)
+pd.set_option("display.max_columns", None)
 
 # Define times for component changes in seconds
 dt_aoa_per_deg = 2
@@ -17,8 +17,8 @@ dt_recalibrate = 15
 dt_decision_point = 5 * 60
 
 use_randomized_testmatrix = True
-generate_excel_sheet = False  # No need to make this true unless you have a good reason
-extended_matrix = True
+generate_excel_sheet = True  # No need to make this true unless you have a good reason
+extended_matrix = False
 extended_short_version = False
 
 if extended_matrix:
@@ -274,11 +274,11 @@ if __name__ == "__main__":
 
     testmatrix_wind_on = reorder_blocks(testmatrix_wind_on, Elevator_values, Tunnel_velocity_values)
 
-
     # Splitting into three parts based on 'Elevator' values
-    parts = {}
+    parts = {elevator: [] for elevator in Elevator_values}
     for elevator, group in testmatrix_wind_on.groupby('Elevator'):
-        parts[elevator] = group
+        if elevator in parts:
+            parts[elevator] = group
 
     # Moving NaN rows to the end of each part
     for elevator, part in parts.items():
@@ -286,8 +286,8 @@ if __name__ == "__main__":
         non_nan_rows = part.dropna()
         parts[elevator] = pd.concat([non_nan_rows, nan_rows])
 
-    # Concatenating the parts
-    testmatrix_wind_on = pd.concat(parts.values())
+    # Concatenating the parts in the order of Elevator_values
+    testmatrix_wind_on = pd.concat([parts[elevator] for elevator in Elevator_values])
 
     testmatrix_wind_on.reset_index(drop=True, inplace=True)
 
@@ -329,4 +329,4 @@ if __name__ == "__main__":
 
         # Add colum with datapoint number
         combined_matrices.insert(0, 'Datapoint number', combined_matrices.index + 1)
-        generate_excel(combined_matrices, filename="../Test_matrices/Testmatrix_extended_actually_used.xlsx")
+        generate_excel(combined_matrices, filename="../Test_matrices/Testmatrix_as_executed.xlsx")
