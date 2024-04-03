@@ -120,7 +120,7 @@ class PlotData:
             ax.legend()
 
         fig.tight_layout()
-        plt.savefig(f"../Figures/new_{savename}.svg")
+        plt.savefig(f"../Figures/V2_{savename}.svg")
 
         return
 
@@ -160,7 +160,7 @@ class PlotData:
             ax.legend()
 
         fig.tight_layout()
-        plt.savefig(f"../Figures/{savename}.svg")
+        plt.savefig(f"../Figures/V2_{savename}.svg")
         return
 
     def curve_fit(self, fig, ax, savename):

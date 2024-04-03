@@ -62,11 +62,18 @@ def get_function_set(data, var1, var2):
 
     name1 = list(var1.keys())[0]
     # tolerance = max(data[name1] - var1[name1])
-    layer1 = data[(data[name1] <= var1[name1] + 0.7) & (data[name1] >= var1[name1] - 0.7)]
+    if 'AoA' in name1:
+        layer1 = data[(data[name1] <= var1[name1] + 0.45) & (data[name1] >= var1[name1] - 0.45)]
+    else:
+        layer1 = data[(data[name1] <= var1[name1] + 0.7) & (data[name1] >= var1[name1] - 0.7)]
 
     if var2 is not None:
         name2 = list(var2.keys())[0]    # eg: 'rounded_J'
-        layer2 = layer1[(layer1[name2] <= var2[name2] + 0.1) & (layer1[name2] >= var2[name2] - 0.1)]
+
+        if 'AoA' in name2:
+            layer2 = layer1[(layer1[name2] <= var2[name2] + 0.45) & (layer1[name2] >= var2[name2] - 0.45)]
+        else:
+            layer2 = layer1[(layer1[name2] <= var2[name2] + 0.1) & (layer1[name2] >= var2[name2] - 0.1)]
         return layer2.sort_values(by='AoA')
     else:
         return layer1.sort_values(by='AoA')

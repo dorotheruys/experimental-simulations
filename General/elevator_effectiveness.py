@@ -170,23 +170,23 @@ if __name__ == "__main__":
         f.write(latex_table)
 
     # 1. Plot CL trim vs AoA
-    get_function_from_dataframe(df_trim_CL_CD, 2, 'AoA', 'CL_total trim', tunnel_prop_combi, np.linspace(-6, 15, 100), 'AoA', 'CL')
+    # get_function_from_dataframe(df_trim_CL_CD, 2, 'AoA', 'CL_total trim', tunnel_prop_combi, np.linspace(-6, 15, 100), 'AoA', 'CL')
 
     # 2. Plot CD trim vs CL trim
-    get_function_from_dataframe(df_trim_CL_CD, 8, 'CL_total trim', 'CD trim', tunnel40_prop_combi, np.linspace(-1, 2, 100), 'AoA', 'CD')
+    # get_function_from_dataframe(df_trim_CL_CD, 8, 'CL_total trim', 'CD trim', tunnel40_prop_combi, np.linspace(-1, 2, 100), 'AoA', 'CD')
 
     # 3. Plot CL/CD trim vs J
-    CLCD_datapoints, CLCD_labels_lst = get_data_for_j(df_trim_CL_CD, used_aoa_V, 'rounded_J', 'Coeff LD trim', 'AoA')
-    PlotData('rounded_J', 'Coeff LD trim', np.linspace(0, 4.5, 100), CLCD_datapoints, 'curvefit', CLCD_labels_lst)
+    # CLCD_datapoints, CLCD_labels_lst = get_data_for_j(df_trim_CL_CD, used_aoa_V, 'rounded_J', 'Coeff LD trim', 'AoA')
+    # PlotData('rounded_J', 'Coeff LD trim', np.linspace(0, 4.5, 100), CLCD_datapoints, 'curvefit', CLCD_labels_lst)
 
     # 4. Plot CM vs delta_e for AoA = 7
-    df_CM_AoA7 = get_function_set(CM_cg_cor, {'AoA cor': 14}, None)
-    get_function_from_dataframe(df_CM_AoA7, 1, 'delta_e', 'CM_total', tunnel40_prop_combi, np.linspace(-16, 20, 100), 'deltae', 'CM')
+    # df_CM_AoA7 = get_function_set(CM_cg_cor, {'AoA cor': 7}, None)
+    # get_function_from_dataframe(df_CM_AoA7, 1, 'delta_e', 'CM_total', tunnel40_prop_combi, np.linspace(-16, 20, 100), 'deltae', 'CM')
 
     # 5. Plot dCM/dDelta_e vs J
     df_dCM_ddelta_e = get_slope_cm_delta(CM_cg_cor_min15, CM_cg_cor_0_sliced, CM_cg_cor_15)
-    dCMdDelta_e_data_lst, dCMdDelta_e_label_lst = get_data_for_j(df_dCM_ddelta_e, used_aoa_V, 'rounded_J', 'dCm_dDelta_e', 'AoA')
-    PlotData('rounded_J', 'dCm_dDelta_e', np.linspace(1.5, 4, 100), dCMdDelta_e_data_lst, 'curvefit', dCMdDelta_e_label_lst)
+    # dCMdDelta_e_data_lst, dCMdDelta_e_label_lst = get_data_for_j(df_dCM_ddelta_e, used_aoa_V, 'rounded_J', 'dCm_dDelta_e', 'AoA')
+    # PlotData('rounded_J', 'dCm_dDelta_e', np.linspace(1.5, 4, 100), dCMdDelta_e_data_lst, 'curvefit', dCMdDelta_e_label_lst)
 
     latex_data = df_dCM_ddelta_e[['AoA', 'V cor', 'rounded_J', 'dCm_dDelta_e']].round(4)
     latex_table = latex_data.to_latex(index=False, float_format="%.4f")

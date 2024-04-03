@@ -131,9 +131,9 @@ l_ac_ac = 3.22
 l_cg = (0.5 - 0.25)
 
 # Get the data
-data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15.csv')
-data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0.csv')
-data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15.csv')
+data_corrected_min15 = pd.read_csv('../Sort_data/cor_data_min15_V2.csv')
+data_corrected_0 = pd.read_csv('../Sort_data/cor_data_0_V2.csv')
+data_corrected_15 = pd.read_csv('../Sort_data/cor_data_15_V2.csv')
 
 
 if __name__ == "__main__":
