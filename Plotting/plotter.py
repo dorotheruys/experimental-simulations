@@ -60,7 +60,7 @@ class PlotData:
             axislabel = f'$\\partial C_M/ \\partial \\delta_e$ [-]'
         else:
             axislabel = ''
-            print(f'{name} is not in the database. The following options exist: AoA, CL, CD, CM, CT, delta_e. If you want additional ones, ask Dorothé.')
+            print(f'{name} is not in the database. The following options exist: AoA, CL, CD, CM, CT, delta_e. If you want additional ones, ask Dorothe.')
 
         if 'trim' in name:
             axislabel = f'{axislabel} (trim)'
