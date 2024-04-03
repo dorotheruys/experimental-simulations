@@ -1,13 +1,14 @@
 from General.Thrust_calculation import *
 
 def drag_coefficients(J,V,CL_unc,df):
-    prop_setting = df['rounded_J'] == J
-    tunnel_velocity = df['rounded_v'] == V
-    filtered_df = df.loc[(prop_setting) & (tunnel_velocity)].copy()     #Filter the dataframe to find rows with set J and V
+    # prop_setting = df['rounded_J'] == J
+    # tunnel_velocity = df['rounded_v'] == V
+    # filtered_df = df.loc[(prop_setting) & (tunnel_velocity)].copy()     #Filter the dataframe to find rows with set J and V
+    #Find an interpolate relevant lift coefficients
     tunnel_prop_combi = [[{'rounded_v': V}, {'rounded_J': J}]]
     CL_alpha_function = get_function_from_dataframe(df, 2, 'AoA', 'CL_thrust_cor', tunnel_prop_combi,np.linspace(-6, 20, 26),None,None)
     CL_array = CL_alpha_function[0].poly_coeff(np.arange(-5,14.1,1))
-    #CL_array = filtered_df['CL'].values                                 #Find relevant lift coefficients
+
     CD_curve = drag_interpolation(V, df)                                     #Interpolation for drag curve
     unique_aoa = np.arange(-5,14.1,1)#filtered_df['rounded_AoA'].unique()
     CD_array = CD_curve(unique_aoa)                                     #Find drag coefficients as function of aoa
@@ -19,6 +20,7 @@ def drag_coefficients(J,V,CL_unc,df):
 
     linear_indices = 8                                                 #Set indices for linear region
     R_squared = 0                                                       #Temporary value
+    # While loop to find appropriate R value for linear part of CD vs CL^2
     while R_squared < 0.965:
     #Curve fittings for linear and quadratic region
         CDi_coefficients = np.polyfit(CL_squared_array[:linear_indices], CD_positive_array[:linear_indices], deg=1)
@@ -41,6 +43,8 @@ def drag_coefficients(J,V,CL_unc,df):
         CDs = CDs_fitted_curve(CL_unc**2)-CDi-CD0
 
     CD_unc = CD0+CDi+CDs
+
+    #Plotting
     plt.plot(CL_squared_array, CDi_fitted_curve(CL_squared_array))
     plt.plot(CL_squared_array, CDs_fitted_curve(CL_squared_array))
     plt.scatter(CL_squared_array, CD_positive_array)
@@ -49,6 +53,7 @@ def drag_coefficients(J,V,CL_unc,df):
     #plt.show()
     return CD0, CDi, CDs, CD_unc
 
+#Separate drag and thrust coefficients
 def CD_CT(df):
     cor = False
     df_drag_thrust_coefficient = pd.DataFrame(columns=['Drag coefficient', 'Thrust coefficient'])
@@ -71,5 +76,6 @@ def CD_CT(df):
         # Append the temporary DataFrame to the main DataFrame
         df_drag_thrust_coefficient = pd.concat([df_drag_thrust_coefficient, df_temp], ignore_index=True)
     df_drag_thrust_coefficient = pd.concat([df, df_drag_thrust_coefficient], axis=1)
+    #Correct for thrust influence on lift
     df_drag_thrust_coefficient['CL_thrust_cor'] = df_drag_thrust_coefficient['CL_strut_cor'] - df_drag_thrust_coefficient['Thrust coefficient'] * np.sin(df_drag_thrust_coefficient['rounded_AoA']*np.pi/180)
     return df_drag_thrust_coefficient

@@ -110,7 +110,7 @@ def lift_interference(df):
     # S_over_C = 0.2172 / 0.165  # Of main wing  # old
     # Sref = 0.0736284708406532
     # C_tunnel = 2.07
-    S_over_C = 0.03556930958485662  # Based on stuff above
+    S_over_C = 0.05123562777917539  # Based on stuff above
     tau2_wing = 0.1                 #l/B=0.045
     tau2_tail = 0.7                 #l/B=0.3
 

@@ -66,7 +66,7 @@ def Windmilling_dragcoefficients(V, df):
         #Apply difference
         windmilling_df['CD_windmilling'] = windmilling_df['CD_windmilling'] - lst_difference
 
-    #Plotting
+    #Plotting may or may not work
     # J = [1.6, 1.8, V40_guess, 3.5]
     # CD_w = windmilling_df['CD_windmilling'].values
     # if V==40:
@@ -82,19 +82,6 @@ def Windmilling_dragcoefficients(V, df):
     # plt.scatter(J, CD_nowindmill)
     # plt.show()
     return windmilling_df
-
-# df = specific_file()
-#
-# Windmilling_dragcoefficients(40, df)
-
-
-# Vlst = [40,20,10]
-# for V in Vlst:
-#     windmill_df = Windmilling_dragcoefficients(V)
-#     aoa = windmill_df['rounded_AoA'].values
-#     CD_windmill = windmill_df['CD_windmilling'].values
-#     plt.plot(aoa,CD_windmill)
-# plt.show()
 
 def drag_interpolation(V, df):
     #Interpolate windmilling drag coefficient for all angles of attack
@@ -113,14 +100,6 @@ def drag_interpolation(V, df):
     return fitted_curve
 
 def Thrust_estimation(J, V, AoA, df, cor):
-    # Old stuff
-    # tunnel_velocity = df['rounded_v'] == V
-    # prop_setting = df['rounded_J'] == J
-    # aoa_setting = df['rounded_AoA'] == AoA
-    # filtered_df = df.loc[(prop_setting) & (tunnel_velocity)].copy()
-    # tancoef = filtered_df['CD'].values
-    # short_aoa = filtered_df['rounded_AoA'].values
-
     if cor==False:
         # Find windmilling drag coefficients for uncorrected data
         curve = drag_interpolation(V, df)
@@ -143,7 +122,7 @@ def Thrust_estimation(J, V, AoA, df, cor):
     #Calculate thrust coefficient
     thrust_coefficient = -(tancoef - windmilling_drag) / np.cos(AoA * np.pi / 180)
 
-    # Plotting
+    # Plotting may or may not work
     # aoa = np.arange(-5,14.1,1)
     # plt.plot(aoa, curve(aoa), label='Windmill')
     # plt.scatter(short_aoa, tancoef)
@@ -157,6 +136,7 @@ def Thrust_estimation(J, V, AoA, df, cor):
     # plt.plot(aoa,lst_coef, label='thrust coefficient')
     return thrust_coefficient
 
+#Function to calculate the corrected thrust coefficient
 def CT_corrected(df):
     cor = True
     df_thrust_correction = pd.DataFrame(columns=['CT cor'])
@@ -178,6 +158,7 @@ def CT_corrected(df):
     df_thrust_correction = pd.concat([df, df_thrust_correction], axis=1)
     return df_thrust_correction
 
+#Used to inspect certain data
 def main():
     cor = False
     df = specific_cor_file()
