@@ -1,14 +1,11 @@
-%input 3 datasets, tunnel velocity
-
-%manual input v=40, AoA=7, varying J
-function plot_SPL_var_J(mic_dat,opp_dat,delta,V)
-%manual input v=40, AoA=7, varying J, different sets of elevator angle
+function plot_SPL_var_a(mic_dat,opp_dat,delta,V)
+%manual input v=40, j=1.6, different sets of elevator angle
 inp_DPN_neg15=[4,8,13,24];
-inp_DPN_0=[68,71,75,90];
+inp_DPN_0=[67,68,69,70];
 inp_DPN_15=[36,42,46,55];
 if delta == 0
     if V== 40
-        inp_DPN = [68,71,75];
+        inp_DPN = [67,68,69,70];
     elseif V==20
         %inp_DPN = [83,95];
         inp_DPN = [95];
@@ -54,22 +51,22 @@ for j = 1:length(inp_DPN)
             %plot
             subplot(2,2,plot_number), box on, hold on;
           
-            lab=['J = ',num2str(round(opp_dat.opp{1}.J_M1(run),2))];
+            lab=['AoA = ',num2str(round(opp_dat.opp{1}.AoA(run),2))];
         
-            plot(mic_dat.MIC{1}.f{run}/opp_dat.opp{1}.RPS_M1(run),mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
-            %plot(mic_dat.MIC{1}.f{run},mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
+            %plot(mic_dat.MIC{1}.f{run}/opp_dat.opp{1}.RPS_M1(run),mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
+            plot(mic_dat.MIC{1}.f{run},mic_dat.MIC{1}.SPL{run}(:,i),colors(j),'DisplayName',lab);
             axis tight
             grid on
             legend
-            xlim([0 14]);
-            %xscale log
+            %xlim([0 14]);
+            xscale log
             if i==7
-                ylim([40 70]);
+                %ylim([40 70]);
             else
-                ylim([65 115]);
+                %ylim([65 115]);
             end
-            %xlabel('Frequency f [Hz]');
-            xlabel('Frequency f/RPS [-]');
+            xlabel('Frequency f [Hz]');
+            %xlabel('Frequency f/RPS [-]');
             ylabel('SPL [dB]');
             title(['Mic ',num2str(i)]);
             %ylim([0 120]);
